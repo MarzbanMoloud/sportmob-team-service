@@ -9,4 +9,4 @@ RUN apt-get -y update && apt-get -y install curl openssl libssl-dev libcurl4-ope
 
 ADD supervisor /etc/supervisor/conf.d/
 
-WORKDIR /var/www
+WORKDIR /usr/share/nginx

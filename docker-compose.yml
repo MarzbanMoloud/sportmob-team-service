@@ -6,7 +6,7 @@ services:
         build:
             context: ./docker/config/php
         volumes:
-            - .:/var/www
+            - ./api:/usr/share/nginx
         networks:
             es-service-network:
 
@@ -17,7 +17,7 @@ services:
         ports:
             - 8080:80
         volumes:
-            - .:/var/www
+            - ./api:/usr/share/nginx
             - ./docker/config/nginx/default.conf:/etc/nginx/conf.d/default.conf
         networks:
             es-service-network:
