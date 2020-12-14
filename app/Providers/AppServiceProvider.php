@@ -4,11 +4,11 @@
 namespace App\Providers;
 
 
+use App\Services\AWS\BrokerService;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\BrokerInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
 use App\Services\EventStrategy\Interfaces\EventInterface;
-use App\Services\Kafka\KafkaService;
 use Illuminate\Support\ServiceProvider;
 use Sentry\SentrySdk;
 use SportMob\Translation\Client;
@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
 
     	$this->app->singleton(
     	    BrokerInterface::class,
-            KafkaService::class
+            BrokerService::class
         );
 
     	/*------ Event Mediator Strategy ------*/
