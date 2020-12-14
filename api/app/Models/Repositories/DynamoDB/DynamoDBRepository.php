@@ -51,7 +51,7 @@ abstract class DynamoDBRepository
 	 */
 	public function __construct(HubInterface $sentryHub)
 	{
-		$this->dynamoDbClient = app()->make('aws')->createClient('dynamodb');
+		$this->dynamoDbClient = new DynamoDbClient(config('aws.dynamoDb'));
 		$this->sentryHub = $sentryHub;
 		$this->marshaler = new Marshaler();
 		$this->serializer = app('Serializer');

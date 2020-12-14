@@ -46,9 +46,10 @@ interface BrokerInterface
 
     /**
      * @param array $topics
+     * @param int $timeout
      * @return mixed
      */
-    public function consumePureMessage(array $topics);
+    public function consumePureMessage(array $topics, int $timeout);
 
     /**
      * @return mixed

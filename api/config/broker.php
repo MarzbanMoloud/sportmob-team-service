@@ -25,14 +25,19 @@ return [
     'ask' => [
         'service' => [
             'response' => [
-                'topic' => env('BROKER_ASK_SERVICE_RESPONSE_TOPIC', '')
+                'topic' => env('BROKER_ASK_SERVICE_RESPONSE_TOPIC', ''),
+                'queue' => env('BROKER_ASK_SERVICE_RESPONSE_QUEUE', '')
             ],
             'request' => [
-                'topic' => env('BROKER_ASK_SERVICE_REQUEST_TOPIC', '')
+                'topic' => env('BROKER_ASK_SERVICE_REQUEST_TOPIC', ''),
+                'queue' => env('BROKER_ASK_SERVICE_REQUEST_QUEUE', '')
             ]
         ],
         'provider' => [
-            'topic' => env('BROKER_ASK_PROVIDER_TOPIC', '')
+            'topic' => env('BROKER_ASK_PROVIDER_TOPIC', ''),
+            'queue' => env('BROKER_ASK_PROVIDER_QUEUE', '')
         ]
-    ]
+    ],
+    'broker_consume_limit_message' => env('BROKER_CONSUME_LIMIT_MESSAGE', 10),
+    'visibility_timeout_message' => env('VISIBILITY_TIMEOUT_MESSAGE', 20)
 ];
