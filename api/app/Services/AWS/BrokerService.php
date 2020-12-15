@@ -213,9 +213,8 @@ class BrokerService implements BrokerInterface
      * @param int $timeout
      * @return mixed|void
      */
-    private function receiveMessage(string $queueUrl, $timeout=20, $limit=null)
+    private function receiveMessage(string $queueUrl, $timeout=20, $limit=10)
     {
-        $limit = $limit ?: config('broker.broker_consume_limit_message');
         Assert::stringNotEmpty($queueUrl, 'Queue url is required.');
         try {
             if (!$this->checkExistQueue($queueUrl)) {
@@ -225,10 +224,10 @@ class BrokerService implements BrokerInterface
             $result = $this->sqsClient->receiveMessage([
                 'AttributeNames' => ['SentTimestamp'],
                 'MessageAttributeNames' => ['All'],
-                'MaxNumberOfMessages' => $limit,
+                'MaxNumberOfMessages' => $limit, //Valid values: 1 to 10. Default: 1.
                 'QueueUrl' => $queueUrl, // REQUIRED
                 'VisibilityTimeout' => config('broker.visibility_timeout_message', 20), //The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request.
-                'WaitTimeSeconds' => $timeout, //The duration (in seconds) for which the call waits for a message to arrive in the queue before returning.
+                'WaitTimeSeconds' => $timeout, //The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. - Valid values: 0 to 20
             ]);
             $messages = $result->get('Messages');
             $metaData = $result->get('@metadata');
