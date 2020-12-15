@@ -38,6 +38,5 @@ return [
             'queue' => env('BROKER_ASK_PROVIDER_QUEUE', '')
         ]
     ],
-    'broker_consume_limit_message' => env('BROKER_CONSUME_LIMIT_MESSAGE', 10),
     'visibility_timeout_message' => env('VISIBILITY_TIMEOUT_MESSAGE', 20)
 ];
