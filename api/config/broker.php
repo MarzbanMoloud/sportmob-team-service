@@ -22,21 +22,17 @@ return [
         'tournament_name' => env('BROKER_SERVICE_TOURNAMENT_NAME', ''),
         'coach_name' => env('BROKER_SERVICE_COACH_NAME', ''),
     ],
-    'ask' => [
-        'service' => [
-            'response' => [
-                'topic' => env('BROKER_ASK_SERVICE_RESPONSE_TOPIC', ''),
-                'queue' => env('BROKER_ASK_SERVICE_RESPONSE_QUEUE', '')
-            ],
-            'request' => [
-                'topic' => env('BROKER_ASK_SERVICE_REQUEST_TOPIC', ''),
-                'queue' => env('BROKER_ASK_SERVICE_REQUEST_QUEUE', '')
-            ]
-        ],
-        'provider' => [
-            'topic' => env('BROKER_ASK_PROVIDER_TOPIC', ''),
-            'queue' => env('BROKER_ASK_PROVIDER_QUEUE', '')
-        ]
+    'visibility_timeout_message' => env('VISIBILITY_TIMEOUT_MESSAGE', 20),
+    'topics'      => [
+        'event'        => env( 'BROKER_TOPIC_EVENT', 'event_topic' ),
+        'question'     => env( 'BROKER_TOPIC_QUESTION', 'question_topic' ),
+        'answer'       => env( 'BROKER_TOPIC_ANSWER', 'answer_topic' ),
+        'notification' => env( 'BROKER_TOPIC_NOTIFICATION', 'notification_topic' ),
     ],
-    'visibility_timeout_message' => env('VISIBILITY_TIMEOUT_MESSAGE', 20)
+    'queues'      => [
+        'event'        => env( 'BROKER_QUEUE_EVENT', 'service_event_queue' ),
+        'question'     => env( 'BROKER_QUEUE_QUESTION', 'service_question_queue' ),
+        'answer'       => env( 'BROKER_QUEUE_ANSWER', 'service_answer_queue' ),
+        'notification' => env( 'BROKER_QUEUE_NOTIFICATION', 'notification_queue' ),
+    ]
 ];

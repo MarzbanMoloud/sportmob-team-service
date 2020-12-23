@@ -15,7 +15,7 @@ services:
         container_name: es_service_nginx
         image: nginx:latest
         ports:
-            - 8080:80
+            - 8091:80
         volumes:
             - ./api:/usr/share/nginx
             - ./docker/config/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -39,22 +39,6 @@ services:
         ports:
             - 8883:8000
         command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
-        networks:
-            es-service-network:
-
-    #Local AWS cloud service
-    localstack:
-        container_name: es_service_localstack
-        image: localstack/localstack
-        ports:
-            - "4566:4566"
-        environment:
-            - SERVICES=sns , sqs
-            - DATA_DIR=/tmp/localstack/data
-            - DEFAULT_REGION=us-west-2
-            - HOSTNAME_EXTERNAL=localstack
-        volumes:
-            - ./Docker/data/localstack:/tmp/localstack
         networks:
             es-service-network:
 

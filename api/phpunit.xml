@@ -15,11 +15,20 @@
     </filter>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <!--REDIS-->
         <env name="CACHE_DRIVER" value="redis"/>
-        <!--QUEUE-->
         <env name="QUEUE_CONNECTION" value="sync"/>
-        <!--LIMIT-->
-        <env name="ALLOWED_LANGUAGES" value="en,ar,fa"/>
+        <env name="AWS_ACCESS_KEY_ID" value="AKIAYSSRNTNFR7FP3QHH"/>
+        <env name="AWS_SECRET_ACCESS_KEY" value="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"/>
+        <env name="AWS_REGION" value="eu-west-2"/>
+        <env name="AWS_VERSION" value="latest"/>
+        <env name="AWS_ACCOUNT_ID" value="589655022411"/>
+        <env name="BROKER_QUEUE_EVENT" value="es_event_queue"/>
+        <env name="BROKER_QUEUE_QUESTION" value="es_question_queue"/>
+        <env name="BROKER_QUEUE_ANSWER" value="es_answer_queue"/>
+        <env name="BROKER_QUEUE_NOTIFICATION" value="es_notification_queue"/>
+        <env name="BROKER_TOPIC_EVENT" value="es_event_topic"/>
+        <env name="BROKER_TOPIC_QUESTION" value="es_question_topic"/>
+        <env name="BROKER_TOPIC_ANSWER" value="es_answer_topic"/>
+        <env name="BROKER_TOPIC_NOTIFICATION" value="es_notification_topic"/>
     </php>
 </phpunit>

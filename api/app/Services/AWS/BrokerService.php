@@ -132,6 +132,9 @@ class BrokerService implements BrokerInterface
         $messages = [];
         $queueUrl = $queueUrl[0];
         $result = $this->receiveMessage($queueUrl, $timeout);
+        if (!$result) {
+            return $messages;
+        }
         foreach ($result as $message) {
             $messages[] = $message['Body'];
             $this->deleteMessage($queueUrl, $message['ReceiptHandle']);
@@ -187,8 +190,7 @@ class BrokerService implements BrokerInterface
     private function checkExistQueue(string $queueUrl)
     {
         $result = $this->sqsClient->listQueues();
-        $queues = $result->get('QueueUrls');
-
+        $queues = $result->get('QueueUrls')?:[];
         return in_array($queueUrl, $queues);
     }
 
@@ -229,6 +231,9 @@ class BrokerService implements BrokerInterface
                 'VisibilityTimeout' => config('broker.visibility_timeout_message', 20), //The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request.
                 'WaitTimeSeconds' => $timeout, //The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. - Valid values: 0 to 20
             ]);
+            if (!$result) {
+                return [];
+            }
             $messages = $result->get('Messages');
             $metaData = $result->get('@metadata');
 
