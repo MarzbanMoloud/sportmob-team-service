@@ -14,6 +14,7 @@ use Sentry\SentrySdk;
 use SportMob\Translation\Client;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -33,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
     {
     	$this->app->bind('Serializer', function (){
 			$encoders = [ new JsonEncoder()];
-			$normalizers = [new PropertyNormalizer(null, null,  new ReflectionExtractor())];
+            $normalizers = [new PropertyNormalizer(null,null,new ReflectionExtractor()), new DateTimeNormalizer()];
 
 			return new Serializer($normalizers, $encoders);
 		});
