@@ -15,20 +15,12 @@ namespace App\ValueObjects\Broker\Mediator;
  */
 class MessageHeader
 {
-    /**
-     * @var string
-     */
+
     private string $event;
 
-    /**
-     * @var string
-     */
     private string $priority;
 
-    /**
-     * @var string
-     */
-    private string $date;
+    private \DateTimeImmutable $date;
 
     /**
      * MessageHeader constructor.
@@ -36,7 +28,7 @@ class MessageHeader
      * @param $priority
      * @param $date
      */
-    public function __construct(string $event, string $priority, string $date)
+    public function __construct(string $event, string $priority, \DateTimeImmutable $date)
     {
         $this->event = $event;
         $this->priority = $priority;
@@ -60,9 +52,9 @@ class MessageHeader
     }
 
     /**
-     * @return string
+     * @return \DateTimeImmutable
      */
-    public function getDate(): string
+    public function getDate(): \DateTimeImmutable
     {
         return $this->date;
     }
