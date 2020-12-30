@@ -9,62 +9,51 @@
 namespace App\Models\ReadModels\Traits;
 
 
-use Carbon\Carbon;
-
-
 /**
  * Class ReadModelTimestampTrait
  * @package App\Models\ReadModels\Traits
  */
 trait ReadModelTimestampTrait
 {
-    /**
-     * @var string
-     */
-    private string $createdAt;
+
+    private \DateTimeImmutable $createdAt;
+
+    private ?\DateTime $updatedAt = null;
 
     /**
-     * @var string
+     * @return \DateTimeImmutable
      */
-    private ?string $updatedAt = null;
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 
     /**
-     * @return string
+     * @param \DateTimeImmutable $createdAt
+     * @return ReadModelTimestampTrait
      */
-    public function getCreatedAt(): string
-	{
-		return $this->createdAt;
-	}
+    public function setCreatedAt(\DateTimeImmutable $createdAt): ReadModelTimestampTrait
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 
     /**
-     *
+     * @return \DateTime|null
      */
-    public function setCreatedAt()
-	{
-		$this->createdAt = Carbon::now()->toDateTimeString();
-	}
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
 
     /**
-     * @return string
+     * @param \DateTime|null $updatedAt
+     * @return ReadModelTimestampTrait
      */
-    public function getUpdatedAt(): ?string
-	{
-		return $this->updatedAt;
-	}
+    public function setUpdatedAt(?\DateTime $updatedAt): ReadModelTimestampTrait
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
 
-    /**
-     *
-     */
-    public function setUpdatedAt()
-	{
-		$this->updatedAt = Carbon::now()->toDateTimeString();
-	}
-
-    /**
-     *
-     */
-    public function updated()
-	{
-		$this->updatedAt = Carbon::now()->toDateTimeString();
-	}
 }
