@@ -3,7 +3,7 @@
 return [
     'kafka' => [
         'producer' => [
-            'clientId' => env('BROKER_PRODUCER_CLIENT_ID', ''),
+            'clientId' => env('BROKER_PRODUCER_CLIENT_ID', 'team_service'),
             'socketBlockingMaxMs' => env('BROKER_PRODUCER_SOCKET_BLOCKING_MAX_MS', 100),
             'messageTimeoutMs' => env('BROKER_PRODUCER_MESSAGE_TIMEOUT_MS', 300000),
             'pollTimeout' => env('BROKER_PRODUCER_POLL_TIMEOUT', 0)
@@ -16,11 +16,11 @@ return [
     ],
     'host' => env('BROKER_HOST', 'broker:9092'),
     'services' => [
-        'player_name' => env('BROKER_SERVICE_PLAYER_NAME', ''),
-        'team_name' => env('BROKER_SERVICE_TEAM_NAME', ''),
-        'competition_name' => env('BROKER_SERVICE_COMPETITION_NAME', ''),
-        'tournament_name' => env('BROKER_SERVICE_TOURNAMENT_NAME', ''),
-        'coach_name' => env('BROKER_SERVICE_COACH_NAME', ''),
+        'player_name' => env('BROKER_SERVICE_PLAYER_NAME', 'player'),
+        'team_name' => env('BROKER_SERVICE_TEAM_NAME', 'team'),
+        'competition_name' => env('BROKER_SERVICE_COMPETITION_NAME', 'competition'),
+        'tournament_name' => env('BROKER_SERVICE_TOURNAMENT_NAME', 'tournament'),
+        'coach_name' => env('BROKER_SERVICE_COACH_NAME', 'coach'),
     ],
     'visibility_timeout_message' => env('VISIBILITY_TIMEOUT_MESSAGE', 20),
     'topics'      => [

@@ -9,51 +9,51 @@
 namespace App\Models\ReadModels\Traits;
 
 
+use DateTimeImmutable;
+
+
 /**
  * Class ReadModelTimestampTrait
  * @package App\Models\ReadModels\Traits
  */
 trait ReadModelTimestampTrait
 {
-
-    private \DateTimeImmutable $createdAt;
-
-    private ?\DateTime $updatedAt = null;
+    private DateTimeImmutable $createdAt;
+	private ?DateTimeImmutable $updatedAt = null;
 
     /**
      * @return \DateTimeImmutable
      */
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    /**
-     * @param \DateTimeImmutable $createdAt
-     * @return ReadModelTimestampTrait
-     */
-    public function setCreatedAt(\DateTimeImmutable $createdAt): ReadModelTimestampTrait
+	/**
+	 * @param DateTimeImmutable $createdAt
+	 * @return $this
+	 */
+	public function setCreatedAt(DateTimeImmutable $createdAt)
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getUpdatedAt(): ?\DateTime
+	/**
+	 * @return DateTimeImmutable|null
+	 */
+	public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    /**
-     * @param \DateTime|null $updatedAt
-     * @return ReadModelTimestampTrait
-     */
-    public function setUpdatedAt(?\DateTime $updatedAt): ReadModelTimestampTrait
+	/**
+	 * @param DateTimeImmutable|null $updatedAt
+	 * @return $this
+	 */
+	public function setUpdatedAt(?DateTimeImmutable $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         return $this;
     }
-
 }

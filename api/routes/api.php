@@ -11,4 +11,10 @@
 |
 */
 
+$router->group(['prefix' => '/{lang}/teams/transfers', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {
+	$router->get('/team/{team}[/{season}]', ['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);
+	$router->get('/player/{player}', ['as' => 'teams.transfers.player.list', 'uses' => 'TransferController@listByPlayer']);
+	$router->put('/{action}/{user}/{transfer}', ['as' => 'teams.transfers.action', 'uses' => 'TransferController@userActionTransfer']);
+});
+
 

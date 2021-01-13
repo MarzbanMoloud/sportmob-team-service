@@ -11,20 +11,20 @@ namespace App\Utilities;
 class Utility
 {
     /**
-     * @param array $lastEvaluatedKey
+     * @param array $data
      * @return string
      */
-    public static function jsonEncode(array $lastEvaluatedKey): string
+    public static function jsonEncode(array $data): string
     {
-        return base64_encode(json_encode($lastEvaluatedKey));
+        return base64_encode(json_encode($data));
     }
 
     /**
-     * @param string $lastEvaluatedKey
+     * @param string $data
      * @return array
      */
-    public static function jsonDecode(string $lastEvaluatedKey): array
+    public static function jsonDecode(string $data): array
     {
-        return json_decode(base64_decode($lastEvaluatedKey), true);
+        return json_decode(base64_decode($data), true);
     }
 }

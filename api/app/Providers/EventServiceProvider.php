@@ -4,6 +4,12 @@
 namespace App\Providers;
 
 
+use App\Events\Projection\PlayerWasTransferredProjectorEvent;
+use App\Events\Projection\TeamWasCreatedProjectorEvent;
+use App\Events\Projection\TrophyProjectorEvent;
+use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
+use App\Listeners\Projection\TeamCacheListener;
+use App\Listeners\Projection\TrophyProjectorListener;
 use App\Events\Consumer\{BrokerCommandEvent, BrokerMediatorEvent, BrokerQueryEvent};
 use App\Listeners\Consumer\{BrokerCommandListener, BrokerMediatorListener, BrokerQueryListener};
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
@@ -21,6 +27,19 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
+
+		/*----- Team Event Listener -----*/
+		TeamWasCreatedProjectorEvent::class => [
+			TeamCacheListener::class
+		],
+
+		PlayerWasTransferredProjectorEvent::class => [
+			PlayerWasTransferredProjectorListener::class
+		],
+
+		TrophyProjectorEvent::class => [
+			TrophyProjectorListener::class
+		],
 
         /*----- Broker - Mediator -----*/
         BrokerMediatorEvent::class => [

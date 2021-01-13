@@ -82,6 +82,20 @@ class Handler extends ExceptionHandler
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+		if ($exception instanceof ResourceNotFoundException) {
+			return response()->json([
+				'message' => 'Resource not found.',
+				'code' => $exception->getErrorCode()
+			], Response::HTTP_NOT_FOUND);
+		}
+
+		if ($exception instanceof UserActionTransferNotAllow) {
+			return response()->json([
+				'message' => 'Unprocessable_request.',
+				'code' => config('common.error_codes.User_is_not_allowed_to_like')
+			], Response::HTTP_UNPROCESSABLE_ENTITY);
+		}
+
         return parent::render($request, $exception);
     }
 }

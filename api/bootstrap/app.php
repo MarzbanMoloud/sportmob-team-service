@@ -23,9 +23,9 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-if ($app->runningUnitTests()) {
+//if ($app->runningUnitTests()) {
     $app->withFacades();
-}
+//}
 
 /*
 |--------------------------------------------------------------------------

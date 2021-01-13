@@ -22,13 +22,13 @@
         <env name="AWS_REGION" value="eu-west-2"/>
         <env name="AWS_VERSION" value="latest"/>
         <env name="AWS_ACCOUNT_ID" value="589655022411"/>
-        <env name="BROKER_QUEUE_EVENT" value="es_event_queue"/>
-        <env name="BROKER_QUEUE_QUESTION" value="es_question_queue"/>
-        <env name="BROKER_QUEUE_ANSWER" value="es_answer_queue"/>
-        <env name="BROKER_QUEUE_NOTIFICATION" value="es_notification_queue"/>
-        <env name="BROKER_TOPIC_EVENT" value="es_event_topic"/>
-        <env name="BROKER_TOPIC_QUESTION" value="es_question_topic"/>
-        <env name="BROKER_TOPIC_ANSWER" value="es_answer_topic"/>
-        <env name="BROKER_TOPIC_NOTIFICATION" value="es_notification_topic"/>
+        <env name="BROKER_QUEUE_EVENT" value="team_event_queue"/>
+        <env name="BROKER_QUEUE_QUESTION" value="team_question_queue"/>
+        <env name="BROKER_QUEUE_ANSWER" value="team_answer_queue"/>
+        <env name="BROKER_QUEUE_NOTIFICATION" value="team_notification_queue"/>
+        <env name="BROKER_TOPIC_EVENT" value="team_event_topic"/>
+        <env name="BROKER_TOPIC_QUESTION" value="team_question_topic"/>
+        <env name="BROKER_TOPIC_ANSWER" value="team_answer_topic"/>
+        <env name="BROKER_TOPIC_NOTIFICATION" value="team_notification_topic"/>
     </php>
 </phpunit>
