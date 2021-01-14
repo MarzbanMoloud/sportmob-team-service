@@ -11,6 +11,7 @@ use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\BrokerCommandStrategy\PlayerWasTransferredUpdateInfo;
 use App\Services\BrokerInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
+use App\Services\BrokerQueryStrategy\TeamInformation;
 use App\Services\Cache\BrokerMessageCacheService;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
@@ -78,6 +79,7 @@ class AppServiceProvider extends ServiceProvider
 
         /*------ Broker Query Strategy ------*/
         $this->app->tag([
+        	TeamInformation::class
         ], [BrokerQueryEventInterface::TAG_NAME]);
 
         /*------ Services ------*/
