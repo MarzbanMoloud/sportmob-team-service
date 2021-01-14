@@ -119,6 +119,9 @@ class TransferService
 			'playerId'  => $transferDecoded['playerId'],
 			'startDate' => $transferDecoded['startDate']
 		]);
+		if (!$transferItem) {
+			throw new NotFoundHttpException();
+		}
 		if ($action == self::TRANSFER_LIKE) {
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_DISLIKE, $user, $transfer)) {
 				$transferItem->setDislike($transferItem->getDislike() - 1);
@@ -140,6 +143,7 @@ class TransferService
 			throw new ProjectionException('Failed to update transfer.', $exception->getCode());
 		}
 		$this->transferCacheService->putUserActionTransfer($action, $user, $transfer);
+		//TODO:: Remove transfer cache.
 	}
 
 	/**

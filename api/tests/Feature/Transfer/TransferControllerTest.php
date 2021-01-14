@@ -356,6 +356,16 @@ class TransferControllerTest extends TestCase
 		$this->assertEquals(1, $transferItem->getDislike());
 	}
 
+	public function testUserActionTransferWhenItemNotExist()
+	{
+		$result = $this->json('PUT', sprintf('/en/teams/transfers/like/%s/%s',
+			$this->faker->uuid,
+			'eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyIsInN0YXJ0RGF0ZSI6IjIwMjAtMDEtMDFUMDA6MDA6MDArMDA6MDAifQ=='));
+		$result = json_decode($result->response->getContent(), true);
+		$this->assertNotNull($result['message']);
+		$this->assertEquals(config('common.error_codes.resource_not_found'), $result['code']);
+	}
+
 	protected function tearDown(): void
 	{
 		$this->transferCacheServiceInterface->flush();

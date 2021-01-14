@@ -359,5 +359,86 @@ interface TransferControllerInterface
 	 */
 	public function listByPlayer(string $player);
 
+	/**
+	 * @OA\Put(
+	 *     path="/{lang}/teams/transfers/{action}/{user}/{transfer}",
+	 *     tags={"Transfer"},
+	 *     @OA\Parameter(
+	 *          name="action",
+	 *          in="path",
+	 *          required=true,
+	 *          description="action",
+	 *          example="'like' or 'dislike",
+	 *          @OA\Schema(type="string")
+	 *     ),
+	 *     @OA\Parameter(
+	 *          name="user",
+	 *          in="path",
+	 *          required=true,
+	 *          description="userId",
+	 *          example="007f646e-b7f7-334e-963f-2df2153a588e",
+	 *          @OA\Schema(type="string")
+	 *     ),
+	 *     @OA\Parameter(
+	 *          name="transfer",
+	 *          in="path",
+	 *          required=true,
+	 *          description="transferId",
+	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyIsInN0YXJ0RGF0ZSI6IjIwMjAtMDEtMDFUMDA6MDA6MDArMDA6MDAifQ==",
+	 *          @OA\Schema(type="string")
+	 *     ),
+	 *     @OA\Response(
+	 *          response=202,
+	 *          description="When the update is successful",
+	 *          @OA\MediaType(
+	 *             mediaType="application/json",
+	 *             @OA\Schema()
+	 *         )
+	 *     ),
+	 *     @OA\Response(
+	 *          response=422,
+	 *          description="when user is not allowed to like or dislike",
+	 *          @OA\MediaType(
+	 *             mediaType="application/json",
+	 *           @OA\Schema(
+	 *                  type="object",
+	 *                  @OA\Property(
+	 *                      property="message",
+	 *                      type="string",
+	 *                      example="Unprocessable_request."
+	 *                  ),
+	 *                  @OA\Property(
+	 *                      property="code",
+	 *                      type="string",
+	 *                      example="TM-002"
+	 *                  ),
+	 *             )
+	 *         )
+	 *     ),
+	 *     @OA\Response(
+	 *          response=404,
+	 *          description="When Resource not found",
+	 *          @OA\MediaType(
+	 *             mediaType="application/json",
+	 *             @OA\Schema(
+	 *                  type="object",
+	 *                  @OA\Property(
+	 *                      property="message",
+	 *                      type="string",
+	 *                      example="Resource not found."
+	 *                  ),
+	 *                  @OA\Property(
+	 *                      property="code",
+	 *                      type="string",
+	 *                      example="TM-404"
+	 *                  ),
+	 *             )
+	 *         )
+	 *     )
+	 * )
+	 * @param string $action
+	 * @param string $user
+	 * @param string $transfer
+	 */
 	public function userActionTransfer(string $action, string $user, string $transfer);
 }
