@@ -70,14 +70,15 @@ class TrophyRepositoryTest extends TestCase
 		$fakeTrophyModel_two->prePersist();
 		$this->trophyRepository->persist($fakeTrophyModel_two);
 
-		$trophies = $this->trophyRepository->findByCompetition($fakeCompetitionId, $fakeTournamentId, $fakeTeamId);
-		$this->assertCount(1, $trophies);
-		$this->assertNotEquals($fakeTeamId, $trophies[0]->getTeamId());
+		$trophies = $this->trophyRepository->findByCompetition($fakeCompetitionId);
+		$this->assertCount(2, $trophies);
+		$this->assertInstanceOf(Trophy::class, $trophies[0]);
+		$this->assertInstanceOf(Trophy::class, $trophies[1]);
 	}
 
 	public function testFindByCompetitionWhenItemNotExist()
 	{
-		$trophies = $this->trophyRepository->findByCompetition($this->faker->uuid, $this->faker->uuid, $this->faker->uuid);
+		$trophies = $this->trophyRepository->findByCompetition($this->faker->uuid);
 		$this->assertEmpty($trophies);
 	}
 

@@ -13,7 +13,7 @@ interface TransferControllerInterface
 	/**
 	 * @OA\Get(
 	 *     path="/{lang}/teams/transfers/team/{team}/{season}",
-	 *     tags={"Teams"},
+	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="team",
 	 *         in="path",
@@ -197,7 +197,7 @@ interface TransferControllerInterface
 	/**
 	 * @OA\Get(
 	 *     path="/{lang}/teams/transfers/player/{player}",
-	 *     tags={"Teams"},
+	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="player",
 	 *         in="path",

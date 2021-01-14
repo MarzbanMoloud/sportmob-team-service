@@ -17,4 +17,8 @@ $router->group(['prefix' => '/{lang}/teams/transfers', 'namespace' => 'Api', 'mi
 	$router->put('/{action}/{user}/{transfer}', ['as' => 'teams.transfers.action', 'uses' => 'TransferController@userActionTransfer']);
 });
 
+$router->group(['prefix' => '/{lang}/teams/trophies', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {
+	$router->get('/team/{team}', ['as' => 'teams.trophies.by.team', 'uses' => 'TrophyController@trophiesByTeam']);
+	$router->get('/competition/{competition}', ['as' => 'teams.trophies.by.competition', 'uses' => 'TrophyController@trophiesByCompetition']);
+});
 

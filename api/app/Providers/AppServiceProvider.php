@@ -15,8 +15,10 @@ use App\Services\Cache\BrokerMessageCacheService;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
+use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\Services\Cache\TeamCacheService;
 use App\Services\Cache\TransferCacheService;
+use App\Services\Cache\TrophyCacheService;
 use App\Services\EventStrategy\Interfaces\EventInterface;
 use App\Services\EventStrategy\PlayerWasTransferred;
 use App\Services\EventStrategy\TeamBecameRunnerUp;
@@ -97,6 +99,11 @@ class AppServiceProvider extends ServiceProvider
 		$this->app->singleton(
 			TransferCacheServiceInterface::class,
 			TransferCacheService::class
+		);
+
+		$this->app->singleton(
+			TrophyCacheServiceInterface::class,
+			TrophyCacheService::class
 		);
     }
 }

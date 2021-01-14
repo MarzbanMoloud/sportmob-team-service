@@ -93,18 +93,14 @@ class EventStrategyHandleTest extends TestCase
 		 * Read from DB
 		 * @var Trophy $trophy
 		 */
-		$trophies = $this->trophyRepository->findByCompetition(
-			$message->getBody()->getIdentifiers()['competition'],
-			$message->getBody()->getIdentifiers()['tournament'],
-			$message->getBody()->getIdentifiers()['team']
-		);
+		$trophies = $this->trophyRepository->findAll();
 		foreach ($trophies as $trophy) {
 			$this->assertEquals($message->getBody()->getIdentifiers()['team'], $trophy->getTeamId());
-			$this->assertEquals($fakeTeamModel->getName(), $trophy->getTeamName());
+			$this->assertEquals($fakeTeamModel->getName()->getOfficial(), $trophy->getTeamName());
 			$this->assertEquals($message->getBody()->getIdentifiers()['tournament'], $trophy->getTournamentId());
 			$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $trophy->getCompetitionId());
 			$this->assertNull($trophy->getCompetitionName());
-			$this->assertNull($trophy->getTournamentSeason());
+			$this->assertEquals("0", $trophy->getTournamentSeason());
 			$this->assertEquals(Trophy::POSITION_WINNER, $trophy->getPosition());
 			$this->assertNotNull($trophy->getBelongTo());
 		}
@@ -146,14 +142,10 @@ class EventStrategyHandleTest extends TestCase
 		 * Read from DB
 		 * @var Trophy $trophy
 		 */
-		$trophies = $this->trophyRepository->findByCompetition(
-			$message->getBody()->getIdentifiers()['competition'],
-			$message->getBody()->getIdentifiers()['tournament'],
-			$message->getBody()->getIdentifiers()['team']
-		);
+		$trophies = $this->trophyRepository->findAll();
 		foreach ($trophies as $trophy) {
-			$this->assertEquals($message->getBody()->getMetadata()['competitionName'], $trophy->getCompetitionName());
-			$this->assertEquals($message->getBody()->getMetadata()['season'], $trophy->getTournamentSeason());
+			$this->assertEquals($answerMessage->getBody()['competitionName'], $trophy->getCompetitionName());
+			$this->assertEquals($answerMessage->getBody()['season'], $trophy->getTournamentSeason());
 		}
 		/**
 		 * Check broker message cache for trophy info.
@@ -269,18 +261,14 @@ class EventStrategyHandleTest extends TestCase
 		 * Read from DB
 		 * @var Trophy $trophy
 		 */
-		$trophies = $this->trophyRepository->findByCompetition(
-			$message->getBody()->getIdentifiers()['competition'],
-			$message->getBody()->getIdentifiers()['tournament'],
-			$message->getBody()->getIdentifiers()['team']
-		);
+		$trophies = $this->trophyRepository->findAll();
 		foreach ($trophies as $trophy) {
 			$this->assertEquals($message->getBody()->getIdentifiers()['team'], $trophy->getTeamId());
-			$this->assertEquals($fakeTeamModel->getName(), $trophy->getTeamName());
+			$this->assertEquals($fakeTeamModel->getName()->getOfficial(), $trophy->getTeamName());
 			$this->assertEquals($message->getBody()->getIdentifiers()['tournament'], $trophy->getTournamentId());
 			$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $trophy->getCompetitionId());
 			$this->assertNull($trophy->getCompetitionName());
-			$this->assertNull($trophy->getTournamentSeason());
+			$this->assertEquals("0", $trophy->getTournamentSeason());
 			$this->assertEquals(Trophy::POSITION_WINNER, $trophy->getPosition());
 			$this->assertNotNull($trophy->getBelongTo());
 		}
@@ -317,14 +305,10 @@ class EventStrategyHandleTest extends TestCase
 		 * Read from DB
 		 * @var Trophy $trophy
 		 */
-		$trophies = $this->trophyRepository->findByCompetition(
-			$message->getBody()->getIdentifiers()['competition'],
-			$message->getBody()->getIdentifiers()['tournament'],
-			$message->getBody()->getIdentifiers()['team']
-		);
+		$trophies = $this->trophyRepository->findAll();
 		foreach ($trophies as $trophy) {
-			$this->assertNull($message->getBody()->getMetadata()['competitionName'], $trophy->getCompetitionName());
-			$this->assertNull($message->getBody()->getMetadata()['season'], $trophy->getTournamentSeason());
+			$this->assertNull($trophy->getCompetitionName());
+			$this->assertEquals("0", $trophy->getTournamentSeason());
 		}
 	}
 

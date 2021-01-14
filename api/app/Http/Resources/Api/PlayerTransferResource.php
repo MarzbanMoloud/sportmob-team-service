@@ -47,17 +47,17 @@ class PlayerTransferResource extends JsonResource
 					]),
 					'player' => [
 						'id' => $transfer->getPlayerId(),
-						'name' => $transfer->getPlayerName(),
-						'position' => $transfer->getPlayerPosition(),
+						'name' => $this->client->translate($transfer->getPlayerName(), $this->lang),
+						'position' => $this->client->translate($transfer->getPlayerPosition(), $this->lang),
 					],
 					'team' => [
 						'to' => [
 							'id' => $transfer->getToTeamId(),
-							'name' =>$transfer->getToTeamName()
+							'name' => $this->client->translate($transfer->getToTeamName(), $this->lang)
 						],
 						'from' => [
 							'id' => $transfer->getFromTeamId(),
-							'name' => $transfer->getFromTeamName(),
+							'name' => $this->client->translate($transfer->getFromTeamName(), $this->lang),
 						]
 					],
 					'marketValue' => $transfer->getMarketValue(),
@@ -65,7 +65,7 @@ class PlayerTransferResource extends JsonResource
 					'endDate' => (string)$transfer->getEndDate()->getTimestamp(),
 					'announcedDate' => (string)$transfer->getAnnouncedDate()->getTimestamp(),
 					'contractDate' => (string)$transfer->getContractDate()->getTimestamp(),
-					'type' => $transfer->getType(),
+					'type' => $this->client->translate($transfer->getType(), $this->lang),
 					'like' => $transfer->getLike(),
 					'dislike' => $transfer->getDislike(),
 					'season' => $transfer->getSeason()
