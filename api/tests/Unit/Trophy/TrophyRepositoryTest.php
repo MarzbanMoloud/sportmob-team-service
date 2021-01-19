@@ -51,6 +51,67 @@ class TrophyRepositoryTest extends TestCase
 		$this->assertEmpty($trophies);
 	}
 
+	public function testFindByTournamentId()
+	{
+		$fakeCompetitionId = $this->faker->uuid;
+		$fakeTournamentId = '';
+		for ($i = 0; $i < 3; $i++) {
+			$fakeTrophyModel = $this->createTrophyModel()
+				->setCompetitionId($fakeCompetitionId);
+			if ($i == 2) {
+				$fakeTournamentId = $fakeTrophyModel->getTournamentId();
+			}
+			$fakeTrophyModel->prePersist();
+			$this->trophyRepository->persist($fakeTrophyModel);
+		}
+		$trophies = $this->trophyRepository->findByTournamentId($fakeTournamentId);
+		$this->assertInstanceOf(Trophy::class, $trophies[0]);
+	}
+
+	public function testFindByTournamentIdWhenItemNotExist()
+	{
+		$trophies = $this->trophyRepository->findByTournamentId($this->faker->uuid);
+		$this->assertEmpty($trophies);
+	}
+
+	public function testFindExcludesByCompetitionTournament()
+	{
+		$fakeCompetitionId = $this->faker->uuid;
+		$fakeTournamentId = $this->faker->uuid;
+		/**
+		 * First team.
+		 */
+		$fakeTrophyModel_first = $this->createTrophyModel()
+			->setTournamentId($fakeTournamentId)
+			->setCompetitionId($fakeCompetitionId);
+		$fakeTrophyModel_first->prePersist();
+		$this->trophyRepository->persist($fakeTrophyModel_first);
+
+		/**
+		 * Second team.
+		 */
+		$fakeTrophyModel_second = $this->createTrophyModel()
+			->setTournamentId($fakeTournamentId)
+			->setCompetitionId($fakeCompetitionId);
+		$fakeTrophyModel_second->prePersist();
+		$this->trophyRepository->persist($fakeTrophyModel_second);
+
+		$trophies = $this->trophyRepository->findExcludesByCompetitionTournament(
+			$fakeCompetitionId,
+			$fakeTournamentId,
+			$fakeTrophyModel_second->getTeamId()
+		);
+		$this->assertInstanceOf(Trophy::class, $trophies[0]);
+		$this->assertEquals($trophies[0]->getTeamId(), $fakeTrophyModel_first->getTeamId());
+		$this->assertEquals($trophies[0]->getTeamName(), $fakeTrophyModel_first->getTeamName());
+	}
+
+	public function testFindExcludesByCompetitionTournamentWhenItemNotExist()
+	{
+		$trophies = $this->trophyRepository->findExcludesByCompetitionTournament($this->faker->uuid, $this->faker->uuid, $this->faker->uuid);
+		$this->assertEmpty($trophies);
+	}
+
 	public function testFindByCompetition()
 	{
 		$fakeCompetitionId = $this->faker->uuid;

@@ -1,0 +1,236 @@
+<?php
+
+
+namespace App\Models\ReadModels;
+
+
+use App\Models\ReadModels\Embedded\TeamName;
+use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface;
+use DateTime;
+
+
+/**
+ * Class TeamsMatch
+ * @package App\Models\ReadModels
+ */
+class TeamsMatch implements DynamoDBRepositoryModelInterface
+{
+	const EVALUATION_DRAW = 'draw';
+	const EVALUATION_LOSS = 'loss';
+	const EVALUATION_WIN = 'win';
+	const STATUS_FINISHED = 'finished';
+	const STATUS_UPCOMING = 'upcoming';
+	const STATUS_UNKNOWN = 'unknown';
+
+	private string $matchId;
+	private string $teamId;
+	private TeamName $teamName;
+	private string $opponentId;
+	private TeamName $opponentName;
+	private bool $isHome;
+	private ?string $evaluation = null;
+	private string $sortKey;
+	private string $status;
+	private array $result = [];
+
+	/**
+	 * @return string
+	 */
+	public function getMatchId(): string
+	{
+		return $this->matchId;
+	}
+
+	/**
+	 * @param string $matchId
+	 * @return TeamsMatch
+	 */
+	public function setMatchId(string $matchId): TeamsMatch
+	{
+		$this->matchId = $matchId;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTeamId(): string
+	{
+		return $this->teamId;
+	}
+
+	/**
+	 * @param string $teamId
+	 * @return TeamsMatch
+	 */
+	public function setTeamId(string $teamId): TeamsMatch
+	{
+		$this->teamId = $teamId;
+		return $this;
+	}
+
+	/**
+	 * @return TeamName
+	 */
+	public function getTeamName(): TeamName
+	{
+		return $this->teamName;
+	}
+
+	/**
+	 * @param TeamName $teamName
+	 * @return TeamsMatch
+	 */
+	public function setTeamName(TeamName $teamName): TeamsMatch
+	{
+		$this->teamName = $teamName;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isHome(): bool
+	{
+		return $this->isHome;
+	}
+
+	/**
+	 * @param bool $isHome
+	 * @return TeamsMatch
+	 */
+	public function setIsHome(bool $isHome): TeamsMatch
+	{
+		$this->isHome = $isHome;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getOpponentId(): string
+	{
+		return $this->opponentId;
+	}
+
+	/**
+	 * @param string $opponentId
+	 * @return TeamsMatch
+	 */
+	public function setOpponentId(string $opponentId): TeamsMatch
+	{
+		$this->opponentId = $opponentId;
+		return $this;
+	}
+
+	/**
+	 * @return TeamName
+	 */
+	public function getOpponentName(): TeamName
+	{
+		return $this->opponentName;
+	}
+
+	/**
+	 * @param TeamName $opponentName
+	 * @return TeamsMatch
+	 */
+	public function setOpponentName(TeamName $opponentName): TeamsMatch
+	{
+		$this->opponentName = $opponentName;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getEvaluation(): ?string
+	{
+		return $this->evaluation;
+	}
+
+	/**
+	 * @param string|null $evaluation
+	 * @return TeamsMatch
+	 */
+	public function setEvaluation(?string $evaluation): TeamsMatch
+	{
+		$this->evaluation = $evaluation;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSortKey(): string
+	{
+		return $this->sortKey;
+	}
+
+	/**
+	 * @param string $sortKey
+	 * @return TeamsMatch
+	 */
+	public function setSortKey(string $sortKey): TeamsMatch
+	{
+		$this->sortKey = $sortKey;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStatus(): string
+	{
+		return $this->status;
+	}
+
+	/**
+	 * @param string $status
+	 * @return TeamsMatch
+	 */
+	public function setStatus(string $status): TeamsMatch
+	{
+		$this->status = $status;
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getResult(): array
+	{
+		return $this->result;
+	}
+
+	/**
+	 * @param array $result
+	 * @return TeamsMatch
+	 */
+	public function setResult(array $result): TeamsMatch
+	{
+		$this->result = $result;
+		return $this;
+	}
+
+	/**
+	 * @param DateTime $matchDate
+	 * @param string $status
+	 * @return string
+	 */
+	public static function generateSortKey(DateTime $matchDate, string $status): string
+	{
+		return sprintf('%s#%s', $status, $matchDate->format('Y-m-d H:i:s'));
+	}
+
+	/**
+	 * @param string $sortKey
+	 * @return DateTime
+	 * @throws \Exception
+	 */
+	public static function getMatchDate(string $sortKey): DateTime
+	{
+		$matchDate = explode('#', $sortKey)[1];
+		return (new DateTime($matchDate));
+	}
+}

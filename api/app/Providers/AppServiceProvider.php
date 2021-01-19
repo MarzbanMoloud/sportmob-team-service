@@ -21,6 +21,8 @@ use App\Services\Cache\TeamCacheService;
 use App\Services\Cache\TransferCacheService;
 use App\Services\Cache\TrophyCacheService;
 use App\Services\EventStrategy\Interfaces\EventInterface;
+use App\Services\EventStrategy\MatchFinished;
+use App\Services\EventStrategy\MatchWasCreated;
 use App\Services\EventStrategy\PlayerWasTransferred;
 use App\Services\EventStrategy\TeamBecameRunnerUp;
 use App\Services\EventStrategy\TeamBecameWinner;
@@ -69,7 +71,9 @@ class AppServiceProvider extends ServiceProvider
         	TeamWasCreated::class,
 			PlayerWasTransferred::class,
 			TeamBecameRunnerUp::class,
-			TeamBecameWinner::class
+			TeamBecameWinner::class,
+			MatchWasCreated::class,
+			MatchFinished::class
         ], [EventInterface::TAG_NAME]);
 
         /*------ Broker Command Strategy ------*/

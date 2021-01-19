@@ -24,5 +24,5 @@ interface TeamCacheServiceInterface
 	 * @param string $teamId
 	 * @return Team
 	 */
-	public function getTeam(string $teamId): Team;
+	public function getTeam(string $teamId): ?Team;
 }

@@ -35,7 +35,7 @@ class TeamCacheService extends CacheService implements TeamCacheServiceInterface
 	 * @param string $teamId
 	 * @return Team
 	 */
-	public function getTeam(string $teamId): Team
+	public function getTeam(string $teamId): ?Team
 	{
 		return $this->get(self::getTeamKey($teamId));
 	}

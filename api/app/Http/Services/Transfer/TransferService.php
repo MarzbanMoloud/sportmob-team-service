@@ -143,7 +143,7 @@ class TransferService
 			throw new ProjectionException('Failed to update transfer.', $exception->getCode());
 		}
 		$this->transferCacheService->putUserActionTransfer($action, $user, $transfer);
-		//TODO:: Remove transfer cache.
+		$this->transferCacheService->forget('transfer*');
 	}
 
 	/**
