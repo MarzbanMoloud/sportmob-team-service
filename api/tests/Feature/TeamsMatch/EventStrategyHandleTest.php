@@ -9,6 +9,7 @@ use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Services\EventStrategy\MatchFinished;
+use App\Services\EventStrategy\MatchStatusChanged;
 use App\Services\EventStrategy\MatchWasCreated;
 use App\ValueObjects\Broker\Mediator\Message;
 use Carbon\Carbon;
@@ -290,6 +291,85 @@ class EventStrategyHandleTest extends TestCase
 		}
 	}
 
+	public function testMatchFinishedHandleWhenWinnerIsNull()
+	{
+		$teamId = $this->faker->uuid;
+		$opponentId = $this->faker->uuid;
+		$teamName = $this->faker->name;
+		$opponentName = $this->faker->name;
+		/**
+		 * Upcoming status.
+		 */
+		$fakeMatchIdForUpcoming = $this->faker->uuid;
+
+		$this->createTeamsMatchModel(
+			$teamId,
+			$opponentId,
+			$teamName,
+			$opponentName,
+			$fakeMatchIdForUpcoming,
+			true
+		);
+		$this->createTeamsMatchModel(
+			$opponentId,
+			$teamId,
+			$opponentName,
+			$teamName,
+			$fakeMatchIdForUpcoming,
+			false
+		);
+
+		$message = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"match":"%s",
+					"winner":"%s"
+				 },
+				"metadata": {
+					"scores": [
+						{
+						   "type":"firstHalf",
+						   "home":1,
+						   "away":1
+						},
+						{
+						   "type":"secondHalf",
+						   "home":2,
+						   "away":2
+						},
+						{
+						   "type":"total",
+						   "home":2,
+						   "away":2
+						}
+        			]
+				}
+			}
+		}',
+			config('mediator-event.events.match_finished'),
+			Carbon::now()->toDateTimeString(),
+			$fakeMatchIdForUpcoming, null);
+		/**
+		 * @var Message $message
+		 */
+		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		app(MatchFinished::class)->handle($message->getBody());
+		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
+		$this->assertCount(2, $teamsMatch);
+		foreach ($teamsMatch as $item) {
+			$this->assertInstanceOf(TeamsMatch::class, $item);
+			$this->assertEquals(TeamsMatch::STATUS_FINISHED, $item->getStatus());
+			$this->assertNotEmpty($item->getResult());
+			$this->assertEquals(TeamsMatch::EVALUATION_DRAW, $item->getEvaluation());
+		}
+	}
+
 	public function testMatchFinishedHandleWithNullIdentifiers()
 	{
 		$this->expectException(ProjectionException::class);
@@ -393,6 +473,181 @@ class EventStrategyHandleTest extends TestCase
 		 */
 		$message = app('Serializer')->deserialize($message, Message::class, 'json');
 		app(MatchFinished::class)->handle($message->getBody());
+	}
+
+	public function testMatchStatusChangedHandle()
+	{
+		$teamId = $this->faker->uuid;
+		$opponentId = $this->faker->uuid;
+		$teamName = $this->faker->name;
+		$opponentName = $this->faker->name;
+		/**
+		 * Upcoming status.
+		 */
+		$fakeMatchIdForUpcoming = $this->faker->uuid;
+
+		$this->createTeamsMatchModel(
+			$teamId,
+			$opponentId,
+			$teamName,
+			$opponentName,
+			$fakeMatchIdForUpcoming,
+			true
+		);
+		$this->createTeamsMatchModel(
+			$opponentId,
+			$teamId,
+			$opponentName,
+			$teamName,
+			$fakeMatchIdForUpcoming,
+			false
+		);
+
+		$message = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"match":"%s"
+				 },
+				"metadata": {
+					"status": "gameEnded"
+				}
+			}
+		}',
+			config('mediator-event.events.match_status_changed'),
+			Carbon::now()->toDateTimeString(),
+			$fakeMatchIdForUpcoming);
+		/**
+		 * @var Message $message
+		 */
+		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		app(MatchStatusChanged::class)->handle($message->getBody());
+		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
+		$this->assertCount(2, $teamsMatch);
+		foreach ($teamsMatch as $item) {
+			$this->assertInstanceOf(TeamsMatch::class, $item);
+			$this->assertEquals(TeamsMatch::STATUS_FINISHED, $item->getStatus());
+		}
+	}
+
+	public function testMatchStatusChangedHandleWithUnknownStatus()
+	{
+		$teamId = $this->faker->uuid;
+		$opponentId = $this->faker->uuid;
+		$teamName = $this->faker->name;
+		$opponentName = $this->faker->name;
+		/**
+		 * Upcoming status.
+		 */
+		$fakeMatchIdForUpcoming = $this->faker->uuid;
+
+		$this->createTeamsMatchModel(
+			$teamId,
+			$opponentId,
+			$teamName,
+			$opponentName,
+			$fakeMatchIdForUpcoming,
+			true
+		);
+		$this->createTeamsMatchModel(
+			$opponentId,
+			$teamId,
+			$opponentName,
+			$teamName,
+			$fakeMatchIdForUpcoming,
+			false
+		);
+
+		$message = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"match":"%s"
+				 },
+				"metadata": {
+					"status": "penalty"
+				}
+			}
+		}',
+			config('mediator-event.events.match_status_changed'),
+			Carbon::now()->toDateTimeString(),
+			$fakeMatchIdForUpcoming);
+		/**
+		 * @var Message $message
+		 */
+		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		app(MatchStatusChanged::class)->handle($message->getBody());
+		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
+		$this->assertCount(2, $teamsMatch);
+		foreach ($teamsMatch as $item) {
+			$this->assertInstanceOf(TeamsMatch::class, $item);
+			$this->assertEquals(TeamsMatch::STATUS_UNKNOWN, $item->getStatus());
+		}
+	}
+
+	public function testMatchStatusChangedHandleWhenIdentifiersIsNull()
+	{
+		$this->expectException(ProjectionException::class);
+		$message = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"match":""
+				 },
+				"metadata": {}
+			}
+		}',
+			config('mediator-event.events.match_status_changed'),
+			Carbon::now()->toDateTimeString());
+		/**
+		 * @var Message $message
+		 */
+		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		app(MatchStatusChanged::class)->handle($message->getBody());
+	}
+
+	public function testMatchStatusChangedHandleWhenMetaDataIsNull()
+	{
+		$this->expectException(ProjectionException::class);
+		$message = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"match":"%s"
+				 },
+				"metadata": {
+					"status": ""
+				}
+			}
+		}',
+			config('mediator-event.events.match_status_changed'),
+			Carbon::now()->toDateTimeString(),
+			$this->faker->uuid);
+		/**
+		 * @var Message $message
+		 */
+		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		app(MatchStatusChanged::class)->handle($message->getBody());
 	}
 
 	protected function tearDown(): void

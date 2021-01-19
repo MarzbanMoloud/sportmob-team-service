@@ -25,6 +25,7 @@ use Exception;
 class MatchProjector
 {
 	const SCORES_TYPE_TOTAL = 'total';
+	const MATCH_STATUS_GAME_ENDED = 'gameEnded';
 
 	private TeamsMatchRepository $teamsMatchRepository;
 	private TeamCacheServiceInterface $teamCacheService;
@@ -78,7 +79,7 @@ class MatchProjector
 		}
 		$teamsMatchItems = $this->checkItemExist($identifier['match']);
 		$score = $this->excludeScoreTypes($metadata['scores']);
-		if (is_null($identifier['winner'])) {
+		if ($identifier['winner'] == "") {
 			foreach ($teamsMatchItems as $teamsMatch) {
 				$this->updateTeamsMatchByMatchFinishedEvent($teamsMatch, $score, TeamsMatch::EVALUATION_DRAW);
 			}
@@ -90,6 +91,27 @@ class MatchProjector
 				$score,
 				($identifier['winner'] == $teamsMatch->getTeamId()) ? TeamsMatch::EVALUATION_WIN : TeamsMatch::EVALUATION_LOSS
 			);
+		}
+	}
+
+	/**
+	 * @param MessageBody $body
+	 * @throws ProjectionException
+	 */
+	public function applyMatchStatusChanged(MessageBody $body): void
+	{
+		$identifier = $body->getIdentifiers();
+		$metadata = $body->getMetadata();
+		if (empty($identifier['match'])){
+			throw new ProjectionException('Match field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+		}
+		if (empty($metadata['status'])){
+			throw new ProjectionException('Status field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+		}
+		$teamsMatchItems = $this->checkItemExist($identifier['match']);
+		$status = ($metadata['status'] == self::MATCH_STATUS_GAME_ENDED) ? TeamsMatch::STATUS_FINISHED : TeamsMatch::STATUS_UNKNOWN;
+		foreach ($teamsMatchItems as $teamsMatch) {
+			$this->updateTeamsMatchByMatchStatusChanged($teamsMatch, $status);
 		}
 	}
 
@@ -224,6 +246,19 @@ class MatchProjector
 						]
 					] : []
 			);
+		$this->persistTeamsMatch($teamsMatch);
+	}
+
+	/**
+	 * @param TeamsMatch $teamsMatch
+	 * @param string $status
+	 * @throws ProjectionException
+	 */
+	private function updateTeamsMatchByMatchStatusChanged(TeamsMatch $teamsMatch, string $status): void
+	{
+		$teamsMatch
+			->setStatus($status)
+			->setSortKey(TeamsMatch::generateSortKey(TeamsMatch::getMatchDate($teamsMatch->getSortKey()), $status));
 		$this->persistTeamsMatch($teamsMatch);
 	}
 

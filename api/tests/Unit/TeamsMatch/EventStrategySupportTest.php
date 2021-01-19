@@ -5,6 +5,7 @@ namespace Tests\Unit\TeamsMatch;
 
 
 use App\Services\EventStrategy\MatchFinished;
+use App\Services\EventStrategy\MatchStatusChanged;
 use App\Services\EventStrategy\MatchWasCreated;
 use App\ValueObjects\Broker\Mediator\Message;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -91,5 +92,39 @@ class EventStrategySupportTest extends TestCase
          }');
 		$valueObject = $this->serializer->deserialize($message, Message::class, 'json');
 		$this->assertFalse(app(MatchFinished::class)->support($valueObject));
+	}
+
+	public function testMatchStatusChanged()
+	{
+		$message = sprintf('{
+            "headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "2020-11-29T10:49:56+04:30"
+            },
+            "body":{
+                "identifiers": {},
+                "metadata": {}
+             }
+         }', config('mediator-event.events.match_status_changed'));
+		$valueObject = $this->serializer->deserialize($message, Message::class, 'json');
+		$this->assertTrue(app(MatchStatusChanged::class)->support($valueObject));
+	}
+
+	public function testMatchStatusChangedWhenEventIsEmpty()
+	{
+		$message = sprintf('{
+            "headers":{
+                "event": "",
+                "priority": "1",
+                "date": "2020-11-29T10:49:56+04:30"
+            },
+            "body":{
+                "identifiers": {},
+                "metadata": {}
+             }
+         }');
+		$valueObject = $this->serializer->deserialize($message, Message::class, 'json');
+		$this->assertFalse(app(MatchStatusChanged::class)->support($valueObject));
 	}
 }
