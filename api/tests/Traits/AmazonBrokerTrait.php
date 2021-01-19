@@ -39,8 +39,7 @@ trait AmazonBrokerTrait
                     'sqs:SendMessage',
                     'sqs:ReceiveMessage'
                 ],
-                'Resource'  => $QueueArn,
-                'Condition' => [ 'ArnEquals' => [ 'aws:SourceArn' => $topicArn ] ]
+                'Resource'  => $QueueArn
             ]
         ];
     }
