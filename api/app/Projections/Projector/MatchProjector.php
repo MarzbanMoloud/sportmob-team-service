@@ -214,7 +214,7 @@ class MatchProjector
 	 * @param $scores
 	 * @return array|mixed
 	 */
-	private function excludeScoreTypes($scores)
+	private function excludeScoreTypes($scores): array
 	{
 		$score = [];
 		foreach ($scores as $scoreItem) {
