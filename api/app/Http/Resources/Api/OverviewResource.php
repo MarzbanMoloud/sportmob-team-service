@@ -100,14 +100,29 @@ class OverviewResource extends JsonResource
 						]
 					],
 					'date' => TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
-					'result' => [
-						'home' => $teamsMatch->getResult()['home'],
-						'away' => $teamsMatch->getResult()['away']
-					]
+					'result' => $this->getResult($teamsMatch->getResult())
 				];
 			}, $this->resource['finished']);
 		} catch (Exception $exception) {
 			return [];
 		}
+	}
+
+	/**
+	 * @param array $result
+	 * @return array
+	 */
+	private function getResult(array $result): array
+	{
+		if (empty($result)) {
+			return $result;
+		}
+		return [
+			'score' => [
+				"home" => !empty($result['penalty']) ? $result['total']['home'] - $result['penalty']['home'] : $result['total']['home'],
+				"away" => !empty($result['penalty']) ? $result['total']['away'] - $result['penalty']['away'] : $result['total']['away'],
+			],
+			'penalty' => !empty($result['penalty']) ? $result['penalty'] : [],
+		];
 	}
 }

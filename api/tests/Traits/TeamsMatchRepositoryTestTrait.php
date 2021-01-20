@@ -69,9 +69,14 @@ trait TeamsMatchRepositoryTestTrait
 			->setCoverage(TeamsMatch::COVERAGE_LOW)
 			->setSortKey(TeamsMatch::generateSortKey(($dateTime) ? new DateTime($dateTime) : new DateTime(), $status ?? TeamsMatch::STATUS_UPCOMING))
 			->setResult([
-				'type' => 'total',
-				'home' => 2,
-				'away' => 2
+					'total' => [
+						'home' => 2,
+						'away' => 2
+					],
+					'penalty' => [
+						'home' => 1,
+						'away' => 1
+					]
 			]);
 		$this->teamsMatchRepository->persist($fakeTeamsMatchModel);
 		return $fakeTeamsMatchModel;

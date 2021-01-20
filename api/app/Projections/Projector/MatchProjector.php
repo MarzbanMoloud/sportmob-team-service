@@ -28,6 +28,7 @@ use Exception;
 class MatchProjector
 {
 	const SCORES_TYPE_TOTAL = 'total';
+	const SCORES_TYPE_PENALTY = 'penalty';
 	const MATCH_STATUS_GAME_ENDED = 'gameEnded';
 
 	private TeamsMatchRepository $teamsMatchRepository;
@@ -242,8 +243,8 @@ class MatchProjector
 	{
 		$score = [];
 		foreach ($scores as $scoreItem) {
-			if ($scoreItem['type'] == self::SCORES_TYPE_TOTAL) {
-				$score = $scoreItem;
+			if (in_array($scoreItem['type'], [self::SCORES_TYPE_TOTAL, self::SCORES_TYPE_PENALTY]) ) {
+				$score[] = $scoreItem;
 			}
 		}
 		return $score;
@@ -261,15 +262,14 @@ class MatchProjector
 			->setEvaluation($evaluation)
 			->setStatus(TeamsMatch::STATUS_FINISHED)
 			->setSortKey(TeamsMatch::generateSortKey(TeamsMatch::getMatchDate($teamsMatch->getSortKey()), TeamsMatch::STATUS_FINISHED))
-			->setResult(
-				($score) ?
-					[
-						$score['type'] => [
-							'home' => $score['home'],
-							'away' => $score['away']
-						]
-					] : []
-			);
+			->setResult(array_map(function ($item){
+				return [
+					$item['type'] => [
+						'home' => $item['home'],
+						'away' => $item['away']
+					]
+				];
+			}, $score));
 		$this->persistTeamsMatch($teamsMatch);
 	}
 

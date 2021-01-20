@@ -546,6 +546,11 @@ class EventStrategyHandleTest extends TestCase
 						   "type":"total",
 						   "home":2,
 						   "away":2
+						},
+						{
+						   "type":"penalty",
+						   "home":1,
+						   "away":1
 						}
         			]
 				}

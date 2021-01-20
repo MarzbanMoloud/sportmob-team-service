@@ -232,8 +232,10 @@ class OverviewControllerTest extends TestCase
 			$this->assertNotNull($item['team']['name']['short']);
 			$this->assertNotNull($item['date']);
 			$this->assertNotEmpty($item['result']);
-			$this->assertNotNull($item['result']['home']);
-			$this->assertNotNull($item['result']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
+			$this->assertNotNull($item['result']['penalty']['home']);
+			$this->assertNotNull($item['result']['penalty']['away']);
 		}
 		/**
 		 * Read from Cache.
@@ -268,8 +270,10 @@ class OverviewControllerTest extends TestCase
 			$this->assertNotNull($item['team']['name']['short']);
 			$this->assertNotNull($item['date']);
 			$this->assertNotEmpty($item['result']);
-			$this->assertNotNull($item['result']['home']);
-			$this->assertNotNull($item['result']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
 		}
 	}
 
@@ -429,8 +433,10 @@ class OverviewControllerTest extends TestCase
 			$this->assertNotNull($item['team']['name']['short']);
 			$this->assertNotNull($item['date']);
 			$this->assertNotEmpty($item['result']);
-			$this->assertNotNull($item['result']['home']);
-			$this->assertNotNull($item['result']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
 		}
 		/**
 		 * Read from Cache.
@@ -450,8 +456,10 @@ class OverviewControllerTest extends TestCase
 			$this->assertNotNull($item['team']['name']['short']);
 			$this->assertNotNull($item['date']);
 			$this->assertNotEmpty($item['result']);
-			$this->assertNotNull($item['result']['home']);
-			$this->assertNotNull($item['result']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
+			$this->assertNotNull($item['result']['score']['home']);
+			$this->assertNotNull($item['result']['score']['away']);
 		}
 	}
 
