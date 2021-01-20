@@ -51,62 +51,71 @@ interface OverviewControllerInterface
 	 *	 							@OA\Property(
 	 *                                    property="competition",
 	 *                                    type="object",
-	 *                         			@OA\Property(
+	 *                         			  @OA\Property(
 	 *                                        property="name",
 	 *                                        type="string",
 	 *                                        example="PrimerLeague"
-	 *                                    )
-	 *                                ),
-	 *	 							@OA\Property(
-	 *                                    property="home",
-	 *                                    type="object",
-	 *                         			@OA\Property(
+	 *                                    ),
+	 *                         			  @OA\Property(
 	 *                                        property="id",
 	 *                                        type="string",
-	 *                                        example="1fa692ec-3fac-3858-83e3-2ed5b5bd2673"
-	 *                                    ),
-	 *                         			@OA\Property(
-	 *                                        property="name",
-	 *                                        type="object",
-	 *     									@OA\Property(
-	 *                                            property="original",
-	 *                                            type="string",
-	 *                                            example="Blake Breitenberg DDS"
-	 *                                        ),
-	 *     									@OA\Property(
-	 *                                            property="short",
-	 *                                            type="string",
-	 *                                            example="Bla"
-	 *                                        )
+	 *                                        example="tga692ec-3fac-3858-83e3-2ed5b5bd26rf"
 	 *                                    )
 	 *                                ),
-	 *	 							@OA\Property(
-	 *                                    property="away",
+	 *     							  @OA\Property(
+	 *                                    property="team",
 	 *                                    type="object",
-	 *                         			@OA\Property(
-	 *                                        property="id",
-	 *                                        type="string",
-	 *                                        example="b6f01b9b-610b-3b0b-bd7d-3fae92cf2d32"
-	 *                                    ),
-	 *                         			@OA\Property(
-	 *                                        property="name",
-	 *                                        type="object",
-	 *     									@OA\Property(
-	 *                                            property="original",
-	 *                                            type="string",
-	 *                                            example="Sadye Kuphal"
-	 *                                        ),
-	 *     									@OA\Property(
-	 *                                            property="short",
-	 *                                            type="string",
-	 *                                            example="Kuphal"
-	 *                                        )
-	 *                                    )
-	 *                                ),
+	 *	 									@OA\Property(
+	 *                                    	property="home",
+	 *                                    	type="object",
+	 *                         					@OA\Property(
+	 *                                        		property="id",
+	 *                                        		type="string",
+	 *                                        		example="1fa692ec-3fac-3858-83e3-2ed5b5bd2673"
+	 *                                    		),
+	 *                         					@OA\Property(
+	 *                                        		property="name",
+	 *                                        		type="object",
+	 *     											@OA\Property(
+	 *                                            		property="original",
+	 *                                            		type="string",
+	 *                                            		example="Blake Breitenberg DDS"
+	 *                                        		),
+	 *     											@OA\Property(
+	 *                                            		property="short",
+	 *                                            		type="string",
+	 *                                            		example="Bla"
+	 *                                        		)
+	 *                                    		)
+	 *                                		),
+	 *	 									@OA\Property(
+	 *                                    		property="away",
+	 *                                    		type="object",
+	 *                         					@OA\Property(
+	 *                                        		property="id",
+	 *                                        		type="string",
+	 *                                        		example="b6f01b9b-610b-3b0b-bd7d-3fae92cf2d32"
+	 *                                    		),
+	 *                         					@OA\Property(
+	 *                                        		property="name",
+	 *                                        		type="object",
+	 *     											@OA\Property(
+	 *                                            		property="original",
+	 *                                            		type="string",
+	 *                                            		example="Sadye Kuphal"
+	 *                                        		),
+	 *     											@OA\Property(
+	 *                                            		property="short",
+	 *                                            		type="string",
+	 *                                            		example="Kuphal"
+	 *                                        		)
+	 *                                    		)
+	 *                                		),
+	 *     							),
 	 *     							@OA\Property(
 	 *                                    property="date",
-	 *                                    type="string",
-	 *                                    example="1611315000"
+	 *                                    type="number",
+	 *                                    example=1611315000
 	 *                              ),
 	 *     							@OA\Property(
 	 *                                    property="coverage",
@@ -126,7 +135,7 @@ interface OverviewControllerInterface
 	 *                                                "short": "Dr. Blake Breitenberg DDS"
 	 *                                            }
 	 *                                        },
-	 *                                        "date": "1611055800",
+	 *                                        "date": 1611055800,
 	 *                                        "result": {
 	 *                                            "home": 2,
 	 *                                            "away": 2

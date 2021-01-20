@@ -57,23 +57,26 @@ class OverviewResource extends JsonResource
 			$upcoming = $this->resource['upcoming'][0];
 			return [
 				'competition' => [
+					'id' => $upcoming->getCompetitionId(),
 					'name' => $this->client->translate($upcoming->getCompetitionName(), $this->lang)
 				],
-				'home' => [
-					'id' => $upcoming->getTeamId(),
-					'name' => [
-						'original' => $this->client->translate($upcoming->getTeamName()->getOriginal(), $this->lang),
-						'short' => $this->client->translate($upcoming->getTeamName()->getShort(), $this->lang),
+				'team' => [
+					'home' => [
+						'id' => $upcoming->getTeamId(),
+						'name' => [
+							'original' => $this->client->translate($upcoming->getTeamName()->getOriginal(), $this->lang),
+							'short' => $this->client->translate($upcoming->getTeamName()->getShort(), $this->lang),
+						]
+					],
+					'away' => [
+						'id' => $upcoming->getOpponentId(),
+						'name' => [
+							'original' => $this->client->translate($upcoming->getOpponentName()->getOriginal(), $this->lang),
+							'short' => $this->client->translate($upcoming->getOpponentName()->getShort(), $this->lang)
+						]
 					]
 				],
-				'away' => [
-					'id' => $upcoming->getOpponentId(),
-					'name' => [
-						'original' => $this->client->translate($upcoming->getOpponentName()->getOriginal(), $this->lang),
-						'short' => $this->client->translate($upcoming->getOpponentName()->getShort(), $this->lang)
-					]
-				],
-				'date' => (string)TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
+				'date' => TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
 				'coverage' => $upcoming->getCoverage()
 			];
 		} catch (Exception $exception) {
@@ -96,7 +99,7 @@ class OverviewResource extends JsonResource
 							'short' => $this->client->translate($teamsMatch->getTeamName()->getShort(), $this->lang),
 						]
 					],
-					'date' => (string)TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
+					'date' => TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
 					'result' => [
 						'home' => $teamsMatch->getResult()['home'],
 						'away' => $teamsMatch->getResult()['away']
