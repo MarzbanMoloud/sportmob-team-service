@@ -17,7 +17,7 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 {
 	public const TEAM_INDEX = 'TeamIndex';
 	public const OPPONENT_INDEX = 'OpponentIndex';
-	public const MATCH_INDEX = 'MatchIndex';
+	public const COMPETITION_INDEX = 'CompetitionIndex';
 
 	/**
 	 * @return string
@@ -105,6 +105,28 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 	}
 
 	/**
+	 * @param string $id
+	 * @return array|null
+	 */
+	public function findTeamsMatchByCompetitionId(string $id)
+	{
+		try {
+			$Result = $this->dynamoDbClient->query( [
+				'TableName'                 => static::getTableName(),
+				'IndexName'                 => self::COMPETITION_INDEX,
+				'KeyConditionExpression'    => 'competitionId = :competitionId',
+				'ExpressionAttributeValues' => $this->marshalJson([
+					':competitionId' => $id,
+				])
+			] );
+		} catch (\Exception $e) {
+			$this->sentryHub->captureException( $e );
+			return [];
+		}
+		return $this->deserializeResult( $Result );
+	}
+
+	/**
 	 * @return array
 	 */
 	public function schema(): array
@@ -126,6 +148,10 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 				],
 				[
 					'AttributeName' => 'opponentId',
+					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
+				],
+				[
+					'AttributeName' => 'competitionId',
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				]
 			],
@@ -163,6 +189,20 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 					'KeySchema'             => [
 						[
 							'AttributeName' => 'opponentId',
+							'KeyType'       => DynamoDBRepositoryInterface::KEY_HASH
+						]
+					],
+					'Projection'            => [ 'ProjectionType' => DynamoDBRepositoryInterface::PROJECTION_ALL ],
+					'ProvisionedThroughput' => [
+						'ReadCapacityUnits'  => 1,
+						'WriteCapacityUnits' => 1
+					]
+				],
+				[
+					'IndexName'             => self::COMPETITION_INDEX,
+					'KeySchema'             => [
+						[
+							'AttributeName' => 'competitionId',
 							'KeyType'       => DynamoDBRepositoryInterface::KEY_HASH
 						]
 					],

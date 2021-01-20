@@ -44,6 +44,7 @@ trait TeamsMatchRepositoryTestTrait
 		?string $status = null
 	): TeamsMatch {
 		$fakeTeamsMatchModel = (new TeamsMatch())
+			->setCompetitionId($this->faker->uuid)
 			->setTeamId($teamId)
 			->setTeamName(
 				(new TeamName())

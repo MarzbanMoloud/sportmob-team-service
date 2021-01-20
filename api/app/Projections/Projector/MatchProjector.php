@@ -4,6 +4,7 @@
 namespace App\Projections\Projector;
 
 
+use App\Events\Projection\MatchWasCreatedProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
@@ -61,6 +62,7 @@ class MatchProjector
 		$awayTeamsMatchModel = $this->createTeamsMatchModel($identifier, $metadata, false);
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
+		event(new MatchWasCreatedProjectorEvent($identifier['competition']));
 	}
 
 	/**
@@ -121,7 +123,7 @@ class MatchProjector
 	 */
 	private function checkIdentifiersValidation(array $identifier): void
 	{
-		$requiredFields = ['match', 'home', 'away'];
+		$requiredFields = ['match', 'home', 'away', 'competition'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($identifier[$fieldName])) {
 				throw new ProjectionException(
@@ -186,6 +188,7 @@ class MatchProjector
 			->setShort($awayTeamItem->getName()->getShort());
 
 		return (new TeamsMatch())
+			->setCompetitionId($identifier['competition'])
 			->setMatchId($identifier['match'])
 			->setTeamId($home ? $identifier['home'] : $identifier['away'])
 			->setOpponentId($home ? $identifier['away'] : $identifier['home'])

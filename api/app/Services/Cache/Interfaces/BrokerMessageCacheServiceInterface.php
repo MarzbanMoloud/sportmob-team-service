@@ -12,6 +12,7 @@ interface BrokerMessageCacheServiceInterface
 {
 	const PLAYER_INFO_NAME_KEY = 'player_info_%s';
 	const TOURNAMENT_INFO_NAME_KEY = 'tournament_info_%s';
+	const COMPETITION_NAME_KEY = 'competition_name_%s';
 
 	/**
 	 * @param array $player
@@ -48,4 +49,22 @@ interface BrokerMessageCacheServiceInterface
 	 * @return mixed
 	 */
 	public function getTournamentInfo(string $tournamentId);
+
+	/**
+	 * @param array $competition
+	 * @return mixed
+	 */
+	public function putCompetitionName(array $competition);
+
+	/**
+	 * @param string $competitionId
+	 * @return mixed
+	 */
+	public function hasCompetitionName(string $competitionId);
+
+	/**
+	 * @param string $competitionId
+	 * @return mixed
+	 */
+	public function getCompetitionName(string $competitionId);
 }

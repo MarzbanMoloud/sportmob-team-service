@@ -8,7 +8,9 @@ use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Response\ResponseService;
 use App\Services\AWS\BrokerService;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
+use App\Services\BrokerCommandStrategy\MatchWasCreatedUpdatedInfo;
 use App\Services\BrokerCommandStrategy\PlayerWasTransferredUpdateInfo;
+use App\Services\BrokerCommandStrategy\TrophyUpdateInfo;
 use App\Services\BrokerInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
 use App\Services\BrokerQueryStrategy\TeamInformation;
@@ -80,7 +82,9 @@ class AppServiceProvider extends ServiceProvider
 
         /*------ Broker Command Strategy ------*/
         $this->app->tag([
-        	PlayerWasTransferredUpdateInfo::class
+        	PlayerWasTransferredUpdateInfo::class,
+			TrophyUpdateInfo::class,
+			MatchWasCreatedUpdatedInfo::class
         ], [BrokerCommandEventInterface::TAG_NAME]);
 
         /*------ Broker Query Strategy ------*/

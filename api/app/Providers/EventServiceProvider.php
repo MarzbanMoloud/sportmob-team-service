@@ -4,9 +4,11 @@
 namespace App\Providers;
 
 
+use App\Events\Projection\MatchWasCreatedProjectorEvent;
 use App\Events\Projection\PlayerWasTransferredProjectorEvent;
 use App\Events\Projection\TeamWasCreatedProjectorEvent;
 use App\Events\Projection\TrophyProjectorEvent;
+use App\Listeners\Projection\MatchWasCreatedProjectorListener;
 use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
 use App\Listeners\Projection\TeamCacheListener;
 use App\Listeners\Projection\TrophyProjectorListener;
@@ -39,6 +41,10 @@ class EventServiceProvider extends ServiceProvider
 
 		TrophyProjectorEvent::class => [
 			TrophyProjectorListener::class
+		],
+
+		MatchWasCreatedProjectorEvent::class => [
+			MatchWasCreatedProjectorListener::class
 		],
 
         /*----- Broker - Mediator -----*/

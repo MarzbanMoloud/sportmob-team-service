@@ -22,6 +22,8 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	const STATUS_UPCOMING = 'upcoming';
 	const STATUS_UNKNOWN = 'unknown';
 
+	private string $competitionId;
+	private ?string $competitionName = null;
 	private string $matchId;
 	private string $teamId;
 	private TeamName $teamName;
@@ -210,6 +212,42 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	public function setResult(array $result): TeamsMatch
 	{
 		$this->result = $result;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCompetitionId(): string
+	{
+		return $this->competitionId;
+	}
+
+	/**
+	 * @param string $competitionId
+	 * @return TeamsMatch
+	 */
+	public function setCompetitionId(string $competitionId): TeamsMatch
+	{
+		$this->competitionId = $competitionId;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getCompetitionName(): ?string
+	{
+		return $this->competitionName;
+	}
+
+	/**
+	 * @param string|null $competitionName
+	 * @return TeamsMatch
+	 */
+	public function setCompetitionName(?string $competitionName): TeamsMatch
+	{
+		$this->competitionName = $competitionName;
 		return $this;
 	}
 

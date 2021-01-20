@@ -32,6 +32,15 @@ class BrokerMessageCacheService extends CacheService implements BrokerMessageCac
 	}
 
 	/**
+	 * @param string $competitionId
+	 * @return string
+	 */
+	private static function getCompetitionNameKey(string $competitionId)
+	{
+		return sprintf(self::COMPETITION_NAME_KEY, $competitionId);
+	}
+
+	/**
 	 * @param array $player
 	 * @return mixed|void
 	 */
@@ -83,5 +92,32 @@ class BrokerMessageCacheService extends CacheService implements BrokerMessageCac
 	public function getTournamentInfo(string $tournamentId)
 	{
 		return $this->get(self::getTournamentInfoKey($tournamentId));
+	}
+
+	/**
+	 * @param array $competition
+	 * @return mixed|void
+	 */
+	public function putCompetitionName(array $competition)
+	{
+		$this->put(self::getCompetitionNameKey($competition['id']), $competition['name']);
+	}
+
+	/**
+	 * @param string $competitionId
+	 * @return bool|mixed
+	 */
+	public function hasCompetitionName(string $competitionId)
+	{
+		return $this->hasKey(self::getCompetitionNameKey($competitionId));
+	}
+
+	/**
+	 * @param string $competitionId
+	 * @return mixed
+	 */
+	public function getCompetitionName(string $competitionId)
+	{
+		return $this->get(self::getCompetitionNameKey($competitionId));
 	}
 }

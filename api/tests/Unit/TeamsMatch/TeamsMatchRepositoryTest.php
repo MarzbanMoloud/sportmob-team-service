@@ -5,11 +5,9 @@ namespace Tests\Unit\TeamsMatch;
 
 
 use App\Models\ReadModels\TeamsMatch;
-use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use Faker\Factory;
 use TestCase;
-use Tests\Traits\TeamRepositoryTestTrait;
 use Tests\Traits\TeamsMatchRepositoryTestTrait;
 
 
@@ -195,6 +193,25 @@ class TeamsMatchRepositoryTest extends TestCase
 	public function testFindTeamsMatchByMatchIdWhenItemNotExist()
 	{
 		$response = $this->teamsMatchRepository->findTeamsMatchByMatchId($this->faker->uuid);
+		$this->assertEmpty($response);
+	}
+
+	public function testFindTeamsMatchByCompetitionId()
+	{
+		$fakeTeamsMatchModel = $this->createTeamsMatchModel(
+			$this->faker->uuid,
+			$this->faker->uuid,
+			$this->faker->name,
+			$this->faker->name,
+			$this->faker->uuid
+		);
+		$response = $this->teamsMatchRepository->findTeamsMatchByCompetitionId($fakeTeamsMatchModel->getCompetitionId());
+		$this->assertInstanceOf(TeamsMatch::class, $response[0]);
+	}
+
+	public function testFindTeamsMatchByCompetitionIdWhenItemNotExist()
+	{
+		$response = $this->teamsMatchRepository->findTeamsMatchByCompetitionId($this->faker->uuid);
 		$this->assertEmpty($response);
 	}
 
