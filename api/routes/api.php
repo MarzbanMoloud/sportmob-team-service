@@ -21,5 +21,6 @@ $router->group(['prefix' => '/{lang}/teams', 'namespace' => 'Api', 'middleware' 
 		$router->get('/team/{team}', ['as' => 'teams.trophies.by.team', 'uses' => 'TrophyController@trophiesByTeam']);
 		$router->get('/competition/{competition}', ['as' => 'teams.trophies.by.competition', 'uses' => 'TrophyController@trophiesByCompetition']);
 	});
+	$router->get('/overview/{team}', ['as' => 'teams.overview.by.team', 'uses' => 'OverviewController@index']);
 });
 

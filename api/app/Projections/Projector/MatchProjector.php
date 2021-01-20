@@ -14,6 +14,8 @@ use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
+use App\Services\Cache\Interfaces\TeamsMatchCacheServiceInterface;
+use App\Services\Cache\TeamsMatchCacheService;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use DateTime;
 use Exception;
@@ -31,21 +33,25 @@ class MatchProjector
 	private TeamsMatchRepository $teamsMatchRepository;
 	private TeamCacheServiceInterface $teamCacheService;
 	private TeamRepository $teamRepository;
+	private TeamsMatchCacheServiceInterface $teamsMatchCacheService;
 
 	/**
 	 * MatchProjector constructor.
 	 * @param TeamsMatchRepository $teamsMatchRepository
 	 * @param TeamCacheServiceInterface $teamCacheService
 	 * @param TeamRepository $teamRepository
+	 * @param TeamsMatchCacheServiceInterface $teamsMatchCacheService
 	 */
 	public function __construct(
 		TeamsMatchRepository $teamsMatchRepository,
 		TeamCacheServiceInterface $teamCacheService,
-		TeamRepository $teamRepository
+		TeamRepository $teamRepository,
+		TeamsMatchCacheServiceInterface $teamsMatchCacheService
 	) {
 		$this->teamsMatchRepository = $teamsMatchRepository;
 		$this->teamCacheService = $teamCacheService;
 		$this->teamRepository = $teamRepository;
+		$this->teamsMatchCacheService = $teamsMatchCacheService;
 	}
 
 	/**
@@ -62,6 +68,10 @@ class MatchProjector
 		$awayTeamsMatchModel = $this->createTeamsMatchModel($identifier, $metadata, false);
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
+		/** Remove cache */
+		if ($this->teamsMatchCacheService->hasTeamsMatchOverviewByTeam($identifier['home'])) {
+			$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchOverviewByTeamKey($identifier['home']));
+		}
 		event(new MatchWasCreatedProjectorEvent($identifier['competition']));
 	}
 
@@ -83,16 +93,26 @@ class MatchProjector
 		$score = $this->excludeScoreTypes($metadata['scores']);
 		if ($identifier['winner'] == "") {
 			foreach ($teamsMatchItems as $teamsMatch) {
+				/** @var TeamsMatch $teamsMatch */
 				$this->updateTeamsMatchByMatchFinishedEvent($teamsMatch, $score, TeamsMatch::EVALUATION_DRAW);
+				/** Remove cache */
+				if ($this->teamsMatchCacheService->hasTeamsMatchOverviewByTeam($teamsMatch->getTeamId())) {
+					$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchOverviewByTeamKey($teamsMatch->getTeamId()));
+				}
 			}
 			return;
 		}
 		foreach ($teamsMatchItems as $teamsMatch) {
+			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchFinishedEvent(
 				$teamsMatch,
 				$score,
 				($identifier['winner'] == $teamsMatch->getTeamId()) ? TeamsMatch::EVALUATION_WIN : TeamsMatch::EVALUATION_LOSS
 			);
+			/** Remove cache */
+			if ($this->teamsMatchCacheService->hasTeamsMatchOverviewByTeam($teamsMatch->getTeamId())) {
+				$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchOverviewByTeamKey($teamsMatch->getTeamId()));
+			}
 		}
 	}
 
@@ -196,6 +216,7 @@ class MatchProjector
 			->setOpponentName($home ? $awayTeamName : $homeTeamName)
 			->setIsHome(($home) ? true : false)
 			->setStatus(TeamsMatch::STATUS_UPCOMING)
+			->setCoverage(($metadata['coverage']) ? $metadata['coverage'] : TeamsMatch::COVERAGE_LOW)
 			->setSortKey(TeamsMatch::generateSortKey(new DateTime($metadata['date'] . $metadata['time']), TeamsMatch::STATUS_UPCOMING));
 	}
 

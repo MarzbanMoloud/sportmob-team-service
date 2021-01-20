@@ -32,7 +32,9 @@ trait TeamsMatchRepositoryTestTrait
 	 * @param string $matchId
 	 * @param bool $home
 	 * @param string|null $status
+	 * @param string|null $dateTime
 	 * @return TeamsMatch
+	 * @throws \Exception
 	 */
 	public function createTeamsMatchModel(
 		string $teamId,
@@ -41,10 +43,12 @@ trait TeamsMatchRepositoryTestTrait
 		string $opponentName,
 		string $matchId,
 		bool $home = true,
-		?string $status = null
+		?string $status = null,
+		?string $dateTime = null
 	): TeamsMatch {
 		$fakeTeamsMatchModel = (new TeamsMatch())
 			->setCompetitionId($this->faker->uuid)
+			->setCompetitionName($this->faker->name)
 			->setTeamId($teamId)
 			->setTeamName(
 				(new TeamName())
@@ -62,7 +66,13 @@ trait TeamsMatchRepositoryTestTrait
 			->setIsHome($home ? true : false)
 			->setMatchId($matchId)
 			->setStatus($status ?? TeamsMatch::STATUS_UPCOMING)
-			->setSortKey(TeamsMatch::generateSortKey(new DateTime(), $status ?? TeamsMatch::STATUS_UPCOMING));
+			->setCoverage(TeamsMatch::COVERAGE_LOW)
+			->setSortKey(TeamsMatch::generateSortKey(($dateTime) ? new DateTime($dateTime) : new DateTime(), $status ?? TeamsMatch::STATUS_UPCOMING))
+			->setResult([
+				'type' => 'total',
+				'home' => 2,
+				'away' => 2
+			]);
 		$this->teamsMatchRepository->persist($fakeTeamsMatchModel);
 		return $fakeTeamsMatchModel;
 

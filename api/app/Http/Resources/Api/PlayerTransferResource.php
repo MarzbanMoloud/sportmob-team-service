@@ -21,7 +21,7 @@ class PlayerTransferResource extends JsonResource
 	private string $lang;
 
 	/**
-	 * TeamTransferResource constructor.
+	 * PlayerTransferResource constructor.
 	 * @param $resource
 	 */
 	public function __construct($resource)

@@ -9,4 +9,6 @@ RUN apt-get -y update && apt-get -y install curl openssl libssl-dev libcurl4-ope
 
 ADD supervisor /etc/supervisor/conf.d/
 
+RUN printf '[PHP]\nmemory_limit=1G\n' > /usr/local/etc/php/conf.d/memory.ini
+
 WORKDIR /var/www

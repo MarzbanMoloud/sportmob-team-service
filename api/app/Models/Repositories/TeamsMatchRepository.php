@@ -38,12 +38,13 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 	/**
 	 * @param string $id
 	 * @param string $status
+	 * @param int|null $limit
 	 * @return array|null
 	 */
-	public function findTeamsMatchByTeamId(string $id, string $status)
+	public function findTeamsMatchByTeamId(string $id, string $status, int $limit = null)
 	{
 		try {
-			$Result = $this->dynamoDbClient->query( [
+			$params = [
 				'ScanIndexForward'          => false,
 				'TableName'                 => static::getTableName(),
 				'IndexName'                 => self::TEAM_INDEX,
@@ -52,7 +53,11 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 					':teamId' => $id,
 					':status' => $status
 				])
-			] );
+			];
+			if (!is_null($limit)) {
+				$params['Limit'] = $limit;
+			}
+			$Result = $this->dynamoDbClient->query( $params );
 		} catch (\Exception $e) {
 			$this->sentryHub->captureException( $e );
 			return [];

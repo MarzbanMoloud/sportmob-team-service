@@ -21,6 +21,7 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	const STATUS_FINISHED = 'finished';
 	const STATUS_UPCOMING = 'upcoming';
 	const STATUS_UNKNOWN = 'unknown';
+	const COVERAGE_LOW = 'low';
 
 	private string $competitionId;
 	private ?string $competitionName = null;
@@ -30,6 +31,7 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	private string $opponentId;
 	private TeamName $opponentName;
 	private bool $isHome;
+	private ?string $coverage = null;
 	private ?string $evaluation = null;
 	private string $sortKey;
 	private string $status;
@@ -248,6 +250,24 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	public function setCompetitionName(?string $competitionName): TeamsMatch
 	{
 		$this->competitionName = $competitionName;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getCoverage(): ?string
+	{
+		return $this->coverage;
+	}
+
+	/**
+	 * @param string|null $coverage
+	 * @return TeamsMatch
+	 */
+	public function setCoverage(?string $coverage): TeamsMatch
+	{
+		$this->coverage = $coverage;
 		return $this;
 	}
 

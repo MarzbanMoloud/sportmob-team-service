@@ -30,6 +30,9 @@ class TeamsMatchRepositoryTest extends TestCase
 		$this->createTeamsMatchTable();
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function testFind()
 	{
 		$fakeMatchId = $this->faker->uuid;
@@ -76,6 +79,9 @@ class TeamsMatchRepositoryTest extends TestCase
 		$this->assertNull($response);
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function testFindTeamsMatchByTeamId()
 	{
 		$teamId = $this->faker->uuid;
