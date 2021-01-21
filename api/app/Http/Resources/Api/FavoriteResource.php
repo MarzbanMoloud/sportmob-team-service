@@ -12,10 +12,10 @@ use SportMob\Translation\Client;
 
 
 /**
- * Class OverviewResource
+ * Class FavoriteResource
  * @package App\Http\Resources\Api
  */
-class OverviewResource extends JsonResource
+class FavoriteResource extends JsonResource
 {
 	use CalculateResultTrait;
 
@@ -23,7 +23,7 @@ class OverviewResource extends JsonResource
 	private string $lang;
 
 	/**
-	 * OverviewResource constructor.
+	 * FavoriteResource constructor.
 	 * @param $resource
 	 */
 	public function __construct($resource)
@@ -34,7 +34,7 @@ class OverviewResource extends JsonResource
 	}
 
 	/**
-	 * @param $data
+	 * @param \Illuminate\Http\Request $data
 	 * @return array|array[]
 	 */
 	public function toArray($data): array
@@ -52,25 +52,22 @@ class OverviewResource extends JsonResource
 				],
 				TeamsMatch::STATUS_UPCOMING => $this->makeUpcomingData(),
 				TeamsMatch::STATUS_FINISHED => $this->makeFinishedData(),
+				'lastMatches' => array_map(function (TeamsMatch $teamsMatch) {
+					return $teamsMatch->getEvaluation();
+				}, $this->resource[TeamsMatch::STATUS_FINISHED])
 			]
 		];
 	}
 
 	/**
-	 * @return array
+	 * @return array|array[]
 	 */
 	private function makeUpcomingData(): array
 	{
 		try {
-			/**
-			 * @var TeamsMatch $upcoming
-			 */
-			$upcoming = $this->resource['upcoming'][0];
+			/** @var TeamsMatch $upcoming */
+			$upcoming = $this->resource[TeamsMatch::STATUS_UPCOMING][0];
 			return [
-				'competition' => [
-					'id' => $upcoming->getCompetitionId(),
-					'name' => $this->client->translate($upcoming->getCompetitionName(), $this->lang)
-				],
 				'team' => [
 					'home' => [
 						'id' => $upcoming->getTeamId(),
@@ -85,10 +82,9 @@ class OverviewResource extends JsonResource
 							'original' => $this->client->translate($upcoming->getOpponentName()->getOriginal(), $this->lang),
 							'short' => $this->client->translate($upcoming->getOpponentName()->getShort(), $this->lang)
 						]
-					]
+					],
 				],
 				'date' => TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
-				'coverage' => $upcoming->getCoverage()
 			];
 		} catch (Exception $exception) {
 			return [];
@@ -101,19 +97,19 @@ class OverviewResource extends JsonResource
 	private function makeFinishedData(): array
 	{
 		try {
-			return array_map(function (TeamsMatch $teamsMatch) {
-				return [
-					'team' => [
-						'id' => $teamsMatch->getOpponentId(),
-						'name' => [
-							'original' => $this->client->translate($teamsMatch->getOpponentName()->getOriginal(), $this->lang),
-							'short' => $this->client->translate($teamsMatch->getOpponentName()->getShort(), $this->lang),
-						]
-					],
-					'date' => TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
-					'result' => $this->getResult($teamsMatch->getResult())
-				];
-			}, $this->resource['finished']);
+			/** @var TeamsMatch $finished */
+			$finished = $this->resource[TeamsMatch::STATUS_FINISHED][0];
+			return[
+				'team' => [
+					'id' => $finished->getTeamId(),
+					'name' => [
+						'original' => $this->client->translate($finished->getOpponentName()->getOriginal(), $this->lang),
+						'short' => $this->client->translate($finished->getOpponentName()->getShort(), $this->lang),
+					]
+				],
+				'date' => TeamsMatch::getMatchDate($finished->getSortKey())->getTimestamp(),
+				'result' => $this->getResult($finished->getResult())
+			];
 		} catch (Exception $exception) {
 			return [];
 		}

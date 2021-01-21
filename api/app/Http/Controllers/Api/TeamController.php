@@ -4,24 +4,25 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\Http\Controllers\Api\Swagger\Interfaces\OverviewControllerInterface;
+use App\Http\Controllers\Api\Swagger\Interfaces\TeamControllerInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\FavoriteResource;
 use App\Http\Resources\Api\OverviewResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\TeamsMatch\TeamsMatchService;
 
 
 /**
- * Class OverviewController
+ * Class TeamController
  * @package App\Http\Controllers\Api
  */
-class OverviewController extends Controller implements OverviewControllerInterface
+class TeamController extends Controller implements TeamControllerInterface
 {
 	private ResponseServiceInterface $responseService;
 	private TeamsMatchService $teamsMatchService;
 
 	/**
-	 * OverviewController constructor.
+	 * TeamController constructor.
 	 * @param ResponseServiceInterface $responseService
 	 * @param TeamsMatchService $teamsMatchService
 	 */
@@ -37,10 +38,21 @@ class OverviewController extends Controller implements OverviewControllerInterfa
 	 * @param string $team
 	 * @return mixed
 	 */
-	public function index(string $team)
+	public function overview(string $team)
 	{
 		return $this->responseService->createSuccessResponseObject(
-			new OverviewResource($this->teamsMatchService->findTeamsMatchByTeamId($team))
+			new OverviewResource($this->teamsMatchService->getTeamsMatchInfo($team))
+		);
+	}
+
+	/**
+	 * @param string $team
+	 * @return mixed
+	 */
+	public function favorite(string $team)
+	{
+		return $this->responseService->createSuccessResponseObject(
+			new FavoriteResource($this->teamsMatchService->getTeamsMatchInfo($team))
 		);
 	}
 }

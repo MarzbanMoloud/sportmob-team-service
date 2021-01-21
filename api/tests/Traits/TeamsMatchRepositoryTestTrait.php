@@ -46,6 +46,7 @@ trait TeamsMatchRepositoryTestTrait
 		?string $status = null,
 		?string $dateTime = null
 	): TeamsMatch {
+		$fakeEvaluation = [TeamsMatch::EVALUATION_DRAW, TeamsMatch::EVALUATION_LOSS, TeamsMatch::EVALUATION_WIN];
 		$fakeTeamsMatchModel = (new TeamsMatch())
 			->setCompetitionId($this->faker->uuid)
 			->setCompetitionName($this->faker->name)
@@ -65,6 +66,7 @@ trait TeamsMatchRepositoryTestTrait
 			)
 			->setIsHome($home ? true : false)
 			->setMatchId($matchId)
+			->setEvaluation($fakeEvaluation[$this->faker->numberBetween(0, 2)])
 			->setStatus($status ?? TeamsMatch::STATUS_UPCOMING)
 			->setCoverage(TeamsMatch::COVERAGE_LOW)
 			->setSortKey(TeamsMatch::generateSortKey(($dateTime) ? new DateTime($dateTime) : new DateTime(), $status ?? TeamsMatch::STATUS_UPCOMING))

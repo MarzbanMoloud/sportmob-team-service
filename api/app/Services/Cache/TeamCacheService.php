@@ -39,4 +39,14 @@ class TeamCacheService extends CacheService implements TeamCacheServiceInterface
 	{
 		return $this->get(self::getTeamKey($teamId));
 	}
+
+	/**
+	 * @param string $teamId
+	 * @param $function
+	 * @return mixed
+	 */
+	public function rememberForeverTeam(string $teamId, $function)
+	{
+		return $this->rememberForever(self::getTeamKey($teamId), $function);
+	}
 }

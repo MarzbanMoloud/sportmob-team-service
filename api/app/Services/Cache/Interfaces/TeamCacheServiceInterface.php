@@ -25,4 +25,11 @@ interface TeamCacheServiceInterface
 	 * @return Team
 	 */
 	public function getTeam(string $teamId): ?Team;
+
+	/**
+	 * @param $teamId
+	 * @param $function
+	 * @return mixed
+	 */
+	public function rememberForeverTeam(string $teamId, $function);
 }

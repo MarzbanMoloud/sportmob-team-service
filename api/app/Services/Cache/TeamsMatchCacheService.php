@@ -15,29 +15,32 @@ class TeamsMatchCacheService extends CacheService implements TeamsMatchCacheServ
 {
 	/**
 	 * @param string $teamId
+	 * @param string $status
 	 * @return string
 	 */
-	public static function getTeamsMatchOverviewByTeamKey(string $teamId): string
+	public static function getTeamsMatchByTeamIdKey(string $teamId, string $status): string
 	{
-		return sprintf(self::TEAMS_MATCH_OVERVIEW_KEY, $teamId);
+		return sprintf(self::TEAMS_MATCH_BY_TEAM_KEY, $teamId, $status);
 	}
 
 	/**
 	 * @param string $teamId
+	 * @param string $status
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTeamsMatchOverviewByTeam(string $teamId, $function)
+	public function rememberForeverTeamsMatchByTeamId(string $teamId, string $status, $function)
 	{
-		return $this->rememberForever(self::getTeamsMatchOverviewByTeamKey($teamId), $function);
+		return $this->rememberForever(self::getTeamsMatchByTeamIdKey($teamId, $status), $function);
 	}
 
 	/**
 	 * @param string $teamId
+	 * @param string $status
 	 * @return bool|mixed
 	 */
-	public function hasTeamsMatchOverviewByTeam(string $teamId)
+	public function hasTeamsMatchByTeamId(string $teamId, string $status)
 	{
-		return $this->hasKey(self::getTeamsMatchOverviewByTeamKey($teamId));
+		return $this->hasKey(self::getTeamsMatchByTeamIdKey($teamId, $status));
 	}
 }

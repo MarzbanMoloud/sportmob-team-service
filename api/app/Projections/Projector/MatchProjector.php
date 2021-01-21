@@ -8,6 +8,7 @@ use App\Events\Projection\MatchWasCreatedProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
+use App\Http\Services\Team\Traits\TeamTraits;
 use App\Models\ReadModels\Embedded\TeamName;
 use App\Models\ReadModels\Team;
 use App\Models\ReadModels\TeamsMatch;
@@ -27,6 +28,8 @@ use Exception;
  */
 class MatchProjector
 {
+	use TeamTraits;
+
 	const SCORES_TYPE_TOTAL = 'total';
 	const SCORES_TYPE_PENALTY = 'penalty';
 	const MATCH_STATUS_GAME_ENDED = 'gameEnded';
@@ -69,10 +72,7 @@ class MatchProjector
 		$awayTeamsMatchModel = $this->createTeamsMatchModel($identifier, $metadata, false);
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
-		/** Remove cache */
-		if ($this->teamsMatchCacheService->hasTeamsMatchOverviewByTeam($identifier['home'])) {
-			$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchOverviewByTeamKey($identifier['home']));
-		}
+		$this->removeTeamsMatchCache($identifier['home']);
 		event(new MatchWasCreatedProjectorEvent($identifier['competition']));
 	}
 
@@ -96,10 +96,7 @@ class MatchProjector
 			foreach ($teamsMatchItems as $teamsMatch) {
 				/** @var TeamsMatch $teamsMatch */
 				$this->updateTeamsMatchByMatchFinishedEvent($teamsMatch, $score, TeamsMatch::EVALUATION_DRAW);
-				/** Remove cache */
-				if ($this->teamsMatchCacheService->hasTeamsMatchOverviewByTeam($teamsMatch->getTeamId())) {
-					$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchOverviewByTeamKey($teamsMatch->getTeamId()));
-				}
+				$this->removeTeamsMatchCache($teamsMatch->getTeamId());
 			}
 			return;
 		}
@@ -110,10 +107,7 @@ class MatchProjector
 				$score,
 				($identifier['winner'] == $teamsMatch->getTeamId()) ? TeamsMatch::EVALUATION_WIN : TeamsMatch::EVALUATION_LOSS
 			);
-			/** Remove cache */
-			if ($this->teamsMatchCacheService->hasTeamsMatchOverviewByTeam($teamsMatch->getTeamId())) {
-				$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchOverviewByTeamKey($teamsMatch->getTeamId()));
-			}
+			$this->removeTeamsMatchCache($teamsMatch->getTeamId());
 		}
 	}
 
@@ -181,12 +175,8 @@ class MatchProjector
 	 */
 	private function createTeamsMatchModel(array $identifier, array $metadata, bool $home = true): TeamsMatch
 	{
-		/**
-		 * @var Team $homeTeamItem
-		 */
-		if (!$homeTeamItem = $this->teamCacheService->getTeam($identifier['home'])) {
-			$homeTeamItem = $this->teamRepository->find(['id' => $identifier['home']]);
-		}
+		/** @var Team $homeTeamItem */
+		$homeTeamItem = $this->findTeam($identifier['home']);
 		if (!$homeTeamItem) {
 			throw new ProjectionException();
 		}
@@ -194,12 +184,9 @@ class MatchProjector
 			->setOfficial($homeTeamItem->getName()->getOfficial())
 			->setOriginal($homeTeamItem->getName()->getOriginal())
 			->setShort($homeTeamItem->getName()->getShort());
-		/**
-		 * @var Team $awayTeamItem
-		 */
-		if (!$awayTeamItem = $this->teamCacheService->getTeam($identifier['away'])) {
-			$awayTeamItem = $this->teamRepository->find(['id' => $identifier['away']]);
-		}
+
+		/** @var Team $awayTeamItem */
+		$awayTeamItem = $this->findTeam($identifier['away']);
 		if (!$awayTeamItem) {
 			throw new ProjectionException();
 		}
@@ -284,6 +271,23 @@ class MatchProjector
 			->setStatus($status)
 			->setSortKey(TeamsMatch::generateSortKey(TeamsMatch::getMatchDate($teamsMatch->getSortKey()), $status));
 		$this->persistTeamsMatch($teamsMatch);
+	}
+
+	/**
+	 * @param string $teamId
+	 */
+	private function removeTeamsMatchCache(string $teamId): void
+	{
+		foreach ([TeamsMatch::STATUS_UPCOMING, TeamsMatch::STATUS_FINISHED] as $status) {
+			if ($this->teamsMatchCacheService->hasTeamsMatchByTeamId($teamId, $status)) {
+				$this->teamsMatchCacheService->forget(
+					TeamsMatchCacheService::getTeamsMatchByTeamIdKey(
+						$teamId,
+						$status
+					)
+				);
+			}
+		}
 	}
 
 	/**
