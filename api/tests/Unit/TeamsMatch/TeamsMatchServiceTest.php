@@ -523,4 +523,10 @@ class TeamsMatchServiceTest extends TestCase
 		$this->expectException(NotFoundHttpException::class);
 		$this->teamsMatchService->getTeamsMatchInfo($this->faker->uuid);
 	}
+
+	protected function tearDown(): void
+	{
+		$this->teamsMatchRepository->drop();
+		$this->teamRepository->drop();
+	}
 }

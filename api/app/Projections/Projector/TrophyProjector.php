@@ -119,7 +119,7 @@ class TrophyProjector
 		try {
 			$this->trophyRepository->persist($trophyModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			throw new ProjectionException('Failed to persist trophy.', $exception->getCode());
+			throw new ProjectionException('Failed to persist trophy.', $exception->getCode(), $exception);
 		}
 	}
 }

@@ -7,6 +7,7 @@ namespace App\Projections\Projector;
 use App\Events\Projection\PlayerWasTransferredProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
+use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TransferRepository;
@@ -73,7 +74,7 @@ class TransferProjector
 					$teamsName[$field] = $this->teamRepository->find(['id' => $identifier[$field]])->getName()->getOriginal();
 				} catch (\Throwable $exception) {
 					throw new ProjectionException(sprintf('Could not find team by given Id :: %s',
-						$identifier[$field]));
+						$identifier[$field]), ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR, $exception);
 				}
 			}
 		}
@@ -130,7 +131,7 @@ class TransferProjector
 		try {
 			$this->transferRepository->persist($transferModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			throw new ProjectionException('Failed to persist transfer.', $exception->getCode());
+			throw new ProjectionException('Failed to persist transfer.', $exception->getCode(), $exception);
 		}
 	}
 }

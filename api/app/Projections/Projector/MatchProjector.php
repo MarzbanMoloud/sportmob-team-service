@@ -299,7 +299,7 @@ class MatchProjector
 		try {
 			$this->teamsMatchRepository->persist($teamsMatch);
 		} catch (DynamoDBRepositoryException $exception) {
-			throw new ProjectionException('Failed to persist teamsMatch.', $exception->getCode());
+			throw new ProjectionException('Failed to persist teamsMatch.', $exception->getCode(), $exception);
 		}
 	}
 }

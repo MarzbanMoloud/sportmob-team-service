@@ -9,7 +9,6 @@ use App\Models\ReadModels\Team;
 use App\Models\Repositories\TeamRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
 use TestCase;
 use Tests\Traits\AmazonBrokerTrait;
 use Tests\Traits\TeamRepositoryTestTrait;

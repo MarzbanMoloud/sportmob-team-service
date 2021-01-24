@@ -5,6 +5,7 @@ namespace Tests\Unit\Team;
 
 
 use App\Services\EventStrategy\TeamWasCreated;
+use App\Services\EventStrategy\TeamWasUpdated;
 use App\ValueObjects\Broker\Mediator\Message;
 use TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -56,5 +57,39 @@ class EventStrategySupportTest extends TestCase
          }');
 		$valueObject = $this->serializer->deserialize($message, Message::class, 'json');
 		$this->assertFalse(app(TeamWasCreated::class)->support($valueObject));
+	}
+
+	public function testTeamWasUpdated()
+	{
+		$message = sprintf('{
+            "headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "2020-11-29T10:49:56+04:30"
+            },
+            "body":{
+                "identifiers": {},
+                "metadata": {}
+             }
+         }', config('mediator-event.events.team_was_updated'));
+		$valueObject = $this->serializer->deserialize($message, Message::class, 'json');
+		$this->assertTrue(app(TeamWasUpdated::class)->support($valueObject));
+	}
+
+	public function testTeamWasUpdatedWhenEventIsEmpty()
+	{
+		$message = sprintf('{
+            "headers":{
+                "event": "",
+                "priority": "1",
+                "date": "2020-11-29T10:49:56+04:30"
+            },
+            "body":{
+                "identifiers": {},
+                "metadata": {}
+             }
+         }');
+		$valueObject = $this->serializer->deserialize($message, Message::class, 'json');
+		$this->assertFalse(app(TeamWasUpdated::class)->support($valueObject));
 	}
 }

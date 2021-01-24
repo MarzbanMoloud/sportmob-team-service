@@ -22,9 +22,6 @@ use DateTimeImmutable;
  */
 class TeamProjector
 {
-	/**
-	 * @var TeamRepository
-	 */
 	private TeamRepository $teamRepository;
 
 	/**
@@ -183,7 +180,7 @@ class TeamProjector
 		try {
 			$this->teamRepository->persist($teamModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			throw new ProjectionException('Failed to persist team.', $exception->getCode());
+			throw new ProjectionException('Failed to persist team.', $exception->getCode(), $exception);
 		}
 	}
 }
