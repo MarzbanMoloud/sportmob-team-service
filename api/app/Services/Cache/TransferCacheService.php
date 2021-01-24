@@ -46,7 +46,7 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	 * @param string $transfer
 	 * @return string
 	 */
-	private static function getUserActionTransferKey(string $action, string $user, string $transfer): string
+	public static function getUserActionTransferKey(string $action, string $user, string $transfer): string
 	{
 		return sprintf(self::USER_ACTION_TRANSFER_KEY, $action, $user, $transfer);
 	}

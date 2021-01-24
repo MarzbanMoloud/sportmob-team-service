@@ -18,7 +18,7 @@ class TeamCacheService extends CacheService implements TeamCacheServiceInterface
 	 * @param string $teamId
 	 * @return string
 	 */
-	private static function getTeamKey(string $teamId): string
+	public static function getTeamKey(string $teamId): string
 	{
 		return sprintf(self::TEAM_KEY, $teamId);
 	}

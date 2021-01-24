@@ -32,6 +32,7 @@ use App\Services\EventStrategy\PlayerWasTransferred;
 use App\Services\EventStrategy\TeamBecameRunnerUp;
 use App\Services\EventStrategy\TeamBecameWinner;
 use App\Services\EventStrategy\TeamWasCreated;
+use App\Services\EventStrategy\TeamWasUpdated;
 use Illuminate\Support\ServiceProvider;
 use Sentry\SentrySdk;
 use SportMob\Translation\Client;
@@ -74,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
     	/*------ Event Mediator Strategy ------*/
         $this->app->tag([
         	TeamWasCreated::class,
+			TeamWasUpdated::class,
 			PlayerWasTransferred::class,
 			TeamBecameRunnerUp::class,
 			TeamBecameWinner::class,

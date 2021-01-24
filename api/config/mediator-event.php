@@ -3,6 +3,7 @@
 return [
     'events' => [
 		'team_was_created' => env('EVENT_TEAM_WAS_CREATED', 'TeamWasCreated'),
+		'team_was_updated' => env('EVENT_TEAM_WAS_UPDATED', 'TeamWasUpdated'),
 		'player_was_transferred' => env('EVENT_PLAYER_WAS_TRANSFERRED', 'PlayerWasTransferred'),
 		'team_became_runner_up' => env('EVENT_TEAM_BECAME_RUNNER_UP', 'TeamBecameRunnerUp'),
 		'team_became_winner' => env('EVENT_TEAM_BECAME_WINNER', 'TeamBecameWinner'),

@@ -14,7 +14,7 @@ interface ResponseServiceInterface
      * Http status codes.
      */
     const STATUS_CODE_SUCCESS = 200;//Success
-    const STATUS_CODE_UPDATE = 202;//update
+    const STATUS_CODE_UPDATE = 204;//update
     const STATUS_CODE_VALIDATION_ERROR = 422;//Validation error
     const STATUS_CODE_CONFLICT_ERROR = 409; //Exist Item error
     const STATUS_CODE_NOT_FOUND_ERROR_404 = 404;//Not found

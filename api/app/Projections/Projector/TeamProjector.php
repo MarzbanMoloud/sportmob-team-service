@@ -5,6 +5,7 @@ namespace App\Projections\Projector;
 
 
 use App\Events\Projection\TeamWasCreatedProjectorEvent;
+use App\Events\Projection\TeamWasUpdatedProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
@@ -54,6 +55,26 @@ class TeamProjector
 	}
 
 	/**
+	 * @param MessageBody $body
+	 * @throws ProjectionException
+	 */
+	public function applyTeamWasUpdated(MessageBody $body): void
+	{
+		$identifier = $body->getIdentifiers();
+		$metadata = $body->getMetadata();
+		if (empty($identifier['team'])) {
+			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+		}
+		if (empty($metadata['name']['original'])) {
+			throw new ProjectionException('OriginalName field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+		}
+		$teamModel = $this->checkItemNotExist($identifier['team']);
+		$teamModel = $this->updateTeamModel($teamModel, $metadata);
+		$this->persistTeam($teamModel);
+		event(new TeamWasUpdatedProjectorEvent($teamModel));
+	}
+
+	/**
 	 * @param array $metadata
 	 * @throws ProjectionException
 	 */
@@ -98,6 +119,23 @@ class TeamProjector
 
 	/**
 	 * @param string $teamId
+	 * @return \App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface
+	 * @throws ProjectionException
+	 */
+	private function checkItemNotExist(string $teamId)
+	{
+		$teamItem = $this->teamRepository->find(['id' => $teamId]);
+		if (!$teamItem) {
+			throw new ProjectionException(
+				sprintf("Team already not exist by following id: %s", $teamId),
+				ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR
+			);
+		}
+		return $teamItem;
+	}
+
+	/**
+	 * @param string $teamId
 	 * @param array $metadata
 	 * @return Team
 	 */
@@ -117,6 +155,23 @@ class TeamProjector
 					->setOfficial( $metadata[ 'officialName' ] )
 					->setShort( $metadata[ 'shortName' ] )
 			);
+	}
+
+	/**
+	 * @param \App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface $teamModel
+	 * @param array $metadata
+	 * @return mixed
+	 */
+	private function updateTeamModel(
+		\App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface $teamModel,
+		array $metadata
+	) {
+		return $teamModel->setName(
+			(new TeamName())
+				->setOriginal($metadata['name']['original'])
+				->setOfficial($metadata['name']['official'])
+				->setShort($metadata['name']['short'])
+		);
 	}
 
 	/**

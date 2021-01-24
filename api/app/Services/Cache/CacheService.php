@@ -59,8 +59,6 @@ class CacheService implements CacheServiceInterface
         if ($clientListCacheKeys) {
             $redis->del($clientListCacheKeys);
         }
-
-        app()->make('cache')->forget($key);
     }
 
     /**

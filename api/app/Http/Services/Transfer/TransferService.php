@@ -9,6 +9,7 @@ use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UserActionTransferNotAllow;
+use App\Services\Cache\TransferCacheService;
 use App\Utilities\Utility;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ReadModels\Transfer;
@@ -125,6 +126,7 @@ class TransferService
 		if ($action == self::TRANSFER_LIKE) {
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_DISLIKE, $user, $transfer)) {
 				$transferItem->setDislike($transferItem->getDislike() - 1);
+				$this->transferCacheService->forget(TransferCacheService::getUserActionTransferKey(self::TRANSFER_DISLIKE, $user, $transfer));
 				$transferItem->setLike($transferItem->getLike() + 1);
 			} else {
 				$transferItem->setLike($transferItem->getLike() + 1);
@@ -132,6 +134,7 @@ class TransferService
 		} else if ($action == self::TRANSFER_DISLIKE) {
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_LIKE, $user, $transfer)) {
 				$transferItem->setLike($transferItem->getLike() - 1);
+				$this->transferCacheService->forget(TransferCacheService::getUserActionTransferKey(self::TRANSFER_LIKE, $user, $transfer));
 				$transferItem->setDislike($transferItem->getDislike() + 1);
 			} else {
 				$transferItem->setDislike($transferItem->getDislike() + 1);
@@ -143,7 +146,6 @@ class TransferService
 			throw new ProjectionException('Failed to update transfer.', $exception->getCode());
 		}
 		$this->transferCacheService->putUserActionTransfer($action, $user, $transfer);
-		$this->transferCacheService->forget('transfer*');
 	}
 
 	/**

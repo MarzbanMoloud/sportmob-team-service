@@ -32,6 +32,7 @@
         <env name="BROKER_TOPIC_NOTIFICATION" value="test_team_notification_topic"/>
         <!--EventMediator-->
         <env name="EVENT_TEAM_WAS_CREATED" value="TeamWasCreated"/>
+        <env name="EVENT_TEAM_WAS_UPDATED" value="TeamWasUpdated"/>
         <env name="EVENT_PLAYER_WAS_TRANSFERRED" value="PlayerWasTransferred"/>
         <env name="EVENT_TEAM_BECAME_RUNNER_UP" value="TeamBecameRunnerUp"/>
         <env name="EVENT_TEAM_BECAME_WINNER" value="TeamBecameWinner"/>

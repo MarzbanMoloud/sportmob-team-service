@@ -4,10 +4,13 @@
 namespace App\Providers;
 
 
+use App\Events\Admin\TeamUpdatedEvent;
 use App\Events\Projection\MatchWasCreatedProjectorEvent;
 use App\Events\Projection\PlayerWasTransferredProjectorEvent;
 use App\Events\Projection\TeamWasCreatedProjectorEvent;
+use App\Events\Projection\TeamWasUpdatedProjectorEvent;
 use App\Events\Projection\TrophyProjectorEvent;
+use App\Listeners\Admin\TeamUpdatedListener;
 use App\Listeners\Projection\MatchWasCreatedProjectorListener;
 use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
 use App\Listeners\Projection\TeamCacheListener;
@@ -35,6 +38,10 @@ class EventServiceProvider extends ServiceProvider
 			TeamCacheListener::class
 		],
 
+		TeamWasUpdatedProjectorEvent::class => [
+			TeamCacheListener::class
+		],
+
 		PlayerWasTransferredProjectorEvent::class => [
 			PlayerWasTransferredProjectorListener::class
 		],
@@ -45,6 +52,10 @@ class EventServiceProvider extends ServiceProvider
 
 		MatchWasCreatedProjectorEvent::class => [
 			MatchWasCreatedProjectorListener::class
+		],
+
+		TeamUpdatedEvent::class => [
+			TeamUpdatedListener::class
 		],
 
         /*----- Broker - Mediator -----*/

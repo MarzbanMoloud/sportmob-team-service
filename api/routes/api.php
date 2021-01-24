@@ -11,6 +11,11 @@
 |
 */
 
+$router->group(['prefix' => 'admin/teams', 'namespace' => 'Admin'], function ($router) {
+	$router->get('/{team}', ['as' => 'admin-teams-show', 'uses' => 'TeamController@show']);
+	$router->put('/{team}', ['as' => 'admin-teams-update', 'uses' => 'TeamController@update']);
+});
+
 $router->group(['prefix' => '/{lang}/teams', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {
 	$router->group(['prefix' => '/transfers'], function ($router) {
 		$router->get('/team/{team}[/{season}]', ['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);
