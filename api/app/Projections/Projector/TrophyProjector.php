@@ -100,7 +100,7 @@ class TrophyProjector
 	 * @param $position
 	 * @return Trophy
 	 */
-	private function createTrophyModel(array $identifiers,Team $team, string $position): Trophy
+	private function createTrophyModel(array $identifiers, Team $team, string $position): Trophy
 	{
 		return (new Trophy())
 			->setCompetitionId($identifiers['competition'])

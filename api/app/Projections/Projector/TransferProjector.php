@@ -8,9 +8,11 @@ use App\Events\Projection\PlayerWasTransferredProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
+use App\Http\Services\Team\Traits\TeamTraits;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TransferRepository;
+use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use DateTimeImmutable;
 
@@ -21,20 +23,26 @@ use DateTimeImmutable;
  */
 class TransferProjector
 {
+	use TeamTraits;
+
 	private TransferRepository $transferRepository;
 	private TeamRepository $teamRepository;
+	private TeamCacheServiceInterface $teamCacheService;
 
 	/**
 	 * TransferProjector constructor.
 	 * @param TransferRepository $transferRepository
 	 * @param TeamRepository $teamRepository
+	 * @param TeamCacheServiceInterface $teamCacheService
 	 */
 	public function __construct(
 		TransferRepository $transferRepository,
-		TeamRepository $teamRepository
+		TeamRepository $teamRepository,
+		TeamCacheServiceInterface $teamCacheService
 	) {
 		$this->transferRepository = $transferRepository;
 		$this->teamRepository = $teamRepository;
+		$this->teamCacheService = $teamCacheService;
 	}
 
 	/**
@@ -71,7 +79,7 @@ class TransferProjector
 		foreach (['from', 'to'] as $field) {
 			if ($identifier[$field]) {
 				try {
-					$teamsName[$field] = $this->teamRepository->find(['id' => $identifier[$field]])->getName()->getOriginal();
+					$teamsName[$field] = $this->findTeam($identifier[$field])->getName()->getOriginal();
 				} catch (\Throwable $exception) {
 					throw new ProjectionException(sprintf('Could not find team by given Id :: %s',
 						$identifier[$field]), ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR, $exception);
