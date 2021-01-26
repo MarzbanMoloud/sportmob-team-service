@@ -30,5 +30,9 @@
         <env name="BROKER_TOPIC_QUESTION" value="es_question_topic"/>
         <env name="BROKER_TOPIC_ANSWER" value="es_answer_topic"/>
         <env name="BROKER_TOPIC_NOTIFICATION" value="es_notification_topic"/>
+        <!-- Monolog-->
+        <env name="ELASTIC_HOST" value="search-log-jhltx5r67swshaz6hwsfzoga6u.eu-west-2.es.amazonaws.com"/>
+        <env name="ELASTIC_USERNAME" value="sportmob-log-user"/>
+        <env name="ELASTIC_PASSWORD" value="vZJtcRqW5#mJ6qF3mHDTz"/>
     </php>
 </phpunit>
