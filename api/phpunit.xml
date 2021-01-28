@@ -39,5 +39,9 @@
         <env name="EVENT_MATCH_WAS_CREATED" value="MatchWasCreated"/>
         <env name="EVENT_MATCH_FINISHED" value="MatchFinished"/>
         <env name="EVENT_MATCH_STATUS_CHANGED" value="MatchStatusChanged"/>
+        <!-- Monolog-->
+        <env name="ELASTIC_HOST" value="search-log-jhltx5r67swshaz6hwsfzoga6u.eu-west-2.es.amazonaws.com"/>
+        <env name="ELASTIC_USERNAME" value="sportmob-log-user"/>
+        <env name="ELASTIC_PASSWORD" value="vZJtcRqW5#mJ6qF3mHDTz"/>
     </php>
 </phpunit>
