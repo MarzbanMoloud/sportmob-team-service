@@ -22,7 +22,7 @@ class BrokerCommandContext implements BrokerCommandStrategyInterface
     public function handle(Message $message): void
     {
         foreach (app()->tagged(BrokerCommandEventInterface::TAG_NAME) as $event) {
-            if ($event->support($message->getHeaders()->getKey())) {
+            if ($event->support($message->getHeaders())) {
                 $event->handle($message);
                 return;
             }
