@@ -12,6 +12,7 @@ use App\Models\Repositories\TransferRepository;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use App\ValueObjects\Broker\Notification\Body as NotificationBody;
 use App\ValueObjects\Broker\Notification\Headers as NotificationHeaders;
@@ -56,12 +57,14 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	}
 
 	/**
-	 * @param string $key
+	 * @param Headers $headers
 	 * @return bool
 	 */
-	public function support(string $key): bool
+	public function support(Headers $headers): bool
 	{
-		return $key == PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY;
+		return
+			($headers->getDestination() == config('broker.services.team_name')) &&
+			($headers->getKey() == PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
 	}
 
 	/**

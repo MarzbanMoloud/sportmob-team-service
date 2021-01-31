@@ -143,7 +143,7 @@ class TransferService
 		try {
 			$this->transferRepository->persist($transferItem);
 		} catch (DynamoDBRepositoryException $exception) {
-			throw new ProjectionException('Failed to update transfer.', $exception->getCode());
+			throw new ProjectionException('Failed to update transfer.', $exception->getCode(), $exception);
 		}
 		$this->transferCacheService->putUserActionTransfer($action, $user, $transfer);
 	}

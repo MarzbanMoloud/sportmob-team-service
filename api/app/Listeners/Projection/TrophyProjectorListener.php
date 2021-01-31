@@ -78,7 +78,7 @@ class TrophyProjectorListener
 		try {
 			$this->trophyRepository->persist($event->trophy);
 		} catch (DynamoDBRepositoryException $exception) {
-			throw new ProjectionException('Failed to update trophy.', $exception->getCode());
+			throw new ProjectionException('Failed to update trophy.', $exception->getCode(), $exception);
 		}
 	}
 }

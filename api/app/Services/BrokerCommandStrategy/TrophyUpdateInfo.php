@@ -10,6 +10,7 @@ use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TrophyRepository;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Sentry\State\HubInterface;
 
@@ -41,12 +42,14 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 	}
 
 	/**
-	 * @param string $key
+	 * @param Headers $headers
 	 * @return bool
 	 */
-	public function support(string $key): bool
+	public function support(Headers $headers): bool
 	{
-		return $key == TrophyProjectorListener::BROKER_EVENT_KEY;
+		return
+			($headers->getDestination() == config('broker.services.team_name')) &&
+			($headers->getKey() == TrophyProjectorListener::BROKER_EVENT_KEY);
 	}
 
 	/**
