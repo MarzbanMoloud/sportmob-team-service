@@ -75,29 +75,6 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 	}
 
 	/**
-	 * @param string $playerId
-	 * @return array|null
-	 */
-	public function findKnownPlayer(string $playerId)
-	{
-		try {
-			$Result = $this->dynamoDbClient->query( [
-				'TableName'                 => static::getTableName(),
-				'KeyConditionExpression'    => 'playerId = :playerId',
-				'FilterExpression'          => 'playerName <> :null',
-				'ExpressionAttributeValues' => $this->marshalJson( [
-					':playerId' => $playerId,
-					':null'     => null
-				] )
-			] );
-		} catch (\Exception $e) {
-			$this->sentryHub->captureException( $e );
-			return [];
-		}
-		return $this->deserializeResult( $Result );
-	}
-
-	/**
 	 * @param string $teamId
 	 * @param string $season
 	 * @return array

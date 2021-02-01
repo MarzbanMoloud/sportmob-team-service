@@ -61,45 +61,6 @@ class TransferRepositoryTest extends TestCase
 		$this->assertEmpty($response);
 	}
 
-	public function testFindKnownPlayer()
-	{
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$fakeTransferModel->setPlayerName(null);
-		$this->transferRepository->persist($fakeTransferModel);
-
-		$fakePlayerId = $this->faker->uuid;
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$fakeTransferModel->setPlayerId($fakePlayerId)->setPlayerName(null);
-		$this->transferRepository->persist($fakeTransferModel);
-
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$fakeTransferModel->setPlayerId($fakePlayerId)->setPlayerName($this->faker->name);
-		$this->transferRepository->persist($fakeTransferModel);
-
-		$response = $this->transferRepository->findKnownPlayer($fakePlayerId);
-		$this->assertInstanceOf(Transfer::class, $response[0]);
-	}
-
-	public function testFindKnownPlayerWhenItemNotExist()
-	{
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$fakeTransferModel->setPlayerName(null);
-		$this->transferRepository->persist($fakeTransferModel);
-
-		$fakePlayerId = $this->faker->uuid;
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$fakeTransferModel->setPlayerId($fakePlayerId)->setPlayerName(null);
-		$this->transferRepository->persist($fakeTransferModel);
-
-		$response = $this->transferRepository->findKnownPlayer($fakePlayerId);
-		$this->assertEmpty($response);
-	}
-
 	public function testGetTransfersByTeamId()
 	{
 		$fakeTeamId = $this->faker->uuid;

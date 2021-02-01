@@ -23,7 +23,7 @@ trait PlayerWasTransferredNotificationTrait
 	 */
 	private function sendNotification(Transfer $transfer, string $event)
 	{
-		//TODO:: Edit after Behnoud contract!
+		//TODO:: Contract!
 		$notificationMessage = (new NotificationMessage())
 			->setHeaders(
 				(new NotificationHeaders())

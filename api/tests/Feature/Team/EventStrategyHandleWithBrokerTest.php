@@ -4,18 +4,14 @@
 namespace Tests\Feature\Team;
 
 
-use App\Exceptions\Projection\ProjectionException;
 use App\Models\ReadModels\Team;
 use App\Models\Repositories\TeamRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
-use App\Services\EventStrategy\TeamWasCreated;
 use App\ValueObjects\Broker\Mediator\Message as MediatorMessage;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use App\ValueObjects\Broker\Mediator\MessageHeader;
-use Carbon\Carbon;
 use TestCase;
 use Faker\Factory;
-use App\ValueObjects\Broker\Mediator\Message;
 use Tests\Traits\AmazonBrokerTrait;
 use Tests\Traits\TeamRepositoryTestTrait;
 use Symfony\Component\Serializer\SerializerInterface;
