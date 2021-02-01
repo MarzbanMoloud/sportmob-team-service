@@ -1,12 +1,12 @@
 <?php
 
 
-namespace App\Models\ReadModels\Embedded;
+namespace App\ValueObjects\ReadModel;
 
 
 /**
  * Class TeamName
- * @package App\Models\ReadModels\Embedded
+ * @package App\ValueObjects\ReadModel
  */
 class TeamName
 {

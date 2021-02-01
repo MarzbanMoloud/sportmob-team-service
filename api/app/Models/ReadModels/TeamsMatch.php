@@ -4,7 +4,7 @@
 namespace App\Models\ReadModels;
 
 
-use App\Models\ReadModels\Embedded\TeamName;
+use App\ValueObjects\ReadModel\TeamName;
 use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface;
 use DateTime;
 

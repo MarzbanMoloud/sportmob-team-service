@@ -5,7 +5,7 @@ namespace Tests\Unit\TeamsMatch;
 
 
 use App\Http\Services\TeamsMatch\TeamsMatchService;
-use App\Models\ReadModels\Embedded\TeamName;
+use App\ValueObjects\ReadModel\TeamName;
 use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;

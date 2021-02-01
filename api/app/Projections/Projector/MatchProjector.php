@@ -9,7 +9,7 @@ use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Team\Traits\TeamTraits;
-use App\Models\ReadModels\Embedded\TeamName;
+use App\ValueObjects\ReadModel\TeamName;
 use App\Models\ReadModels\Team;
 use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamRepository;

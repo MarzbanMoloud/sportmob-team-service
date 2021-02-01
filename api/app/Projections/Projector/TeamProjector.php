@@ -9,10 +9,10 @@ use App\Events\Projection\TeamWasUpdatedProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
-use App\Models\ReadModels\Embedded\TeamName;
 use App\Models\ReadModels\Team;
 use App\Models\Repositories\TeamRepository;
 use App\ValueObjects\Broker\Mediator\MessageBody;
+use App\ValueObjects\ReadModel\TeamName;
 use DateTimeImmutable;
 
 

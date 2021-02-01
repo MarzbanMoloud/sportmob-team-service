@@ -6,7 +6,7 @@ namespace App\Http\Services\Team;
 
 use App\Events\Admin\TeamUpdatedEvent;
 use App\Http\Services\Team\Traits\TeamTraits;
-use App\Models\ReadModels\Embedded\TeamName;
+use App\ValueObjects\ReadModel\TeamName;
 use App\Models\Repositories\TeamRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\ValueObjects\DTO\TeamDTO;
