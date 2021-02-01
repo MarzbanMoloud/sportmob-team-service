@@ -5,6 +5,7 @@ namespace App\Services\Cache;
 
 
 use App\Services\Cache\Interfaces\CacheServiceInterface;
+use Illuminate\Contracts\Cache\Repository;
 
 
 /**
@@ -13,6 +14,13 @@ use App\Services\Cache\Interfaces\CacheServiceInterface;
  */
 class CacheService implements CacheServiceInterface
 {
+	private Repository $cache;
+	
+	public function __construct(Repository $cache)
+	{
+		$this->cache = $cache;
+	}
+
     /**
      * @param $function
      * @param string $key
@@ -21,7 +29,7 @@ class CacheService implements CacheServiceInterface
      */
     public function remember($function, string $key, $ttl = CacheServiceInterface::DAY)
     {
-        return app()->make('cache')->remember($key, $ttl, $function);
+        return $this->cache->remember($key, $ttl, $function);
     }
 
     /**
@@ -31,7 +39,7 @@ class CacheService implements CacheServiceInterface
      */
     public function rememberForever(string $key, $function)
     {
-        return app()->make('cache')->rememberForever($key, $function);
+        return $this->cache->rememberForever($key, $function);
     }
 
     /**
@@ -43,7 +51,7 @@ class CacheService implements CacheServiceInterface
      */
     public function rememberByTags($function, string $key, int $ttl, array $tags)
     {
-        return app()->make('cache')->tags($tags)->remember($key, $ttl, $function);
+        return $this->cache->tags($tags)->remember($key, $ttl, $function);
     }
 
     /**
@@ -53,7 +61,7 @@ class CacheService implements CacheServiceInterface
     public function forget(string $key)
     {
         $redis = app()->make('redis');
-        $cachePrefix = app()->make('cache')->getPrefix();
+        $cachePrefix = $this->cache->getPrefix();
         $cacheKeyPattern = $cachePrefix . $key;
         $clientListCacheKeys = $redis->keys($cacheKeyPattern);
         if ($clientListCacheKeys) {
@@ -67,7 +75,7 @@ class CacheService implements CacheServiceInterface
      */
     public function forgetByTags(array $tags)
     {
-        app()->make('cache')->tags($tags)->flush();
+        $this->cache->tags($tags)->flush();
     }
 
     /**
@@ -77,7 +85,7 @@ class CacheService implements CacheServiceInterface
      */
     public function put(string $key, $value)
     {
-        app()->make('cache')->put($key, $value);
+        $this->cache->put($key, $value);
     }
 
     /**
@@ -89,7 +97,7 @@ class CacheService implements CacheServiceInterface
      */
     public function putByTags(string $key, $value, int $ttl, array $tags)
     {
-        app()->make('cache')->tags($tags)->put($key, $value, $ttl);
+        $this->cache->tags($tags)->put($key, $value, $ttl);
     }
 
     /**
@@ -98,7 +106,7 @@ class CacheService implements CacheServiceInterface
      */
     public function get(string $key)
     {
-        return app()->make('cache')->get($key);
+        return $this->cache->get($key);
     }
 
     /**
@@ -108,7 +116,7 @@ class CacheService implements CacheServiceInterface
      */
     public function getByTags(string $key, array $tags)
     {
-        return app()->make('cache')->tags($tags)->get($key);
+        return $this->cache->tags($tags)->get($key);
     }
 
     /**
@@ -117,7 +125,7 @@ class CacheService implements CacheServiceInterface
      */
     public function hasKey(string $key)
     {
-        if (app()->make('cache')->has($key)) {
+        if ($this->cache->has($key)) {
             return true;
         } else {
             return false;
@@ -131,7 +139,7 @@ class CacheService implements CacheServiceInterface
      */
     public function hasByTags(string $key, array $tags)
     {
-        if (app()->make('cache')->tags($tags)->has($key)) {
+        if ($this->cache->tags($tags)->has($key)) {
             return true;
         } else {
             return false;
@@ -143,6 +151,6 @@ class CacheService implements CacheServiceInterface
      */
     public function flush()
     {
-        app()->make('cache')->flush();
+        $this->cache->flush();
     }
 }
