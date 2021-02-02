@@ -57,7 +57,7 @@ class TransferProjector
 			throw new ProjectionException( 'Empty or invalid player ID' );
 		}
 		if (empty( $identifier[ 'to' ] )) {
-			throw new ProjectionException( 'Both from and to team Id is invalid or empty.' );
+			throw new ProjectionException( 'to team Id is invalid or empty.' );
 		}
 		if ($latestTransfers = $this->transferRepository->findActiveTransfer( $identifier[ 'player' ] )) {
 			$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $metadata);
