@@ -59,6 +59,7 @@ class TransferProjector
 		if (empty( $identifier[ 'to' ] )) {
 			throw new ProjectionException( 'to team Id is invalid or empty.' );
 		}
+		$this->checkMetadataValidation($metadata);
 		if ($latestTransfers = $this->transferRepository->findActiveTransfer( $identifier[ 'player' ] )) {
 			$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $metadata);
 		}
@@ -66,6 +67,28 @@ class TransferProjector
 		$transferModel->prePersist();
 		$this->persistTransfer($transferModel);
 		event(new PlayerWasTransferredProjectorEvent($transferModel));
+	}
+
+	private function checkMetadataValidation(array $metadata): void
+	{
+		$requiredFields = [
+			'startDate' => 'Start Date',
+			'type' => 'Type',
+		];
+		foreach ($requiredFields as $fieldName => $prettyFieldName) {
+			if (empty($metadata[$fieldName])) {
+				throw new ProjectionException(
+					sprintf("%s field is empty.", $prettyFieldName),
+					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
+				);
+			}
+		}
+		if (is_null($metadata['active'])) {
+			throw new ProjectionException(
+				sprintf("Active field is empty."),
+				ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
+			);
+		}
 	}
 
 	/**
