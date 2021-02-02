@@ -20,20 +20,7 @@ class SetLangMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $lang = $request->route('lang');
-
-        if(!in_array($lang , $this->allowedLanguages())){
-            throw new \Exception('Lang not support.');
-        }
-        app()->setLocale($lang);
+        app()->setLocale($request->route('lang'));
         return $next($request);
-    }
-
-    /**
-     * @return array
-     */
-    private function allowedLanguages()
-    {
-        return explode(",", env("ALLOWED_LANGUAGES"));
     }
 }
