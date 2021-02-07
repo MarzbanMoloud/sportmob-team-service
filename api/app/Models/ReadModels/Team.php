@@ -175,9 +175,9 @@ class Team implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
-	 * @return string
+	 * @return bool
 	 */
-	public function getActive(): string
+	public function getActive(): bool
 	{
 		return $this->active;
 	}

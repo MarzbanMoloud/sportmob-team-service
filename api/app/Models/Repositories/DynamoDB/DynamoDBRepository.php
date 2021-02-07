@@ -78,7 +78,7 @@ abstract class DynamoDBRepository
 				'TableName' => static::getTableName(),
 				'Item' => $item
 			]);
-		} catch (Exception $exception) {$this->sentryHub->captureException($exception);
+		} catch (Exception $exception) {
 			throw new DynamoDBRepositoryException($exception->getMessage(), $exception->getCode(), $exception);
 		}
 	}
