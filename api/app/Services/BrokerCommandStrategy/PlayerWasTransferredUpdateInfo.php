@@ -75,20 +75,15 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		if (empty($commandQuery->getBody())) {
 			return;
 		}
-		$playerId = $commandQuery->getHeaders()->getId();
-		$playerTransfers = $this->transferRepository->findByPlayerId($playerId);
-		foreach ($playerTransfers as $transfer) {
-			/**
-			 * @var Transfer $transfer
-			 */
-			$transfer
-				->setPlayerName($commandQuery->getBody()['fullName'] ?? $commandQuery->getBody()['shortName'])
-				->setPlayerPosition($commandQuery->getBody()['position']);
-			try {
-				$this->transferRepository->persist($transfer);
-			} catch (DynamoDBRepositoryException $exception) {
-				$this->sentryHub->captureException($exception);
-			}
+		[$playerId, $startDate] = explode('#', $commandQuery->getHeaders()->getId());
+		/** @var Transfer $transfer */
+		$transfer = $this->transferRepository->find(['playerId' => $playerId, 'startDate' => $startDate]);
+		$transfer->setPlayerName($commandQuery->getBody()['fullName'] ?? $commandQuery->getBody()['shortName'])
+			->setPlayerPosition($commandQuery->getBody()['position']);
+		try {
+			$this->transferRepository->persist($transfer);
+		} catch (DynamoDBRepositoryException $exception) {
+			$this->sentryHub->captureException($exception);
 		}
 		/**
 		 * Put playerInfo in cache.

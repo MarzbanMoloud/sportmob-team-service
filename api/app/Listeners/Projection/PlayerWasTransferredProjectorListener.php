@@ -14,6 +14,7 @@ use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -56,12 +57,15 @@ class PlayerWasTransferredProjectorListener
 	 */
 	public function handle(PlayerWasTransferredProjectorEvent $event)
 	{
-		if (! $this->brokerMessageCacheService->hasPlayerInfo($event->transfer->getPlayerId())) {
+		if (!$this->brokerMessageCacheService->hasPlayerInfo($event->transfer->getPlayerId())) {
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
 						->setKey(self::BROKER_EVENT_KEY)
-						->setId($event->transfer->getPlayerId())
+						->setId(
+							sprintf('%s#%s', $event->transfer->getPlayerId(),
+								$event->transfer->getStartDate()->format(DateTimeInterface::ATOM))
+						)
 						->setDestination(config('broker.services.player_name'))
 						->setSource(config('broker.services.team_name'))
 						->setDate(Carbon::now()->toDateTimeString())

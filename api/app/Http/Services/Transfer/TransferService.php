@@ -4,13 +4,16 @@
 namespace App\Http\Services\Transfer;
 
 
+use App\Events\Admin\PlayerTransferUpdatedEvent;
 use App\Events\UserLikeTransferEvent;
+use App\Exceptions\DynamoDB\DynamoDBException;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UserActionTransferNotAllow;
 use App\Services\Cache\TransferCacheService;
 use App\Utilities\Utility;
+use App\ValueObjects\DTO\PlayerTransferDTO;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TransferRepository;
@@ -54,7 +57,7 @@ class TransferService
 		if (is_null($season)) {
 			$season = $this->getAllSeasons($teamId)[0] ?? sprintf("%d-%d", date('Y'), date('Y') + 1);
 		}
-		$transfers = $this->transferCacheService->rememberForeverTransferByTeam($teamId,
+		$transfers = $this->transferCacheService->rememberForeverTransferByTeam($teamId, $season,
 			function () use ($teamId, $season) {
 				return $this->transferRepository->findByTeamId($teamId, $season);
 			});
@@ -112,17 +115,7 @@ class TransferService
 		if ($this->transferCacheService->hasUserActionTransfer($action, $user, $transfer)) {
 			throw new UserActionTransferNotAllow();
 		}
-		$transferDecoded = Utility::jsonDecode($transfer);
-		/**
-		 * @var Transfer $transferItem
-		 */
-		$transferItem = $this->transferRepository->find([
-			'playerId'  => $transferDecoded['playerId'],
-			'startDate' => $transferDecoded['startDate']
-		]);
-		if (!$transferItem) {
-			throw new NotFoundHttpException();
-		}
+		$transferItem = $this->findTransfer($transfer);
 		if ($action == self::TRANSFER_LIKE) {
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_DISLIKE, $user, $transfer)) {
 				$transferItem->setDislike($transferItem->getDislike() - 1);
@@ -149,6 +142,52 @@ class TransferService
 	}
 
 	/**
+	 * @param PlayerTransferDTO $playerTransferDTO
+	 * @throws DynamoDBException
+	 */
+	public function updateItem(PlayerTransferDTO $playerTransferDTO)
+	{
+		$transferItem = $this->findTransfer($playerTransferDTO->getTransferId());
+		try {
+			$transferItem
+				->setContractDate(
+					(new \DateTimeImmutable())->setDate(
+						date('Y', $playerTransferDTO->getContractDate()),
+						date('m', $playerTransferDTO->getContractDate()),
+						date('d', $playerTransferDTO->getContractDate())
+					)->setTime(
+						date('H', $playerTransferDTO->getContractDate()),
+						date('i', $playerTransferDTO->getContractDate()),
+						date('s', $playerTransferDTO->getContractDate()),
+					)
+				)
+				->setAnnouncedDate(
+					(new \DateTimeImmutable())->setDate(
+						date('Y', $playerTransferDTO->getAnnouncedDate()),
+						date('m', $playerTransferDTO->getAnnouncedDate()),
+						date('d', $playerTransferDTO->getAnnouncedDate())
+					)->setTime(
+						date('H', $playerTransferDTO->getAnnouncedDate()),
+						date('i', $playerTransferDTO->getAnnouncedDate()),
+						date('s', $playerTransferDTO->getAnnouncedDate()),
+					)
+				)
+				->setMarketValue($playerTransferDTO->getMarketValue());
+			$this->transferRepository->persist($transferItem);
+		} catch (\Exception $exception) {
+			throw new DynamoDBException(
+				'Transfer Update failed.',
+				Response::HTTP_UNPROCESSABLE_ENTITY,
+				$exception,
+				config('common.error_codes.transfer_update_failed')
+			);
+		}
+		$this->transferCacheService->forget(TransferCacheService::getTransferByPlayerKey($transferItem->getPlayerId()));
+		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getToTeamId(), $transferItem->getSeason()));
+		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getFromTeamId(), $transferItem->getSeason()));
+	}
+
+	/**
 	 * @param array $transfers
 	 */
 	private static function sortBySeason(array &$transfers)
@@ -160,5 +199,25 @@ class TransferService
 				}
 				return ($first->getSeason() > $second->getSeason()) ? 1 : -1;
 			});
+	}
+
+	/**
+	 * @param string $transfer
+	 * @return Transfer
+	 */
+	private function findTransfer(string $transfer): Transfer
+	{
+		$transferDecoded = Utility::jsonDecode($transfer);
+		/**
+		 * @var Transfer $transferItem
+		 */
+		$transferItem = $this->transferRepository->find([
+			'playerId' => $transferDecoded['playerId'],
+			'startDate' => $transferDecoded['startDate']
+		]);
+		if (!$transferItem) {
+			throw new NotFoundHttpException();
+		}
+		return $transferItem;
 	}
 }

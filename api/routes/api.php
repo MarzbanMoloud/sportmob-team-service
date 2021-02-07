@@ -11,9 +11,15 @@
 |
 */
 
-$router->group(['prefix' => 'admin/teams', 'namespace' => 'Admin'], function ($router) {
-	$router->get('/{team}', ['as' => 'admin-teams-show', 'uses' => 'TeamController@show']);
-	$router->put('/{team}', ['as' => 'admin-teams-update', 'uses' => 'TeamController@update']);
+$router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function ($router) {
+	$router->group(['prefix' => '/teams'], function ($router) {
+		$router->get('/{team}', ['as' => 'admin-teams-show', 'uses' => 'TeamController@show']);
+		$router->put('/{team}', ['as' => 'admin-teams-update', 'uses' => 'TeamController@update']);
+	});
+	$router->group(['prefix' => '/transfers/players'], function ($router) {
+		$router->get('/{player}', ['as' => 'admin-transfers-players-index', 'uses' => 'TransferController@index']);
+		$router->put('/{transfer}', ['as' => 'admin-transfers-players-update', 'uses' => 'TransferController@update']);
+	});
 });
 
 $router->group(['prefix' => '/{lang}/teams', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {

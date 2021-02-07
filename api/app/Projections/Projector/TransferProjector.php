@@ -9,6 +9,7 @@ use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Team\Traits\TeamTraits;
+use App\Http\Services\Transfer\TransferService;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TransferRepository;
@@ -28,21 +29,25 @@ class TransferProjector
 	private TransferRepository $transferRepository;
 	private TeamRepository $teamRepository;
 	private TeamCacheServiceInterface $teamCacheService;
+	private TransferService $transferService;
 
 	/**
 	 * TransferProjector constructor.
 	 * @param TransferRepository $transferRepository
 	 * @param TeamRepository $teamRepository
 	 * @param TeamCacheServiceInterface $teamCacheService
+	 * @param TransferService $transferService
 	 */
 	public function __construct(
 		TransferRepository $transferRepository,
 		TeamRepository $teamRepository,
-		TeamCacheServiceInterface $teamCacheService
+		TeamCacheServiceInterface $teamCacheService,
+		TransferService $transferService
 	) {
 		$this->transferRepository = $transferRepository;
 		$this->teamRepository = $teamRepository;
 		$this->teamCacheService = $teamCacheService;
+		$this->transferService = $transferService;
 	}
 
 	/**
@@ -60,13 +65,18 @@ class TransferProjector
 			throw new ProjectionException( 'to team Id is invalid or empty.' );
 		}
 		$this->checkMetadataValidation($metadata);
-		if ($latestTransfers = $this->transferRepository->findActiveTransfer( $identifier[ 'player' ] )) {
-			$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $metadata);
+		if ($metadata['active'] == true) {
+			if ($latestTransfers = $this->transferRepository->findActiveTransfer( $identifier[ 'player' ] )) {
+				$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $metadata);
+			}
 		}
 		$transferModel = $this->createTransferModel($identifier, $metadata);
 		$transferModel->prePersist();
 		$this->persistTransfer($transferModel);
 		event(new PlayerWasTransferredProjectorEvent($transferModel));
+		/** Create cache by call service */
+		$this->transferService->listByPlayer($identifier[ 'player' ]);
+		$this->transferService->listByTeam($identifier[ 'to' ], $transferModel->getSeason());
 	}
 
 	private function checkMetadataValidation(array $metadata): void

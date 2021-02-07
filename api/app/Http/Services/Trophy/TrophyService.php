@@ -49,11 +49,15 @@ class TrophyService
 				 * @var Trophy $trophy
 				 * @var Trophy $excludedTrophies
 				 */
-				$excludedTrophies[] = $this->trophyRepository->findExcludesByCompetitionTournament(
+				$item = $this->trophyRepository->findExcludesByCompetitionTournament(
 					$trophy->getCompetitionId(),
 					$trophy->getTournamentId(),
 					$trophy->getTeamId()
-				)[0];
+				);
+				if (!$item) {
+					continue;
+				}
+				$excludedTrophies[] = $item[0];
 			}
 			return array_merge($excludedTrophies, $trophies);
 		});

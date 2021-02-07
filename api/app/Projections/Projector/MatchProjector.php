@@ -9,6 +9,7 @@ use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Team\Traits\TeamTraits;
+use App\Http\Services\TeamsMatch\TeamsMatchService;
 use App\ValueObjects\ReadModel\TeamName;
 use App\Models\ReadModels\Team;
 use App\Models\ReadModels\TeamsMatch;
@@ -38,6 +39,7 @@ class MatchProjector
 	private TeamCacheServiceInterface $teamCacheService;
 	private TeamRepository $teamRepository;
 	private TeamsMatchCacheServiceInterface $teamsMatchCacheService;
+	private TeamsMatchService $teamsMatchService;
 
 	/**
 	 * MatchProjector constructor.
@@ -45,17 +47,20 @@ class MatchProjector
 	 * @param TeamCacheServiceInterface $teamCacheService
 	 * @param TeamRepository $teamRepository
 	 * @param TeamsMatchCacheServiceInterface $teamsMatchCacheService
+	 * @param TeamsMatchService $teamsMatchService
 	 */
 	public function __construct(
 		TeamsMatchRepository $teamsMatchRepository,
 		TeamCacheServiceInterface $teamCacheService,
 		TeamRepository $teamRepository,
-		TeamsMatchCacheServiceInterface $teamsMatchCacheService
+		TeamsMatchCacheServiceInterface $teamsMatchCacheService,
+		TeamsMatchService $teamsMatchService
 	) {
 		$this->teamsMatchRepository = $teamsMatchRepository;
 		$this->teamCacheService = $teamCacheService;
 		$this->teamRepository = $teamRepository;
 		$this->teamsMatchCacheService = $teamsMatchCacheService;
+		$this->teamsMatchService = $teamsMatchService;
 	}
 
 	/**
@@ -73,7 +78,10 @@ class MatchProjector
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
 		$this->removeTeamsMatchCache($identifier['home']);
-		event(new MatchWasCreatedProjectorEvent($identifier['competition']));
+		event(new MatchWasCreatedProjectorEvent($identifier));
+		/** Create cache by call service */
+		$this->teamsMatchService->getTeamsMatchInfo($identifier['home']);
+		$this->teamsMatchService->getTeamsMatchInfo($identifier['away']);
 	}
 
 	/**
@@ -245,18 +253,18 @@ class MatchProjector
 	 */
 	private function updateTeamsMatchByMatchFinishedEvent(TeamsMatch $teamsMatch, array $score, string $evaluation): void
 	{
+		$formattedScore = [];
+		foreach ($score as $item) {
+			$formattedScore[$item['type']] =  [
+				'home' => $item['home'],
+				'away' => $item['away']
+			];
+		}
 		$teamsMatch
 			->setEvaluation($evaluation)
 			->setStatus(TeamsMatch::STATUS_FINISHED)
 			->setSortKey(TeamsMatch::generateSortKey(TeamsMatch::getMatchDate($teamsMatch->getSortKey()), TeamsMatch::STATUS_FINISHED))
-			->setResult(array_map(function ($item){
-				return [
-					$item['type'] => [
-						'home' => $item['home'],
-						'away' => $item['away']
-					]
-				];
-			}, $score));
+			->setResult($formattedScore);
 		$this->persistTeamsMatch($teamsMatch);
 	}
 

@@ -56,18 +56,19 @@ class MatchWasCreatedProjectorListener
 	 */
 	public function handle(MatchWasCreatedProjectorEvent $event)
 	{
-		if (! $this->brokerMessageCacheService->hasCompetitionName($event->competitionId)) {
+		if (!$this->brokerMessageCacheService->hasCompetitionName($event->identifier['competition'])) {
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
 						->setKey(self::BROKER_EVENT_KEY)
-						->setId($event->competitionId)
+						->setId(sprintf('%s#%s#%s', $event->identifier['match'], $event->identifier['home'],
+							$event->identifier['away']))
 						->setDestination(config('broker.services.competition_name'))
 						->setSource(config('broker.services.team_name'))
 						->setDate(Carbon::now()->toDateTimeString())
 				)->setBody([
 					'entity' => config('broker.services.competition_name'),
-					'id' => $event->competitionId
+					'id' => $event->identifier['competition']
 				]);
 			$this->broker->flushMessages()->addMessage(
 				self::BROKER_EVENT_KEY,
@@ -75,18 +76,31 @@ class MatchWasCreatedProjectorListener
 			)->produceMessage(config('broker.topics.question'));
 			return;
 		}
-		$competitionName = $this->brokerMessageCacheService->getCompetitionName($event->competitionId);
-		$teamsMatchItems = $this->teamsMatchRepository->findTeamsMatchByCompetitionId($event->competitionId);
-		foreach ($teamsMatchItems as $teamsMatch) {
-			/**
-			 * @var TeamsMatch $teamsMatch
-			 */
-			$teamsMatch->setCompetitionName($competitionName);
-			try {
-				$this->teamsMatchRepository->persist($teamsMatch);
-			} catch (DynamoDBRepositoryException $exception) {
-				$this->sentryHub->captureException($exception);
-			}
+		$competitionName = $this->brokerMessageCacheService->getCompetitionName($event->identifier['competition']);
+		$this->updateTeamsMatch($event->identifier['match'], $event->identifier['home'], $competitionName);
+		$this->updateTeamsMatch($event->identifier['match'], $event->identifier['away'], $competitionName);
+	}
+
+	/**
+	 * @param string $matchId
+	 * @param string $teamId
+	 * @param string $competitionName
+	 */
+	private function updateTeamsMatch(string $matchId, string $teamId, string $competitionName): void
+	{
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $matchId,
+			'teamId' => $teamId
+		]);
+		if (!$teamsMatchItem) {
+			return;
+		}
+		/** @var TeamsMatch $teamsMatchItem */
+		$teamsMatchItem->setCompetitionName($competitionName);
+		try {
+			$this->teamsMatchRepository->persist($teamsMatchItem);
+		} catch (DynamoDBRepositoryException $exception) {
+			$this->sentryHub->captureException($exception);
 		}
 	}
 }

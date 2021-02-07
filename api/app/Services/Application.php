@@ -57,8 +57,7 @@ class Application extends LumenApplication
 			'password' => config('monolog.handler.elasticSearch.password')
 		]), [
 			'index' => config('monolog.index'),
-			'type' => self::TYPE,
-			'ignore_error' => true
+			'type' => self::TYPE
 		]))->setFormatter(new SportmobFormatter(config('monolog.index'), self::TYPE));
 	}
 }

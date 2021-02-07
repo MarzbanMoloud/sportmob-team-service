@@ -148,41 +148,6 @@ class TeamsMatchRepositoryTest extends TestCase
 		$this->assertEmpty($response);
 	}
 
-	public function testFindTeamsMatchByOpponentId()
-	{
-		$fakeOpponentId = $this->faker->uuid;
-		$fakeOpponentName = $this->faker->uuid;
-		$this->createTeamsMatchModel(
-			$this->faker->uuid,
-			$fakeOpponentId,
-			$this->faker->name,
-			$fakeOpponentName,
-			$this->faker->uuid,
-			true,
-			TeamsMatch::STATUS_FINISHED
-		);
-		$this->createTeamsMatchModel(
-			$this->faker->uuid,
-			$fakeOpponentId,
-			$this->faker->name,
-			$fakeOpponentName,
-			$this->faker->uuid,
-			true,
-			TeamsMatch::STATUS_UPCOMING
-		);
-
-		$response = $this->teamsMatchRepository->findTeamsMatchByOpponentId($fakeOpponentId);
-		$this->assertCount(2, $response);
-		$this->assertInstanceOf(TeamsMatch::class, $response[0]);
-		$this->assertInstanceOf(TeamsMatch::class, $response[1]);
-	}
-
-	public function testFindTeamsMatchByOpponentIdWhenItemNotExist()
-	{
-		$response = $this->teamsMatchRepository->findTeamsMatchByOpponentId($this->faker->uuid);
-		$this->assertEmpty($response);
-	}
-
 	public function testFindTeamsMatchByMatchId()
 	{
 		$fakeTeamsMatchModel = $this->createTeamsMatchModel(
@@ -199,25 +164,6 @@ class TeamsMatchRepositoryTest extends TestCase
 	public function testFindTeamsMatchByMatchIdWhenItemNotExist()
 	{
 		$response = $this->teamsMatchRepository->findTeamsMatchByMatchId($this->faker->uuid);
-		$this->assertEmpty($response);
-	}
-
-	public function testFindTeamsMatchByCompetitionId()
-	{
-		$fakeTeamsMatchModel = $this->createTeamsMatchModel(
-			$this->faker->uuid,
-			$this->faker->uuid,
-			$this->faker->name,
-			$this->faker->name,
-			$this->faker->uuid
-		);
-		$response = $this->teamsMatchRepository->findTeamsMatchByCompetitionId($fakeTeamsMatchModel->getCompetitionId());
-		$this->assertInstanceOf(TeamsMatch::class, $response[0]);
-	}
-
-	public function testFindTeamsMatchByCompetitionIdWhenItemNotExist()
-	{
-		$response = $this->teamsMatchRepository->findTeamsMatchByCompetitionId($this->faker->uuid);
 		$this->assertEmpty($response);
 	}
 

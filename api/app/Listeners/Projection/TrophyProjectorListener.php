@@ -52,12 +52,13 @@ class TrophyProjectorListener
 	 */
 	public function handle(TrophyProjectorEvent $event)
 	{
-		if (! $this->brokerMessageCacheService->hasTournamentInfo($event->trophy->getTournamentId())) {
+		if (!$this->brokerMessageCacheService->hasTournamentInfo($event->trophy->getTournamentId())) {
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
 						->setKey(self::BROKER_EVENT_KEY)
-						->setId($event->trophy->getTournamentId())
+						->setId(sprintf('%s#%s#%s', $event->trophy->getCompetitionId(),
+							$event->trophy->getTournamentId(), $event->trophy->getTeamId()))
 						->setDestination(config('broker.services.competition_name'))
 						->setSource(config('broker.services.team_name'))
 						->setDate(Carbon::now()->toDateTimeString())

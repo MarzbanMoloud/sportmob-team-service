@@ -18,6 +18,9 @@ use Tests\Traits\TransferRepositoryTestTrait;
  */
 class TransferRepositoryTest extends TestCase
 {
+	static int $fakeStartYear = 1992;
+	static int $fakeEndYear = 1993;
+
 	use TransferRepositoryTestTrait;
 
 	private TransferRepository $transferRepository;
@@ -48,10 +51,19 @@ class TransferRepositoryTest extends TestCase
 
 	public function testFindActiveTransfer()
 	{
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$this->transferRepository->persist($fakeTransferModel);
-		$response = $this->transferRepository->findActiveTransfer($fakeTransferModel->getPlayerId());
+		$fakePlayerId = '';
+		for ($i = 0; $i<10; $i++) {
+			$fakeTransferModel = $this->createTransferModel();
+			if ($i == 5) {
+				$fakeTransferModel->setActive(true);
+				$fakePlayerId = $fakeTransferModel->getPlayerId();
+			} else {
+				$fakeTransferModel->setActive(false);
+			}
+			$fakeTransferModel->prePersist();
+			$this->transferRepository->persist($fakeTransferModel);
+		}
+		$response = $this->transferRepository->findActiveTransfer($fakePlayerId);
 		$this->assertInstanceOf(Transfer::class, $response[0]);
 	}
 
@@ -80,7 +92,6 @@ class TransferRepositoryTest extends TestCase
 		$fakeTransferModel->setStartDate(new DateTimeImmutable());
 		$fakeTransferModel->prePersist();
 		$this->transferRepository->persist($fakeTransferModel);
-
 		$this->assertCount(5, $this->transferRepository->findAll());
 		$this->assertCount(3, $this->transferRepository->findByTeamId($fakeTeamId,'2019-2020'));
 	}
@@ -92,11 +103,22 @@ class TransferRepositoryTest extends TestCase
 
 	public function testGetAllSeasons()
 	{
-		$fakeTransferModel = $this->createTransferModel();
-		$fakeTransferModel->prePersist();
-		$this->transferRepository->persist($fakeTransferModel);
-		$response = $this->transferRepository->getAllSeasons($fakeTransferModel->getFromTeamId());
-		$this->assertNotNull($response[0]);
+		$fromTeamId = $this->faker->uuid;
+		$toTeamId = $this->faker->uuid;
+		for ($i = 0; $i < 50; $i++) {
+			self::$fakeStartYear+=1;
+			self::$fakeEndYear+=1;
+			$fakeTransferModel = $this->createTransferModel();
+			$fakeTransferModel
+				->setStartDate(new DateTimeImmutable(self::$fakeStartYear . '-01-01'))
+				->setEndDate(new DateTimeImmutable(self::$fakeEndYear . '-01-01'))
+				->setFromTeamId($fromTeamId)
+				->setToTeamId($toTeamId);
+			$fakeTransferModel->prePersist();
+			$this->transferRepository->persist($fakeTransferModel);
+		}
+		$response = $this->transferRepository->getAllSeasons($toTeamId);
+		$this->assertCount(50, $response);
 	}
 
 	public function testGetAllSeasonsWhenItemsNotExist()

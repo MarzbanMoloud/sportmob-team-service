@@ -60,20 +60,16 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 		if (empty($commandQuery->getBody())) {
 			return;
 		}
-		$tournamentId = $commandQuery->getHeaders()->getId();
-		$trophies = $this->trophyRepository->findByTournamentId($tournamentId);
-		foreach ($trophies as $trophy) {
-			/**
-			 * @var Trophy $trophy
-			 */
-			$trophy
-				->setTournamentSeason($commandQuery->getBody()['season'])
-				->setCompetitionName($commandQuery->getBody()['competitionName']);
-			try {
-				$this->trophyRepository->persist($trophy);
-			} catch (DynamoDBRepositoryException $exception) {
-				$this->sentryHub->captureException($exception);
-			}
+		[$competitionId, $tournamentId, $teamId] = explode('#', $commandQuery->getHeaders()->getId());
+		$sortKey = sprintf("%s#%s", $tournamentId, $teamId);
+		/** @var Trophy $trophy */
+		$trophy = $this->trophyRepository->find(['competitionId' => $competitionId, 'sortKey' => $sortKey]);
+		$trophy->setTournamentSeason($commandQuery->getBody()['season'])
+			->setCompetitionName($commandQuery->getBody()['competitionName']);
+		try {
+			$this->trophyRepository->persist($trophy);
+		} catch (DynamoDBRepositoryException $exception) {
+			$this->sentryHub->captureException($exception);
 		}
 		$data = $commandQuery->getBody();
 		unset($data['entity']);

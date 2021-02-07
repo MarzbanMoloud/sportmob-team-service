@@ -23,7 +23,7 @@ class Trophy implements DynamoDBRepositoryModelInterface
 	private string $teamId;
 	private string $teamName;
 	private string $position;
-	private string $belongTo;
+	private string $sortKey;
 	private string $competitionId;
 	private ?string $competitionName = null;
 	private string $tournamentId;
@@ -94,18 +94,18 @@ class Trophy implements DynamoDBRepositoryModelInterface
 	/**
 	 * @return string
 	 */
-	public function getBelongTo(): string
+	public function getSortKey(): string
 	{
-		return $this->belongTo;
+		return $this->sortKey;
 	}
 
 	/**
-	 * @param string $belongTo
+	 * @param string $sortKey
 	 * @return Trophy
 	 */
-	public function setBelongTo(string $belongTo): Trophy
+	public function setSortKey(string $sortKey): Trophy
 	{
-		$this->belongTo = $belongTo;
+		$this->sortKey = $sortKey;
 		return $this;
 	}
 
@@ -181,9 +181,9 @@ class Trophy implements DynamoDBRepositoryModelInterface
 		return $this;
 	}
 
-	private function createBelongTo()
+	private function createSortKey()
 	{
-		$this->belongTo = sprintf("%s#%s", $this->tournamentId, $this->teamId);
+		$this->sortKey = sprintf("%s#%s", $this->tournamentId, $this->teamId);
 	}
 
 	/**
@@ -191,6 +191,6 @@ class Trophy implements DynamoDBRepositoryModelInterface
 	 */
 	public function prePersist()
 	{
-		$this->createBelongTo();
+		$this->createSortKey();
 	}
 }

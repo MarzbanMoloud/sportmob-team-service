@@ -60,25 +60,38 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 		if (empty($commandQuery->getBody())) {
 			return;
 		}
-		$competitionId = $commandQuery->getHeaders()->getId();
-		$teamsMatchItems = $this->teamsMatchRepository->findTeamsMatchByCompetitionId($competitionId);
-		foreach ($teamsMatchItems as $teamsMatch) {
-			/**
-			 * @var TeamsMatch $teamsMatch
-			 */
-			$teamsMatch->setCompetitionName($commandQuery->getBody()['competitionName']);
-			try {
-				$this->teamsMatchRepository->persist($teamsMatch);
-			} catch (DynamoDBRepositoryException $exception) {
-				$this->sentryHub->captureException($exception);
-			}
-		}
+		[$matchId, $homeTeamId, $awayTeamId] = explode('#', $commandQuery->getHeaders()->getId());
+		$this->updateTeamsMatch($matchId, $homeTeamId, $commandQuery->getBody()['competitionName']);
+		$this->updateTeamsMatch($matchId, $awayTeamId, $commandQuery->getBody()['competitionName']);
 		/**
 		 * Put competitionName in cache.
 		 */
 		$this->brokerMessageCacheService->putCompetitionName([
-			'id' => $competitionId,
+			'id' => $commandQuery->getBody()['id'],
 			'name' => $commandQuery->getBody()['competitionName']
 		]);
+	}
+
+	/**
+	 * @param string $matchId
+	 * @param string $teamId
+	 * @param string $competitionName
+	 */
+	private function updateTeamsMatch(string $matchId, string $teamId, string $competitionName): void
+	{
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $matchId,
+			'teamId' => $teamId
+		]);
+		if (!$teamsMatchItem) {
+			return;
+		}
+		/** @var TeamsMatch $teamsMatchItem */
+		$teamsMatchItem->setCompetitionName($competitionName);
+		try {
+			$this->teamsMatchRepository->persist($teamsMatchItem);
+		} catch (DynamoDBRepositoryException $exception) {
+			$this->sentryHub->captureException($exception);
+		}
 	}
 }

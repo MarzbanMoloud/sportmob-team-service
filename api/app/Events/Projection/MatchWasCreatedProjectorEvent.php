@@ -13,14 +13,14 @@ use App\Events\Event;
  */
 class MatchWasCreatedProjectorEvent extends Event
 {
-	public string $competitionId;
+	public array $identifier;
 
 	/**
 	 * MatchWasCreatedProjectorEvent constructor.
-	 * @param string $competitionId
+	 * @param array $identifier
 	 */
-	public function __construct(string $competitionId)
+	public function __construct(array $identifier)
 	{
-		$this->competitionId = $competitionId;
+		$this->identifier = $identifier;
 	}
 }

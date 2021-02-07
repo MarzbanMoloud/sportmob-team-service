@@ -8,6 +8,7 @@ use App\Events\Projection\TrophyProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
+use App\Http\Services\Trophy\TrophyService;
 use App\Models\ReadModels\Team;
 use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TeamRepository;
@@ -23,18 +24,22 @@ class TrophyProjector
 {
 	private TrophyRepository $trophyRepository;
 	private TeamRepository $teamRepository;
+	private TrophyService $trophyService;
 
 	/**
 	 * TrophyProjector constructor.
 	 * @param TrophyRepository $trophyRepository
 	 * @param TeamRepository $teamRepository
+	 * @param TrophyService $trophyService
 	 */
 	public function __construct(
 		TrophyRepository $trophyRepository,
-		TeamRepository $teamRepository
+		TeamRepository $teamRepository,
+		TrophyService $trophyService
 	) {
 		$this->trophyRepository = $trophyRepository;
 		$this->teamRepository = $teamRepository;
+		$this->trophyService = $trophyService;
 	}
 
 	/**
@@ -64,13 +69,16 @@ class TrophyProjector
 	{
 		$identifiers = $body->getIdentifiers();
 		$this->checkIdentifiersValidation($identifiers);
-		if (!$team = $this->teamRepository->find(['id' => $identifiers[ 'team' ]])) {
+		if (!$team = $this->teamRepository->find(['id' => $identifiers['team']])) {
 			throw new ProjectionException(sprintf('Could not find team by given Id : %s', $identifiers['team']));
 		}
 		$trophyModel = $this->createTrophyModel($identifiers, $team, $position);
 		$trophyModel->prePersist();
 		$this->persistTrophy($trophyModel);
 		event(new TrophyProjectorEvent($trophyModel));
+		/** Create cache by call service */
+		$this->trophyService->getTrophiesByTeam($identifiers['team']);
+		$this->trophyService->getTrophiesByCompetition($identifiers['competition']);
 	}
 
 	/**

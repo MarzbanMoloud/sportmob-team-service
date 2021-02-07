@@ -12,5 +12,6 @@ return [
 		'transfer_team_seasons_not_found' => 'TM-001',
 		'User_is_not_allowed_to_like' => 'TM-002',
 		'team_update_failed' => 'TM-003',
+		'transfer_update_failed' => 'TM-004',
     ]
 ];

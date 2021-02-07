@@ -57,6 +57,7 @@ class TeamRepositoryTest extends TestCase
 		$this->assertEquals($fakeTeamModel->getId(), $response->getId());
 		$this->assertEquals($fakeTeamModel->getName(), $response->getName());
 		$this->assertEquals($fakeTeamModel->getCountry(), $response->getCountry());
+		$this->assertEquals($fakeTeamModel->getCountryId(), $response->getCountryId());
 		$this->assertEquals($fakeTeamModel->getGender(), $response->getGender());
 		$this->assertEquals($fakeTeamModel->getCity(), $response->getCity());
 		$this->assertEquals($fakeTeamModel->getFounded(), $response->getFounded());

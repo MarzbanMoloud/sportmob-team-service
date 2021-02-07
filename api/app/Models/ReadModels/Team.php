@@ -22,6 +22,7 @@ class Team implements DynamoDBRepositoryModelInterface
 
 	private string $id;
 	private string $country;
+	private string $countryId;
 	private string $city;
 	private string $founded;
 	private string $gender;
@@ -62,6 +63,24 @@ class Team implements DynamoDBRepositoryModelInterface
 	public function setCountry(string $country): Team
 	{
 		$this->country = $country;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCountryId(): string
+	{
+		return $this->countryId;
+	}
+
+	/**
+	 * @param string $countryId
+	 * @return Team
+	 */
+	public function setCountryId(string $countryId): Team
+	{
+		$this->countryId = $countryId;
 		return $this;
 	}
 

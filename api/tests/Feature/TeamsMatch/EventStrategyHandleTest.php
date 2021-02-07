@@ -10,6 +10,7 @@ use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Services\BrokerCommandStrategy\MatchWasCreatedUpdatedInfo;
+use App\Services\Cache\TeamsMatchCacheService;
 use App\Services\EventStrategy\MatchFinished;
 use App\Services\EventStrategy\MatchStatusChanged;
 use App\Services\EventStrategy\MatchWasCreated;
@@ -37,12 +38,14 @@ class EventStrategyHandleTest extends TestCase
 	private TeamRepository $teamRepository;
 	private \Faker\Generator $faker;
 	private TeamsMatchRepository $teamsMatchRepository;
+	private TeamsMatchCacheService $teamsMatchCacheService;
 
 	protected function setUp(): void
 	{
 		$this->createApplication();
 		$this->faker = Factory::create();
 		$this->teamRepository = app(TeamRepository::class);
+		$this->teamsMatchCacheService = app(TeamsMatchCacheService::class);
 		$this->teamsMatchRepository = app(TeamsMatchRepository::class);
 		$this->setupAWSBroker();
 		$this->createTeamTable();
@@ -130,7 +133,12 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals(config('broker.services.team_name'), $payload['headers']['source']);
 		$this->assertEquals(config('broker.services.competition_name'), $payload['headers']['destination']);
 		$this->assertEquals(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY, $payload['headers']['key']);
-		$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $payload['headers']['id']);
+		$this->assertEquals(
+			sprintf('%s#%s#%s',
+				$message->getBody()->getIdentifiers()['match'],
+				$message->getBody()->getIdentifiers()['home'],
+				$message->getBody()->getIdentifiers()['away']
+			), $payload['headers']['id']);
 		$this->assertNotNull($payload['headers']['date']);
 		$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $payload['body']['id']);
 		$this->assertEquals(config('broker.services.competition_name'), $payload['body']['entity']);
@@ -141,25 +149,37 @@ class EventStrategyHandleTest extends TestCase
 			->setHeaders(
 				(new Headers())
 					->setKey(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY)
-					->setId($message->getBody()->getIdentifiers()['competition'])
+					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
 					->setDate(Carbon::now()->toDateTimeString())
 			)->setBody([
 				'entity' => config('broker.services.competition_name'),
-				'id' => $message->getBody()->getIdentifiers()['competition'],
+				'id' => $payload['body']['id'],
 				'competitionName' => 'Premier League',
 			]);
 		/**
 		 * Handle answer message from player service for update player info in transfer model.
 		 */
 		app(MatchWasCreatedUpdatedInfo::class)->handle($answerMessage);
-		$teamsMatchItems = $this->teamsMatchRepository->findTeamsMatchByCompetitionId(
-			$message->getBody()->getIdentifiers()['competition']
-		);
-		foreach ($teamsMatchItems as $teamsMatch) {
-			$this->assertEquals('Premier League', $teamsMatch->getCompetitionName());
-		}
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $message->getBody()->getIdentifiers()['match'],
+			'teamId' => $message->getBody()->getIdentifiers()['home']
+		]);
+		$this->assertEquals('Premier League', $teamsMatchItem->getCompetitionName());
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $message->getBody()->getIdentifiers()['match'],
+			'teamId' => $message->getBody()->getIdentifiers()['away']
+		]);
+		$this->assertEquals('Premier League', $teamsMatchItem->getCompetitionName());
+
+		/**
+		 * Read from Cache
+		 */
+		$response = app('cache')->get($this->teamsMatchCacheService->getTeamsMatchByTeamIdKey($fakeHomeId, TeamsMatch::STATUS_UPCOMING));
+		$this->assertInstanceOf(TeamsMatch::class, $response[0]);
+		$response = app('cache')->get($this->teamsMatchCacheService->getTeamsMatchByTeamIdKey($fakeAwayId, TeamsMatch::STATUS_UPCOMING));
+		$this->assertInstanceOf(TeamsMatch::class, $response[0]);
 	}
 
 	public function testMatchWasCreatedHandleWhenCoverageIsNull()
@@ -243,7 +263,12 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals(config('broker.services.team_name'), $payload['headers']['source']);
 		$this->assertEquals(config('broker.services.competition_name'), $payload['headers']['destination']);
 		$this->assertEquals(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY, $payload['headers']['key']);
-		$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $payload['headers']['id']);
+		$this->assertEquals(
+			sprintf('%s#%s#%s',
+				$message->getBody()->getIdentifiers()['match'],
+				$message->getBody()->getIdentifiers()['home'],
+				$message->getBody()->getIdentifiers()['away']
+			), $payload['headers']['id']);
 		$this->assertNotNull($payload['headers']['date']);
 		$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $payload['body']['id']);
 		$this->assertEquals(config('broker.services.competition_name'), $payload['body']['entity']);
@@ -254,25 +279,29 @@ class EventStrategyHandleTest extends TestCase
 			->setHeaders(
 				(new Headers())
 					->setKey(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY)
-					->setId($message->getBody()->getIdentifiers()['competition'])
+					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
 					->setDate(Carbon::now()->toDateTimeString())
 			)->setBody([
 				'entity' => config('broker.services.competition_name'),
-				'id' => $message->getBody()->getIdentifiers()['competition'],
+				'id' => $payload['body']['id'],
 				'competitionName' => 'Premier League',
 			]);
 		/**
 		 * Handle answer message from player service for update player info in transfer model.
 		 */
 		app(MatchWasCreatedUpdatedInfo::class)->handle($answerMessage);
-		$teamsMatchItems = $this->teamsMatchRepository->findTeamsMatchByCompetitionId(
-			$message->getBody()->getIdentifiers()['competition']
-		);
-		foreach ($teamsMatchItems as $teamsMatch) {
-			$this->assertEquals('Premier League', $teamsMatch->getCompetitionName());
-		}
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $message->getBody()->getIdentifiers()['match'],
+			'teamId' => $message->getBody()->getIdentifiers()['home']
+		]);
+		$this->assertEquals('Premier League', $teamsMatchItem->getCompetitionName());
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $message->getBody()->getIdentifiers()['match'],
+			'teamId' => $message->getBody()->getIdentifiers()['away']
+		]);
+		$this->assertEquals('Premier League', $teamsMatchItem->getCompetitionName());
 	}
 
 	public function testMatchWasCreatedHandleWhenCompetitionNameIsNull()
@@ -355,7 +384,12 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals(config('broker.services.team_name'), $payload['headers']['source']);
 		$this->assertEquals(config('broker.services.competition_name'), $payload['headers']['destination']);
 		$this->assertEquals(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY, $payload['headers']['key']);
-		$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $payload['headers']['id']);
+		$this->assertEquals(
+			sprintf('%s#%s#%s',
+				$message->getBody()->getIdentifiers()['match'],
+				$message->getBody()->getIdentifiers()['home'],
+				$message->getBody()->getIdentifiers()['away']
+			), $payload['headers']['id']);
 		$this->assertNotNull($payload['headers']['date']);
 		$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $payload['body']['id']);
 		$this->assertEquals(config('broker.services.competition_name'), $payload['body']['entity']);
@@ -366,7 +400,7 @@ class EventStrategyHandleTest extends TestCase
 			->setHeaders(
 				(new Headers())
 					->setKey(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY)
-					->setId($message->getBody()->getIdentifiers()['competition'])
+					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
 					->setDate(Carbon::now()->toDateTimeString())
@@ -375,12 +409,16 @@ class EventStrategyHandleTest extends TestCase
 		 * Handle answer message from player service for update player info in transfer model.
 		 */
 		app(MatchWasCreatedUpdatedInfo::class)->handle($answerMessage);
-		$teamsMatchItems = $this->teamsMatchRepository->findTeamsMatchByCompetitionId(
-			$message->getBody()->getIdentifiers()['competition']
-		);
-		foreach ($teamsMatchItems as $teamsMatch) {
-			$this->assertNull($teamsMatch->getCompetitionName());
-		}
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $message->getBody()->getIdentifiers()['match'],
+			'teamId' => $message->getBody()->getIdentifiers()['home']
+		]);
+		$this->assertNull($teamsMatchItem->getCompetitionName());
+		$teamsMatchItem = $this->teamsMatchRepository->find([
+			'matchId' => $message->getBody()->getIdentifiers()['match'],
+			'teamId' => $message->getBody()->getIdentifiers()['away']
+		]);
+		$this->assertNull($teamsMatchItem->getCompetitionName());
 	}
 
 	public function testMatchWasCreatedHandleWhenIdentifierIsNull()
@@ -571,6 +609,18 @@ class EventStrategyHandleTest extends TestCase
 			$this->assertInstanceOf(TeamsMatch::class, $item);
 			$this->assertEquals(TeamsMatch::STATUS_FINISHED, $item->getStatus());
 			$this->assertNotEmpty($item->getResult());
+			$this->assertCount(2, $item->getResult());
+			$this->assertEquals([
+				"total" => [
+					"home" => 2,
+					"away" => 2
+				],
+				"penalty" => [
+					"home" => 1,
+					"away" => 1
+				]
+			], $item->getResult());
+
 			$this->assertContains($item->getEvaluation(), [TeamsMatch::EVALUATION_WIN, TeamsMatch::EVALUATION_LOSS]);
 		}
 	}

@@ -17,7 +17,6 @@ class TrophyRepository extends DynamoDBRepository implements DynamoDBRepositoryI
 {
 	public const TROPHY_TEAM_INDEX = 'TrophyTeamIndex';
 	public const TROPHY_COMPETITION_TOURNAMENT_INDEX = 'TrophyCompetitionTournamentIndex';
-	public const TROPHY_TOURNAMENT_INDEX = 'TrophyTournamentIndex';
 
 	/**
 	 * @return string
@@ -56,26 +55,6 @@ class TrophyRepository extends DynamoDBRepository implements DynamoDBRepositoryI
 	}
 
 	/**
-	 * @param string $tournamentId
-	 * @return array
-	 */
-	public function findByTournamentId(string $tournamentId): array
-	{
-		try {
-			$Result = $this->dynamoDbClient->query( [
-				'TableName'                 => static::getTableName(),
-				'IndexName'                 => self::TROPHY_TOURNAMENT_INDEX,
-				'KeyConditionExpression'    => 'tournamentId = :tournamentId',
-				'ExpressionAttributeValues' => $this->marshalJson([':tournamentId' => $tournamentId])
-			] );
-		} catch (\Exception $e) {
-			$this->sentryHub->captureException( $e );
-			return [];
-		}
-		return $this->deserializeResult( $Result );
-	}
-
-	/**
 	 * @param string $competitionId
 	 * @return array|null
 	 */
@@ -105,7 +84,7 @@ class TrophyRepository extends DynamoDBRepository implements DynamoDBRepositoryI
 		try {
 			$Result = $this->dynamoDbClient->query( [
 				'TableName'                 => static::getTableName(),
-				'KeyConditionExpression'    => 'competitionId = :competition and begins_with(belongTo,:tournament)',
+				'KeyConditionExpression'    => 'competitionId = :competition and begins_with(sortKey,:tournament)',
 				'FilterExpression'          => 'teamId <> :team',
 				'ExpressionAttributeValues' => $this->marshalJson( [
 					':competition' => $competitionId,
@@ -133,7 +112,7 @@ class TrophyRepository extends DynamoDBRepository implements DynamoDBRepositoryI
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				],
 				[
-					'AttributeName' => 'belongTo',
+					'AttributeName' => 'sortKey',
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				],
 				[
@@ -151,7 +130,7 @@ class TrophyRepository extends DynamoDBRepository implements DynamoDBRepositoryI
 					'KeyType'       => DynamoDBRepositoryInterface::KEY_HASH
 				],
 				[
-					'AttributeName' => 'belongTo',
+					'AttributeName' => 'sortKey',
 					'KeyType'       => DynamoDBRepositoryInterface::KEY_RANGE
 				]
 			],
@@ -161,20 +140,6 @@ class TrophyRepository extends DynamoDBRepository implements DynamoDBRepositoryI
 					'KeySchema'             => [
 						[
 							'AttributeName' => 'teamId',
-							'KeyType'       => DynamoDBRepositoryInterface::KEY_HASH
-						]
-					],
-					'Projection'            => [ 'ProjectionType' => DynamoDBRepositoryInterface::PROJECTION_ALL ],
-					'ProvisionedThroughput' => [
-						'ReadCapacityUnits'  => 1,
-						'WriteCapacityUnits' => 1
-					]
-				],
-				[
-					'IndexName'             => self::TROPHY_TOURNAMENT_INDEX,
-					'KeySchema'             => [
-						[
-							'AttributeName' => 'tournamentId',
 							'KeyType'       => DynamoDBRepositoryInterface::KEY_HASH
 						]
 					],

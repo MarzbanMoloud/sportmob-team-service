@@ -15,18 +15,19 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 {
 	/**
 	 * @param string $teamId
+	 * @param string $season
 	 * @return string
 	 */
-	private static function getTransferByTeamKey(string $teamId): string
+	public static function getTransferByTeamKey(string $teamId, string $season): string
 	{
-		return sprintf(self::TRANSFER_BY_TEAM_KEY, $teamId);
+		return sprintf(self::TRANSFER_BY_TEAM_KEY, $teamId, $season);
 	}
 
 	/**
 	 * @param string $playerId
 	 * @return string
 	 */
-	private static function getTransferByPlayerKey(string $playerId): string
+	public static function getTransferByPlayerKey(string $playerId): string
 	{
 		return sprintf(self::TRANSFER_BY_PLAYER_KEY, $playerId);
 	}
@@ -35,7 +36,7 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	 * @param string $teamId
 	 * @return string
 	 */
-	private static function getAllSeasonsByTeamKey(string $teamId): string
+	public static function getAllSeasonsByTeamKey(string $teamId): string
 	{
 		return sprintf(self::TRANSFER_All_SEASONS_BY_TEAM_KEY, $teamId);
 	}
@@ -53,12 +54,13 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 
 	/**
 	 * @param string $teamId
+	 * @param string $season
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransferByTeam(string $teamId, $function)
+	public function rememberForeverTransferByTeam(string $teamId, string $season, $function)
 	{
-		return $this->rememberForever(self::getTransferByTeamKey($teamId), $function);
+		return $this->rememberForever(self::getTransferByTeamKey($teamId, $season), $function);
 	}
 
 	/**

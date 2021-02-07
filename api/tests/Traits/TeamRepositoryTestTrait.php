@@ -37,6 +37,7 @@ trait TeamRepositoryTestTrait
 			->setGender($gender[$this->faker->numberBetween(0, 1)])
 			->setFounded('12112')
 			->setCountry($this->faker->country)
+			->setCountryId($this->faker->uuid)
 			->setCity($this->faker->city)
 			->setType($types[$this->faker->numberBetween(0, 1)])
 			->setActive($active[$this->faker->numberBetween(0, 1)])

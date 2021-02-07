@@ -17,18 +17,18 @@ class TrophyCacheService extends CacheService implements TrophyCacheServiceInter
 	 * @param string $teamId
 	 * @return string
 	 */
-	private static function getTrophyByTeamKey(string $teamId): string
+	public static function getTrophyByTeamKey(string $teamId): string
 	{
 		return sprintf(self::TROPHY_BY_TEAM_KEY, $teamId);
 	}
 
 	/**
-	 * @param string $teamId
+	 * @param string $competitionId
 	 * @return string
 	 */
-	private static function getTrophyByCompetitionKey(string $teamId): string
+	public static function getTrophyByCompetitionKey(string $competitionId): string
 	{
-		return sprintf(self::TROPHY_BY_COMPETITION_KEY, $teamId);
+		return sprintf(self::TROPHY_BY_COMPETITION_KEY, $competitionId);
 	}
 
 	/**

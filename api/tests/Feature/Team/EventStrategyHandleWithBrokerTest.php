@@ -60,6 +60,7 @@ class EventStrategyHandleWithBrokerTest extends TestCase
 				"officialName" => $this->faker->name,
 				"type" => 'club',
 				"country" => $this->faker->country,
+				"countryId" => $this->faker->uuid,
 				"city" => $this->faker->city,
 				"active" => false,
 				"founded" => '1234',
@@ -89,6 +90,7 @@ class EventStrategyHandleWithBrokerTest extends TestCase
 		$this->assertEquals($message->getBody()->getMetadata()['officialName'], $response->getName()->getOfficial());
 		$this->assertEquals($message->getBody()->getMetadata()['type'], $response->getType());
 		$this->assertEquals($message->getBody()->getMetadata()['country'], $response->getCountry());
+		$this->assertEquals($message->getBody()->getMetadata()['countryId'], $response->getCountryId());
 		$this->assertEquals($message->getBody()->getMetadata()['city'], $response->getCity());
 		$this->assertEquals($message->getBody()->getMetadata()['founded'], $response->getFounded());
 		$this->assertEquals($message->getBody()->getMetadata()['gender'], $response->getGender());
@@ -103,7 +105,7 @@ class EventStrategyHandleWithBrokerTest extends TestCase
 		$this->assertEquals($message->getBody()->getMetadata()['shortName'], $response->getName()->getShort());
 		$this->assertEquals($message->getBody()->getMetadata()['officialName'], $response->getName()->getOfficial());
 		$this->assertEquals($message->getBody()->getMetadata()['type'], $response->getType());
-		$this->assertEquals($message->getBody()->getMetadata()['country'], $response->getCountry());
+		$this->assertEquals($message->getBody()->getMetadata()['countryId'], $response->getCountryId());
 		$this->assertEquals($message->getBody()->getMetadata()['city'], $response->getCity());
 		$this->assertEquals($message->getBody()->getMetadata()['founded'], $response->getFounded());
 		$this->assertEquals($message->getBody()->getMetadata()['gender'], $response->getGender());

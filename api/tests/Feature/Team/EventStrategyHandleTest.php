@@ -56,6 +56,7 @@ class EventStrategyHandleTest extends TestCase
 					"officialName": "Barcelona_official",
 					"type": "club",
 					"country": "England",
+					"countryId": "10458356-653d-11eb-ae93-0242ac130002",
 					"city": "Manchester",
 					"active": true,
 					"founded": "1234",
@@ -83,6 +84,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals($message->getBody()->getMetadata()['officialName'], $response->getName()->getOfficial());
 		$this->assertEquals($message->getBody()->getMetadata()['type'], $response->getType());
 		$this->assertEquals($message->getBody()->getMetadata()['country'], $response->getCountry());
+		$this->assertEquals($message->getBody()->getMetadata()['countryId'], $response->getCountryId());
 		$this->assertEquals($message->getBody()->getMetadata()['city'], $response->getCity());
 		$this->assertEquals($message->getBody()->getMetadata()['founded'], $response->getFounded());
 		$this->assertEquals($message->getBody()->getMetadata()['gender'], $response->getGender());
@@ -98,6 +100,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals($message->getBody()->getMetadata()['officialName'], $response->getName()->getOfficial());
 		$this->assertEquals($message->getBody()->getMetadata()['type'], $response->getType());
 		$this->assertEquals($message->getBody()->getMetadata()['country'], $response->getCountry());
+		$this->assertEquals($message->getBody()->getMetadata()['countryId'], $response->getCountryId());
 		$this->assertEquals($message->getBody()->getMetadata()['city'], $response->getCity());
 		$this->assertEquals($message->getBody()->getMetadata()['founded'], $response->getFounded());
 		$this->assertEquals($message->getBody()->getMetadata()['gender'], $response->getGender());
@@ -125,6 +128,7 @@ class EventStrategyHandleTest extends TestCase
 					"officialName": "Barcelona_official",
 					"type": "club",
 					"country": "England",
+					"countryId": "10458356-653d-11eb-ae93-0242ac130002",
 					"city": "Manchester",
 					"active": true,
 					"founded": "1234",

@@ -16,7 +16,6 @@ use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryInterface;
 class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBRepositoryInterface
 {
 	public const TEAM_INDEX = 'TeamIndex';
-	public const OPPONENT_INDEX = 'OpponentIndex';
 	public const COMPETITION_INDEX = 'CompetitionIndex';
 
 	/**
@@ -58,29 +57,6 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 				$params['Limit'] = $limit;
 			}
 			$Result = $this->dynamoDbClient->query( $params );
-		} catch (\Exception $e) {
-			$this->sentryHub->captureException( $e );
-			return [];
-		}
-		return $this->deserializeResult( $Result );
-	}
-
-	/**
-	 * @param string $id
-	 * @return array|null
-	 */
-	public function findTeamsMatchByOpponentId(string $id)
-	{
-		try {
-			$Result = $this->dynamoDbClient->query( [
-				'ScanIndexForward'          => false,
-				'TableName'                 => static::getTableName(),
-				'IndexName'                 => self::OPPONENT_INDEX,
-				'KeyConditionExpression'    => 'opponentId = :opponentId',
-				'ExpressionAttributeValues' => $this->marshalJson([
-					':opponentId' => $id,
-				])
-			] );
 		} catch (\Exception $e) {
 			$this->sentryHub->captureException( $e );
 			return [];
@@ -181,20 +157,6 @@ class TeamsMatchRepository extends DynamoDBRepository implements DynamoDBReposit
 						[
 							'AttributeName' => 'sortKey',
 							'KeyType'       => DynamoDBRepositoryInterface::KEY_RANGE
-						]
-					],
-					'Projection'            => [ 'ProjectionType' => DynamoDBRepositoryInterface::PROJECTION_ALL ],
-					'ProvisionedThroughput' => [
-						'ReadCapacityUnits'  => 1,
-						'WriteCapacityUnits' => 1
-					]
-				],
-				[
-					'IndexName'             => self::OPPONENT_INDEX,
-					'KeySchema'             => [
-						[
-							'AttributeName' => 'opponentId',
-							'KeyType'       => DynamoDBRepositoryInterface::KEY_HASH
 						]
 					],
 					'Projection'            => [ 'ProjectionType' => DynamoDBRepositoryInterface::PROJECTION_ALL ],

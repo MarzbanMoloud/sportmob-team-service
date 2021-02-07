@@ -53,11 +53,10 @@ class TeamInformation implements BrokerQueryEventInterface
 	{
 		$teamItem = $this->teamRepository->find(['id' => $commandQuery->getBody()['id']]);
 
+		$teamItemArray = [];
 		if($teamItem) {
 			$teamItemArray = $this->serializer->normalize($teamItem);
 			$teamItemArray['entity'] = $commandQuery->getBody()['entity'];
-		} else {
-			$teamItemArray = array();
 		}
 
 		$message = (new Message())

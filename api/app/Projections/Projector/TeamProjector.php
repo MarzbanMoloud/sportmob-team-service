@@ -143,6 +143,7 @@ class TeamProjector
 			->setGender( $metadata[ 'gender' ])
 			->setFounded( $metadata[ 'founded' ] ?? '' )
 			->setCountry( $metadata[ 'country' ] )
+			->setCountryId( $metadata[ 'countryId' ] )
 			->setCity( $metadata[ 'city' ] ?? '' )
 			->setType( $metadata[ 'type' ] )
 			->setCreatedAt(new DateTimeImmutable())

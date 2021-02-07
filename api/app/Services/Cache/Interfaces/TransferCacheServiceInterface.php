@@ -10,17 +10,18 @@ namespace App\Services\Cache\Interfaces;
  */
 interface TransferCacheServiceInterface
 {
-	const TRANSFER_BY_TEAM_KEY = 'transfer_by_team_%s';
+	const TRANSFER_BY_TEAM_KEY = 'transfer_by_team_%s_season_%s';
 	const TRANSFER_BY_PLAYER_KEY = 'transfer_by_player_%s';
 	const TRANSFER_All_SEASONS_BY_TEAM_KEY = 'transfer_all_seasons_by_team_%s';
 	const USER_ACTION_TRANSFER_KEY = 'transfer_user_action_%s_%s_%s';
 
 	/**
 	 * @param string $teamId
+	 * @param string $season
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransferByTeam(string $teamId, $function);
+	public function rememberForeverTransferByTeam(string $teamId, string $season, $function);
 
 	/**
 	 * @param string $teamId
