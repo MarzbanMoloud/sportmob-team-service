@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Elastica\Client;
 use Laravel\Lumen\Application as LumenApplication;
+use Monolog\Formatter\ElasticaFormatter;
 use Monolog\Handler\ElasticaHandler;
 use Monolog\Logger;
 
