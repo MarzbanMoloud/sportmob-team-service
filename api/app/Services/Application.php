@@ -30,6 +30,6 @@ class Application extends LumenApplication
 		]), [
 			'index' => config('monolog.index'),
 			'type' => self::TYPE
-		]))->setFormatter(new ElasticaFormatter(config('monolog.index'), self::TYPE));
+		],Logger::ALERT))->setFormatter(new ElasticaFormatter(config('monolog.index'), self::TYPE));
 	}
 }
