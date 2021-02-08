@@ -45,16 +45,17 @@ abstract class DynamoDBRepository
 	 */
 	protected SerializerInterface $serializer;
 
-	/**
-	 * DynamoDBRepository constructor.
-	 * @param HubInterface $sentryHub
-	 */
-	public function __construct(HubInterface $sentryHub)
+    /**
+     * DynamoDBRepository constructor.
+     * @param HubInterface $sentryHub
+     * @param SerializerInterface $serializer
+     */
+	public function __construct(HubInterface $sentryHub,SerializerInterface $serializer)
 	{
 		$this->dynamoDbClient = new DynamoDbClient(config('aws.dynamoDb'));
 		$this->sentryHub = $sentryHub;
 		$this->marshaler = new Marshaler();
-		$this->serializer = app('Serializer');
+		$this->serializer = $serializer;
 	}
 
 	/**
