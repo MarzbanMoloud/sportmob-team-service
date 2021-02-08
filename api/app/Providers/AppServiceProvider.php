@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
-
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class AppServiceProvider
@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('Serializer', function (){
+        $this->app->singleton(SerializerInterface::class, function (){
             $encoders = [ new JsonEncoder()];
             $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
             $normalizers = [new PropertyNormalizer(null,null,$extractor), new DateTimeNormalizer(), new ArrayDenormalizer(),];
