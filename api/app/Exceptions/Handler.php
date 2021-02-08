@@ -77,8 +77,8 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof DynamoDBRepositoryException) {
             return response()->json([
-                'message' => 'Unprocessable_request.',
-                'code' => config('common.error_codes.Unprocessable_request')
+                'message' => 'unprocessable_request.',
+                'code' => config('common.error_codes.unprocessable_request')
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -91,7 +91,7 @@ class Handler extends ExceptionHandler
 
 		if ($exception instanceof UserActionTransferNotAllow) {
 			return response()->json([
-				'message' => 'Unprocessable_request.',
+				'message' => 'unprocessable_request.',
 				'code' => config('common.error_codes.User_is_not_allowed_to_like')
 			], Response::HTTP_UNPROCESSABLE_ENTITY);
 		}
