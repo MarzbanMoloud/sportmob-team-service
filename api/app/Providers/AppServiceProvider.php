@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
-
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class AppServiceProvider
@@ -59,16 +59,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('Serializer', function (){
+        $this->app->singleton(SerializerInterface::class, function (){
             $encoders = [ new JsonEncoder()];
             $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
             $normalizers = [new PropertyNormalizer(null,null,$extractor), new DateTimeNormalizer(), new ArrayDenormalizer(),];
             return new Serializer($normalizers, $encoders);
         });
 
-    	$this->app->singleton('TranslationClient', function (){
-           return (new Client('http://127.0.0.1', 'redis', 6379, SentrySdk::getCurrentHub()));
-        });
+        $this->app->singleton( Client::class,
+            function() {
+                return new Client( env( 'TRANSLATION_SERVICE_URL', 'http://127.0.0.1' ),
+                                   env( 'REDIS_HOST', 'redis' ),
+                                   env( 'REDIS_PORT', 6379 ),
+                                   SentrySdk::getCurrentHub() );
+            } );
 
     	$this->app->singleton(
     	    BrokerInterface::class,
