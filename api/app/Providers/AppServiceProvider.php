@@ -42,9 +42,13 @@ class AppServiceProvider extends ServiceProvider
             return new Serializer($normalizers, $encoders);
         });
 
-    	$this->app->singleton('TranslationClient', function (){
-           return (new Client('http://127.0.0.1', 'redis', 6379, SentrySdk::getCurrentHub()));
-        });
+        $this->app->singleton( Client::class,
+            function() {
+                return new Client( env( 'TRANSLATION_SERVICE_URL', 'http://127.0.0.1' ),
+                                   env( 'REDIS_HOST', 'redis' ),
+                                   env( 'REDIS_PORT', 6379 ),
+                                   SentrySdk::getCurrentHub() );
+            } );
 
     	$this->app->singleton(
     	    BrokerInterface::class,
