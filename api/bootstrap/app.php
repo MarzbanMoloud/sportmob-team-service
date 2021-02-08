@@ -65,7 +65,6 @@ $app->configure('swagger-lume');
 $app->configure('database');
 $app->configure('broker');
 $app->configure('mediator-event');
-$app->configure('favorite-stat');
 $app->configure('common');
 
 /*
