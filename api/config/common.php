@@ -5,6 +5,6 @@ return [
     'error_codes' =>[
         'validation_failed' => '-400',
         'resource_not_found' => '-404',
-        'Unprocessable_request' => '-422',
+        'unprocessable_request' => '-422',
     ]
 ];
