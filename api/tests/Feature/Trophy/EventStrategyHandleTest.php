@@ -19,6 +19,7 @@ use App\ValueObjects\Broker\CommandQuery\Message as CommandQueryMessage;
 use App\ValueObjects\Broker\Mediator\Message;
 use Carbon\Carbon;
 use Faker\Factory;
+use Symfony\Component\Serializer\SerializerInterface;
 use TestCase;
 use Tests\Traits\AmazonBrokerTrait;
 use Tests\Traits\TeamRepositoryTestTrait;
@@ -36,17 +37,17 @@ class EventStrategyHandleTest extends TestCase
 		TeamRepositoryTestTrait;
 
 	private \Faker\Generator $faker;
-	private $serializer;
 	private TrophyRepository $trophyRepository;
 	private BrokerMessageCacheServiceInterface $brokerMessageCacheService;
 	private TeamRepository $teamRepository;
 	private TrophyCacheService $trophyCacheService;
+	private SerializerInterface $serializer;
 
 	protected function setUp(): void
 	{
 		$this->createApplication();
 		$this->faker = Factory::create();
-		$this->serializer = app('Serializer');
+		$this->serializer = app(SerializerInterface::class);
 		$this->trophyRepository = app(TrophyRepository::class);
 		$this->trophyCacheService = app(TrophyCacheService::class);
 		$this->teamRepository = app(TeamRepository::class);
@@ -103,11 +104,11 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $winnerMessage
 		 */
-		$winnerMessage = app('Serializer')->deserialize($winnerMessage, Message::class, 'json');
+		$winnerMessage = $this->serializer->deserialize($winnerMessage, Message::class, 'json');
 		/**
 		 * @var Message $runnerUpMessage
 		 */
-		$runnerUpMessage = app('Serializer')->deserialize($runnerUpMessage, Message::class, 'json');
+		$runnerUpMessage = $this->serializer->deserialize($runnerUpMessage, Message::class, 'json');
 		/**
 		 * persist team item.
 		 */
@@ -265,7 +266,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Handle event.
 		 */
@@ -299,7 +300,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Handle event.
 		 */
@@ -332,7 +333,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * persist team item.
 		 */

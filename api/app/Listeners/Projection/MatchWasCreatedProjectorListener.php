@@ -37,14 +37,16 @@ class MatchWasCreatedProjectorListener
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param TeamsMatchRepository $teamsMatchRepository
 	 * @param HubInterface $sentryHub
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		TeamsMatchRepository $teamsMatchRepository,
-		HubInterface $sentryHub
+		HubInterface $sentryHub,
+		SerializerInterface $serializer
 	) {
-		$this->serializer = app('Serializer');
+		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->teamsMatchRepository = $teamsMatchRepository;

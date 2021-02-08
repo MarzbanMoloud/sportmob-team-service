@@ -21,7 +21,7 @@ class EventStrategySupportTest extends TestCase
 	protected function setUp(): void
 	{
 		$this->createApplication();
-		$this->serializer = app('Serializer');
+		$this->serializer = app(SerializerInterface::class);
 	}
 
 	public function testPlayerWasTransferred()

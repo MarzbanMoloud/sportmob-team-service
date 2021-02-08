@@ -10,6 +10,7 @@ use App\Models\Repositories\TeamRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\EventStrategy\TeamWasCreated;
 use Carbon\Carbon;
+use Symfony\Component\Serializer\SerializerInterface;
 use TestCase;
 use Faker\Factory;
 use App\ValueObjects\Broker\Mediator\Message;
@@ -27,6 +28,7 @@ class EventStrategyHandleTest extends TestCase
 	private TeamRepository $teamRepository;
 	private \Faker\Generator $faker;
 	private TeamCacheServiceInterface $teamCacheService;
+	private SerializerInterface $serializer;
 
 	protected function setUp(): void
 	{
@@ -34,6 +36,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->faker = Factory::create();
 		$this->teamRepository = app(TeamRepository::class);
 		$this->teamCacheService = app(TeamCacheServiceInterface::class);
+		$this->serializer = app(SerializerInterface::class);
 		$this->createTeamTable();
 	}
 
@@ -70,7 +73,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(TeamWasCreated::class)->handle($message->getBody());
 		/**
 		 * @var Team $response
@@ -142,7 +145,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(TeamWasCreated::class)->handle($message->getBody());
 	}
 
@@ -168,7 +171,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(TeamWasCreated::class)->handle($message->getBody());
 	}
 
@@ -199,7 +202,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(TeamWasCreated::class)->handle($message->getBody());
 	}
 

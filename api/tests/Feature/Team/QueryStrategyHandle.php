@@ -34,7 +34,7 @@ class QueryStrategyHandle extends TestCase
 		$this->createApplication();
 		$this->teamRepository = app(TeamRepository::class);
 		$this->faker = Factory::create();
-		$this->serializer = app('Serializer');
+		$this->serializer = app(SerializerInterface::class);
 		$this->createTeamTable();
 		$this->setupAWSBroker();
 	}

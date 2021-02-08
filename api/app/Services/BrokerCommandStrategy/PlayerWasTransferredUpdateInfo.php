@@ -42,17 +42,19 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param HubInterface $sentryHub
 	 * @param BrokerInterface $broker
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		TransferRepository $transferRepository,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		HubInterface $sentryHub,
-		BrokerInterface $broker
+		BrokerInterface $broker,
+		SerializerInterface $serializer
 	) {
 		$this->transferRepository = $transferRepository;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->sentryHub = $sentryHub;
-		$this->serializer = app('Serializer');
+		$this->serializer = $serializer;
 		$this->broker = $broker;
 	}
 

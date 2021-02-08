@@ -29,14 +29,16 @@ class TeamUpdatedListener
 	 * TeamUpdatedListener constructor.
 	 * @param BrokerInterface $broker
 	 * @param TeamCacheServiceInterface $teamCacheService
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		BrokerInterface $broker,
-		TeamCacheServiceInterface $teamCacheService
+		TeamCacheServiceInterface $teamCacheService,
+		SerializerInterface $serializer
 	) {
-		$this->serializer = app('Serializer');
 		$this->broker = $broker;
 		$this->teamCacheService = $teamCacheService;
+		$this->serializer = $serializer;
 	}
 
 	/**

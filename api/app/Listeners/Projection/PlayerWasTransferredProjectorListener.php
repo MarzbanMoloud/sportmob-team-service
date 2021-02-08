@@ -39,13 +39,15 @@ class PlayerWasTransferredProjectorListener
 	 * @param BrokerInterface $broker
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param TransferRepository $transferRepository
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
-		TransferRepository $transferRepository
+		TransferRepository $transferRepository,
+		SerializerInterface $serializer
 	) {
-		$this->serializer = app('Serializer');
+		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->transferRepository = $transferRepository;

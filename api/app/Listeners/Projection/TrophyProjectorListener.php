@@ -34,16 +34,19 @@ class TrophyProjectorListener
 	 * @param BrokerInterface $broker
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param TrophyRepository $trophyRepository
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
-		TrophyRepository $trophyRepository
+		TrophyRepository $trophyRepository,
+		SerializerInterface $serializer
 	) {
-		$this->serializer = app('Serializer');
+		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->trophyRepository = $trophyRepository;
+		$this->serializer = $serializer;
 	}
 
 	/**

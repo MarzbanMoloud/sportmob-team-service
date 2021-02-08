@@ -47,7 +47,7 @@ class EventStrategyHandleTest extends TestCase
 	{
 		$this->createApplication();
 		$this->faker = Factory::create();
-		$this->serializer = app('Serializer');
+		$this->serializer = app(SerializerInterface::class);
 		$this->transferRepository = app(TransferRepository::class);
 		$this->transferCacheService = app(TransferCacheService::class);
 		$this->teamRepository = app(TeamRepository::class);
@@ -88,7 +88,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Persist team items for 'to' and 'from' fields.
 		 */
@@ -250,7 +250,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Persist team items for 'to' and 'from' fields.
 		 */
@@ -347,7 +347,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Persist team items for 'to' and 'from' fields.
 		 */
@@ -475,7 +475,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Persist team items for 'to' and 'from' fields.
 		 */
@@ -619,7 +619,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Handle event.
 		 */
@@ -658,7 +658,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Handle event.
 		 */
@@ -697,7 +697,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Handle event.
 		 */
@@ -735,7 +735,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		/**
 		 * Persist team items for 'to' and 'from' fields.
 		 */

@@ -36,7 +36,7 @@ class EventStrategyHandleWithBrokerTest extends TestCase
 	{
 		$this->createApplication();
 		$this->faker = Factory::create();
-		$this->serializer = app('Serializer');
+		$this->serializer = app(SerializerInterface::class);
 		$this->teamRepository = app(TeamRepository::class);
 		$this->teamCacheService = app(TeamCacheServiceInterface::class);
 		$this->createTeamTable();

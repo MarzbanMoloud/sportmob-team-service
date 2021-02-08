@@ -27,11 +27,15 @@ class TeamInformation implements BrokerQueryEventInterface
 	 * TeamInformation constructor.
 	 * @param BrokerInterface $broker
 	 * @param TeamRepository $teamRepository
+	 * @param SerializerInterface $serializer
 	 */
-	public function __construct(BrokerInterface $broker, TeamRepository $teamRepository)
-	{
+	public function __construct(
+		BrokerInterface $broker,
+		TeamRepository $teamRepository,
+		SerializerInterface $serializer
+	) {
 		$this->broker = $broker;
-		$this->serializer = app('Serializer');
+		$this->serializer = $serializer;
 		$this->teamRepository = $teamRepository;
 	}
 

@@ -28,7 +28,7 @@ class TeamTransferResource extends JsonResource
 	 */
 	public function __construct($resource)
 	{
-		$this->client = app('TranslationClient');
+		$this->client = app(Client::class);
 		$this->lang = app()->getLocale();
 		$this->transferCacheService = app(TransferCacheServiceInterface::class);
 		parent::__construct($resource);

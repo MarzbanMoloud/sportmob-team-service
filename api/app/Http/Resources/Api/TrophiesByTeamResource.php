@@ -23,7 +23,7 @@ class TrophiesByTeamResource extends JsonResource
 	 */
 	public function __construct($resource)
 	{
-		$this->client = app('TranslationClient');
+		$this->client = app(Client::class);
 		$this->lang = app()->getLocale();
 		parent::__construct($resource);
 	}

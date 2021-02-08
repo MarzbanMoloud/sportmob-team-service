@@ -19,6 +19,7 @@ use App\ValueObjects\Broker\CommandQuery\Message as CommandQueryMessage;
 use App\ValueObjects\Broker\Mediator\Message;
 use Carbon\Carbon;
 use Faker\Factory;
+use Symfony\Component\Serializer\SerializerInterface;
 use TestCase;
 use Tests\Traits\AmazonBrokerTrait;
 use Tests\Traits\TeamRepositoryTestTrait;
@@ -39,11 +40,13 @@ class EventStrategyHandleTest extends TestCase
 	private \Faker\Generator $faker;
 	private TeamsMatchRepository $teamsMatchRepository;
 	private TeamsMatchCacheService $teamsMatchCacheService;
+	private SerializerInterface $serializer;
 
 	protected function setUp(): void
 	{
 		$this->createApplication();
 		$this->faker = Factory::create();
+		$this->serializer = app(SerializerInterface::class);
 		$this->teamRepository = app(TeamRepository::class);
 		$this->teamsMatchCacheService = app(TeamsMatchCacheService::class);
 		$this->teamsMatchRepository = app(TeamsMatchRepository::class);
@@ -99,7 +102,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchWasCreated::class)->handle($message->getBody());
 		/**
 		 * Read from DB.
@@ -229,7 +232,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchWasCreated::class)->handle($message->getBody());
 		/**
 		 * Read from DB.
@@ -351,7 +354,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchWasCreated::class)->handle($message->getBody());
 		/**
 		 * Read from DB.
@@ -446,7 +449,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchWasCreated::class)->handle($message->getBody());
 	}
 
@@ -483,7 +486,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchWasCreated::class)->handle($message->getBody());
 	}
 
@@ -524,7 +527,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchWasCreated::class)->handle($message->getBody());
 	}
 
@@ -601,7 +604,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchFinished::class)->handle($message->getBody());
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
@@ -692,7 +695,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchFinished::class)->handle($message->getBody());
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
@@ -727,7 +730,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchFinished::class)->handle($message->getBody());
 	}
 
@@ -758,7 +761,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchFinished::class)->handle($message->getBody());
 	}
 
@@ -805,7 +808,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchFinished::class)->handle($message->getBody());
 	}
 
@@ -859,7 +862,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchStatusChanged::class)->handle($message->getBody());
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
@@ -919,7 +922,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchStatusChanged::class)->handle($message->getBody());
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
@@ -951,7 +954,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchStatusChanged::class)->handle($message->getBody());
 	}
 
@@ -980,7 +983,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * @var Message $message
 		 */
-		$message = app('Serializer')->deserialize($message, Message::class, 'json');
+		$message = $this->serializer->deserialize($message, Message::class, 'json');
 		app(MatchStatusChanged::class)->handle($message->getBody());
 	}
 
