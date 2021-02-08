@@ -4,6 +4,8 @@
 namespace App\Http\Controllers\Api\Swagger\Interfaces;
 
 
+use Illuminate\Http\Request;
+
 /**
  * Interface TransferControllerInterface
  * @package App\Http\Controllers\Api\Swagger\Interfaces
@@ -361,7 +363,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Put(
-	 *     path="/{lang}/teams/transfers/{action}/{user}/{transfer}",
+	 *     path="/{lang}/teams/transfers/{action}/{transfer}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *          name="action",
@@ -372,11 +374,11 @@ interface TransferControllerInterface
 	 *          @OA\Schema(type="string")
 	 *     ),
 	 *     @OA\Parameter(
-	 *          name="user",
+	 *          name="lang",
 	 *          in="path",
 	 *          required=true,
-	 *          description="userId",
-	 *          example="007f646e-b7f7-334e-963f-2df2153a588e",
+	 *          description="language",
+	 *          example="en",
 	 *          @OA\Schema(type="string")
 	 *     ),
 	 *     @OA\Parameter(
@@ -387,6 +389,19 @@ interface TransferControllerInterface
 	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyIsInN0YXJ0RGF0ZSI6IjIwMjAtMDEtMDFUMDA6MDA6MDArMDA6MDAifQ==",
 	 *          @OA\Schema(type="string")
 	 *     ),
+	 *     @OA\RequestBody(
+	 *         @OA\MediaType(
+	 *             mediaType="application/json",
+	 *             @OA\Schema(
+	 *                 required={"userId"},
+	 *                 @OA\Property(
+	 *                     	property="userId",
+	 *                     	type="object",
+	 *						example="007f646e-b7f7-334e-963f-2df2153a588e"
+	 *     				)
+	 * 			   )
+	 * 			)
+	 * 		),
 	 *     @OA\Response(
 	 *          response=202,
 	 *          description="When the update is successful",
@@ -437,8 +452,8 @@ interface TransferControllerInterface
 	 *     )
 	 * )
 	 * @param string $action
-	 * @param string $user
 	 * @param string $transfer
+	 * @param Request $request
 	 */
-	public function userActionTransfer(string $action, string $user, string $transfer);
+	public function userActionTransfer(string $action, string $transfer, Request $request);
 }

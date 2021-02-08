@@ -6,11 +6,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Swagger\Interfaces\TransferControllerInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TransferActionRequest;
 use App\Http\Resources\Api\PlayerTransferResource;
 use App\Http\Resources\Api\TeamTransferResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Transfer\TransferService;
 use App\Utilities\Utility;
+use Illuminate\Http\Request;
 
 
 /**
@@ -63,15 +65,17 @@ class TransferController extends Controller implements TransferControllerInterfa
 
 	/**
 	 * @param string $action
-	 * @param string $user
 	 * @param string $transfer
+	 * @param Request $request
 	 * @return mixed
 	 * @throws \App\Exceptions\Projection\ProjectionException
 	 * @throws \App\Exceptions\UserActionTransferNotAllow
+	 * @throws \Illuminate\Validation\ValidationException
 	 */
-	public function userActionTransfer(string $action, string $user, string $transfer)
+	public function userActionTransfer(string $action, string $transfer, Request $request)
 	{
-		$this->transferService->userActionTransfer($action, $user, $transfer);
+		(new TransferActionRequest())->validation($request);
+		$this->transferService->userActionTransfer($action, $request->userId, $transfer);
 		return $this->responseService->createUpdateResponseObject();
 	}
 }
