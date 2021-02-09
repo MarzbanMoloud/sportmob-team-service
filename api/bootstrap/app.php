@@ -83,7 +83,8 @@ $app->configure('common');
 // ]);
 
 $app->routeMiddleware([
-    'set.lang' => \App\Http\Middleware\SetLangMiddleware::class,
+    'set.lang' => App\Http\Middleware\SetLangMiddleware::class,
+    'logging' => App\Http\Middleware\RequestResponseLoggingMiddleware::class
 ]);
 
 /*
