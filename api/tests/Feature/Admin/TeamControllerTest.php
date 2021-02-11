@@ -147,7 +147,9 @@ class TeamControllerTest extends TestCase
 		];
 		foreach ($wrongValues as $value) {
 			$response = $this->put('/admin/teams/' . $this->faker->uuid, [
-				'name' => $value,
+				'name' => [
+					'original' => $value,
+				]
 			]);
 			$response->assertResponseStatus(Response::HTTP_BAD_REQUEST);
 			$response = json_decode($response->response->getContent(), true);
