@@ -41,11 +41,14 @@ class RequestResponseLoggingMiddleware
                 'content'    => (string)$request->getContent(),
             ];
 
-        $this->logger->alert( 'Request/Response',
-                              [
-                                  'request'  => $requestContext,
-                                  'response' => $this->serializer->normalize( $response, 'array' )
-                              ] );
+        try {
+            $this->logger->alert( 'Request/Response',
+                                  [
+                                      'request'  => $requestContext,
+                                      'response' => $this->serializer->normalize( $response, 'array' )
+                                  ] );
+        } catch (\Exception $e) {
+        }
 
         return $response;
     }
