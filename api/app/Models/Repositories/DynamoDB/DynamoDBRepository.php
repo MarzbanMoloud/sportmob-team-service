@@ -25,24 +25,18 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 abstract class DynamoDBRepository
 {
-	/**
-	 * @var DynamoDbClient
-	 */
+
+    public const RETURN_VALUE_NONE = 'NONE';
+    public const RETURN_VALUE_ALL_OLD = 'ALL_OLD';
+    public const RETURN_VALUE_UPDATED_OLD = 'UPDATED_OLD';
+    public const RETURN_VALUE_ALL_NEW = 'ALL_NEW';
+    public const RETURN_VALUE_UPDATED_NEW = 'UPDATED_NEW';
 	protected DynamoDbClient $dynamoDbClient;
 
-	/**
-	 * @var HubInterface
-	 */
 	protected HubInterface $sentryHub;
 
-	/**
-	 * @var Marshaler
-	 */
 	protected Marshaler $marshaler;
 
-	/**
-	 * @var SerializerInterface
-	 */
 	protected SerializerInterface $serializer;
 
     /**
@@ -136,6 +130,24 @@ abstract class DynamoDBRepository
 			return null;
 		}
 	}
+
+    /**
+     * @param array $keys
+     * @return bool
+     * @throws DynamoDBRepositoryException
+     */
+    public function delete(array $keys)
+    {
+        try {
+            $this->dynamoDbClient->deleteItem( [
+                                                   'TableName' => static::getTableName(),
+                                                   'Key' => $this->marshaler->marshalJson(json_encode($keys))
+                                               ]);
+            return true;
+        } catch (Exception $exception) {
+            throw new DynamoDBRepositoryException( $exception->getMessage(), $exception->getCode(), $exception );
+        }
+    }
 
 	/**
 	 * @return Result|null
