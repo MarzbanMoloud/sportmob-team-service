@@ -10,9 +10,11 @@ use App\ValueObjects\ReadModel\TeamName;
 use App\Models\Repositories\TeamRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\ValueObjects\DTO\TeamDTO;
+use Aws\DynamoDb\Marshaler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Exceptions\DynamoDB\DynamoDBException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -25,18 +27,24 @@ class TeamService
 
 	private TeamRepository $teamRepository;
 	private TeamCacheServiceInterface $teamCacheService;
+	private SerializerInterface $serializer;
+	private Marshaler $marshaler;
 
 	/**
 	 * TeamService constructor.
 	 * @param TeamRepository $teamRepository
 	 * @param TeamCacheServiceInterface $teamCacheService
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		TeamRepository $teamRepository,
-		TeamCacheServiceInterface $teamCacheService
+		TeamCacheServiceInterface $teamCacheService,
+		SerializerInterface $serializer
 	) {
 		$this->teamRepository = $teamRepository;
 		$this->teamCacheService = $teamCacheService;
+		$this->marshaler = new Marshaler();
+		$this->serializer = $serializer;
 	}
 
 	/**
@@ -66,7 +74,9 @@ class TeamService
 					->setOriginal($teamDTO->getOriginalName())
 					->setShort($teamDTO->getShortName())
 			);
-			$this->teamRepository->persist($teamItem);
+			$oldTeamModel = $this->marshaler->unmarshalItem(
+				$this->teamRepository->persist($teamItem, TeamRepository::RETURN_VALUE_ALL_OLD)['Attributes']
+			);
 		} catch (\Exception $exception) {
 			throw new DynamoDBException(
 				'Team Update failed.',
@@ -75,7 +85,11 @@ class TeamService
 				config('common.error_codes.team_update_failed')
 			);
 		}
-		event(new TeamUpdatedEvent($teamItem));
-		//TODO::check
+		$normalizeTeamItem = $this->serializer->normalize($teamItem);
+		ksort($normalizeTeamItem);
+		ksort($oldTeamModel);
+		if (md5(json_encode($normalizeTeamItem)) != md5(json_encode($oldTeamModel))) {
+			event(new TeamUpdatedEvent($teamItem));
+		}
 	}
 }

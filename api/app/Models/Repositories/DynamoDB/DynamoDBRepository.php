@@ -62,16 +62,18 @@ abstract class DynamoDBRepository
 
 	/**
 	 * @param DynamoDBRepositoryModelInterface $model
+	 * @param string $returnValue
 	 * @return Result
 	 * @throws DynamoDBRepositoryException
 	 */
-	public function persist(DynamoDBRepositoryModelInterface $model = null): Result
+	public function persist(DynamoDBRepositoryModelInterface $model = null, string $returnValue = self::RETURN_VALUE_NONE): Result
 	{
 		$item = $this->marshaler->marshalJson($this->serializer->serialize($model, 'json'));
 		try {
 			return $this->dynamoDbClient->putItem([
 				'TableName' => static::getTableName(),
-				'Item' => $item
+				'Item' => $item,
+				'ReturnValues'=> $returnValue
 			]);
 		} catch (Exception $exception) {
 			throw new DynamoDBRepositoryException($exception->getMessage(), $exception->getCode(), $exception);
