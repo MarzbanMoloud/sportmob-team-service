@@ -62,17 +62,17 @@ class TeamTransferResource extends JsonResource
 				]),
 				'player' => [
 					'id' => $transfer->getPlayerId(),
-					'name' => $this->client->translate($transfer->getPlayerName(), $this->lang),
-					'position' => $this->client->translate($transfer->getPlayerPosition(), $this->lang)
+					'name' => $this->client->getByLang($transfer->getPlayerName(), $this->lang),
+					'position' => $this->client->getByLang($transfer->getPlayerPosition(), $this->lang)
 				],
 				'team' => [
 					'to' => [
 						'id' => $transfer->getToTeamId(),
-						'name' => $this->client->translate($transfer->getToTeamName(), $this->lang)
+						'name' => $this->client->getByLang($transfer->getToTeamName(), $this->lang)
 					],
 					'from' => [
 						'id' => $transfer->getFromTeamId(),
-						'name' => $this->client->translate($transfer->getFromTeamName(), $this->lang)
+						'name' => $this->client->getByLang($transfer->getFromTeamName(), $this->lang)
 					]
 				],
 				'marketValue' => $transfer->getMarketValue(),

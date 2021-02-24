@@ -17,20 +17,49 @@
         <env name="APP_ENV" value="testing"/>
         <env name="CACHE_DRIVER" value="redis"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+        <!--AWS-->
+        <env name="AWS_ACCOUNT_ID" value="589655022411"/>
         <env name="AWS_ACCESS_KEY_ID" value="AKIAYSSRNTNFR7FP3QHH"/>
         <env name="AWS_SECRET_ACCESS_KEY" value="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"/>
+        <env name="AWS_DYNAMODB_ENDPOINT" value="http://dynamodb:8000"/>
         <env name="AWS_REGION" value="eu-west-2"/>
         <env name="AWS_VERSION" value="latest"/>
-        <env name="AWS_ACCOUNT_ID" value="589655022411"/>
-        <env name="BROKER_QUEUE_EVENT" value="test_team_event_queue"/>
-        <env name="BROKER_QUEUE_QUESTION" value="test_team_question_queue"/>
-        <env name="BROKER_QUEUE_ANSWER" value="test_team_answer_queue"/>
-        <env name="BROKER_QUEUE_NOTIFICATION" value="test_team_notification_queue"/>
+        <!--Broker-->
+        <env name="BROKER_PRODUCER_CLIENT_ID" value="team_service"/>
+        <env name="BROKER_PRODUCER_SOCKET_BLOCKING_MAX_MS" value="100"/>
+        <env name="BROKER_PRODUCER_MESSAGE_TIMEOUT_MS" value="300000"/>
+        <env name="BROKER_PRODUCER_POLL_TIMEOUT" value="0"/>
+        <env name="BROKER_CONSUMER_GROUP_ID" value="teamGroup"/>
+        <env name="BROKER_CONSUMER_OFFSET_STORE_METHOD" value="broker"/>
+        <env name="BROKER_CONSUMER_AUTO_OFFSET_RESET" value="smallest"/>
+        <env name="BROKER_HOST" value="broker:9092"/>
+        <env name="BROKER_SERVICE_PLAYER_NAME" value="player"/>
+        <env name="BROKER_SERVICE_TEAM_NAME" value="team"/>
+        <env name="BROKER_SERVICE_COMPETITION_NAME" value="competition"/>
+        <env name="BROKER_SERVICE_TOURNAMENT_NAME" value="tournament"/>
+        <env name="BROKER_SERVICE_COACH_NAME" value="coach"/>
+        <env name="VISIBILITY_TIMEOUT_MESSAGE" value="20"/>
         <env name="BROKER_TOPIC_EVENT" value="test_team_event_topic"/>
         <env name="BROKER_TOPIC_QUESTION" value="test_team_question_topic"/>
         <env name="BROKER_TOPIC_ANSWER" value="test_team_answer_topic"/>
         <env name="BROKER_TOPIC_NOTIFICATION" value="test_team_notification_topic"/>
-        <!--EventMediator-->
+        <env name="BROKER_QUEUE_EVENT" value="test_team_event_queue"/>
+        <env name="BROKER_QUEUE_QUESTION" value="test_team_question_queue"/>
+        <env name="BROKER_QUEUE_ANSWER" value="test_team_answer_queue"/>
+        <env name="BROKER_QUEUE_NOTIFICATION" value="test_team_notification_queue"/>
+        <!--Common-->
+        <env name="LIMIT_TEAM_OVERVIEW_UPCOMING" value="1"/>
+        <env name="LIMIT_TEAM_OVERVIEW_FINISHED" value="5"/>
+        <!--Database-->
+        <env name="REDIS_CLIENT" value="predis"/>
+        <env name="REDIS_CLUSTER" value="redis"/>
+        <env name="REDIS_PREFIX" value=""/>
+        <env name="REDIS_HOST" value="redis"/>
+        <env name="REDIS_PASSWORD" value=""/>
+        <env name="REDIS_PORT" value="6379"/>
+        <env name="REDIS_DB" value="0"/>
+        <env name="REDIS_CACHE_DB" value="1"/>
+        <!--MediatorEvent-->
         <env name="EVENT_TEAM_WAS_CREATED" value="TeamWasCreated"/>
         <env name="EVENT_TEAM_WAS_UPDATED" value="TeamWasUpdated"/>
         <env name="EVENT_PLAYER_WAS_TRANSFERRED" value="PlayerWasTransferred"/>
@@ -39,11 +68,14 @@
         <env name="EVENT_MATCH_WAS_CREATED" value="MatchWasCreated"/>
         <env name="EVENT_MATCH_FINISHED" value="MatchFinished"/>
         <env name="EVENT_MATCH_STATUS_CHANGED" value="MatchStatusChanged"/>
-        <!-- Sentry-->
-        <env name="SENTRY_DSN" value="http://0f22a7f2ebdc4d63a5ae647c88d5d896@sentry.sportmob.com/14"/>
         <!-- Monolog-->
+        <env name="MONOLOG_INDEX" value="sportmob"/>
         <env name="ELASTIC_HOST" value="search-sportmob-log-27rwhqkql6ctdjdmxewzd27gfy.eu-west-2.es.amazonaws.com"/>
+        <env name="ELASTIC_PORT" value="443"/>
+        <env name="ELASTIC_TRANSPORT" value="https"/>
         <env name="ELASTIC_USERNAME" value="sportmob-log-usr"/>
         <env name="ELASTIC_PASSWORD" value="vZJtcRqW5#mJ6qF3mHDTz"/>
+        <!-- Sentry-->
+        <env name="SENTRY_DSN" value="http://0f22a7f2ebdc4d63a5ae647c88d5d896@sentry.sportmob.com/14"/>
     </php>
 </phpunit>

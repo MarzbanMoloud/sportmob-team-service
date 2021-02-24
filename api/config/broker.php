@@ -9,7 +9,7 @@ return [
             'pollTimeout' => env('BROKER_PRODUCER_POLL_TIMEOUT', 0)
         ],
         'consumer' => [
-            'groupId' => env('BROKER_CONSUMER_GROUP_ID', ''),
+            'groupId' => env('BROKER_CONSUMER_GROUP_ID', 'teamGroup'),
             'offsetStoreMethod' => env('BROKER_CONSUMER_OFFSET_STORE_METHOD', 'broker'),
             'autoOffsetReset' => env('BROKER_CONSUMER_AUTO_OFFSET_RESET', 'smallest')
         ],

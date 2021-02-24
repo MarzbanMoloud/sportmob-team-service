@@ -59,10 +59,10 @@ class TrophiesByTeamResource extends JsonResource
 				$result[$i]['tournament'][$j]['id'] = $tournamentId;
 				foreach ($tournament as $trophy) {
 					$result[$i]['tournament'][$j]['season'] = $trophy->getTournamentSeason();
-					$result[$i]['competition']['name'] = $this->client->translate($trophy->getCompetitionName(), $this->lang);
+					$result[$i]['competition']['name'] = $this->client->getByLang($trophy->getCompetitionName(), $this->lang);
 					$result[$i]['tournament'][$j][$trophy->getPosition()] = [
 						'id' => $trophy->getTeamId(),
-						'name' => $this->client->translate($trophy->getTeamName(), $this->lang),
+						'name' => $this->client->getByLang($trophy->getTeamName(), $this->lang),
 					];
 				}
 				$j++;
