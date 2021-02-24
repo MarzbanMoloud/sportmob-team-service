@@ -9,6 +9,7 @@ use App\Services\BrokerInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Carbon\Carbon;
 
@@ -22,21 +23,25 @@ class TeamInformation implements BrokerQueryEventInterface
 	private SerializerInterface $serializer;
 	private BrokerInterface $broker;
 	private TeamRepository $teamRepository;
+	private LoggerInterface $logger;
 
 	/**
 	 * TeamInformation constructor.
 	 * @param BrokerInterface $broker
 	 * @param TeamRepository $teamRepository
 	 * @param SerializerInterface $serializer
+	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		TeamRepository $teamRepository,
-		SerializerInterface $serializer
+		SerializerInterface $serializer,
+		LoggerInterface $logger
 	) {
 		$this->broker = $broker;
 		$this->serializer = $serializer;
 		$this->teamRepository = $teamRepository;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -55,6 +60,20 @@ class TeamInformation implements BrokerQueryEventInterface
 	 */
 	public function handle(Message $commandQuery): void
 	{
+		$this->logger->alert(
+			sprintf(
+				"Question %s by %s will handle by %s.",
+				$commandQuery->getHeaders()->getKey(),
+				$commandQuery->getHeaders()->getSource(),
+				__CLASS__
+			),
+			$this->serializer->normalize($commandQuery, 'array')
+		);
+		$this->logger->alert(
+			sprintf("%s handler in progress.", $commandQuery->getHeaders()->getKey()),
+			$this->serializer->normalize($commandQuery, 'array')
+		);
+
 		$teamItem = $this->teamRepository->find(['id' => $commandQuery->getBody()['id']]);
 
 		$teamItemArray = [];
@@ -76,5 +95,10 @@ class TeamInformation implements BrokerQueryEventInterface
 			$commandQuery->getHeaders()->getKey(),
 			$this->serializer->serialize($message, 'json')
 		)->produceMessage(config('broker.topics.answer'));
+
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", $commandQuery->getHeaders()->getKey()),
+			$teamItemArray
+		);
 	}
 }

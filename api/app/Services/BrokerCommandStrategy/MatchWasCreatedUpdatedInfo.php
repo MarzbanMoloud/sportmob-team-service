@@ -12,7 +12,9 @@ use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
+use Psr\Log\LoggerInterface;
 use Sentry\State\HubInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -24,21 +26,29 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 	private TeamsMatchRepository $teamsMatchRepository;
 	private BrokerMessageCacheServiceInterface $brokerMessageCacheService;
 	private HubInterface $sentryHub;
+	private SerializerInterface $serializer;
+	private LoggerInterface $logger;
 
 	/**
 	 * MatchWasCreatedUpdatedInfo constructor.
 	 * @param TeamsMatchRepository $teamsMatchRepository
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param HubInterface $sentryHub
+	 * @param SerializerInterface $serializer
+	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		TeamsMatchRepository $teamsMatchRepository,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
-		HubInterface $sentryHub
+		HubInterface $sentryHub,
+		SerializerInterface $serializer,
+		LoggerInterface $logger
 	) {
 		$this->teamsMatchRepository = $teamsMatchRepository;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->sentryHub = $sentryHub;
+		$this->serializer = $serializer;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -57,7 +67,28 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 	 */
 	public function handle(Message $commandQuery): void
 	{
+		$this->logger->alert(
+			sprintf(
+				"Answer %s by %s will handle by %s.",
+				MatchWasCreatedProjectorListener::BROKER_EVENT_KEY,
+				$commandQuery->getHeaders()->getSource(),
+				__CLASS__
+			),
+			$this->serializer->normalize($commandQuery, 'array')
+		);
+		$this->logger->alert(
+			sprintf("%s handler in progress.", MatchWasCreatedProjectorListener::BROKER_EVENT_KEY),
+			$this->serializer->normalize($commandQuery, 'array')
+		);
 		if (empty($commandQuery->getBody())) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s.",
+					MatchWasCreatedProjectorListener::BROKER_EVENT_KEY,
+					'Data not found.'
+				),
+				$this->serializer->normalize($commandQuery, 'array')
+			);
 			return;
 		}
 		[$matchId, $homeTeamId, $awayTeamId] = explode('#', $commandQuery->getHeaders()->getId());
@@ -70,6 +101,10 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 			'id' => $commandQuery->getBody()['id'],
 			'name' => $commandQuery->getBody()['competitionName']
 		]);
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", MatchWasCreatedProjectorListener::BROKER_EVENT_KEY),
+			$this->serializer->normalize($commandQuery, 'array')
+		);
 	}
 
 	/**
@@ -91,6 +126,14 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 		try {
 			$this->teamsMatchRepository->persist($teamsMatchItem);
 		} catch (DynamoDBRepositoryException $exception) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s.",
+					MatchWasCreatedProjectorListener::BROKER_EVENT_KEY,
+					'Failed to persist teamsMatch.'
+				),
+				$this->serializer->normalize($teamsMatchItem, 'array')
+			);
 			$this->sentryHub->captureException($exception);
 		}
 	}

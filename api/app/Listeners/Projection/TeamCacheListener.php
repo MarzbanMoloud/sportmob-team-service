@@ -26,9 +26,9 @@ class TeamCacheListener
 	}
 
 	/**
-	 * @param TeamWasCreatedProjectorEvent $event
+	 * @param $event
 	 */
-	public function handle(TeamWasCreatedProjectorEvent $event): void
+	public function handle($event): void
 	{
 		$this->teamCacheService->putTeam($event->team);
 	}

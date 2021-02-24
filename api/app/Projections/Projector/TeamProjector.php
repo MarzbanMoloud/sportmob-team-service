@@ -14,6 +14,8 @@ use App\Models\Repositories\TeamRepository;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use App\ValueObjects\ReadModel\TeamName;
 use DateTimeImmutable;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -23,14 +25,24 @@ use DateTimeImmutable;
 class TeamProjector
 {
 	private TeamRepository $teamRepository;
+	private LoggerInterface $logger;
+	private SerializerInterface $serializer;
+	private string $eventName;
 
 	/**
 	 * TeamProjector constructor.
 	 * @param TeamRepository $teamRepository
+	 * @param LoggerInterface $logger
+	 * @param SerializerInterface $serializer
 	 */
-	public function __construct(TeamRepository $teamRepository)
-	{
+	public function __construct(
+		TeamRepository $teamRepository,
+		LoggerInterface $logger,
+		SerializerInterface $serializer
+	) {
 		$this->teamRepository = $teamRepository;
+		$this->logger = $logger;
+		$this->serializer = $serializer;
 	}
 
 	/**
@@ -39,9 +51,21 @@ class TeamProjector
 	 */
 	public function applyTeamWasCreated(MessageBody $body): void
 	{
+		$this->eventName = config('mediator-event.events.team_was_created');
+		$this->logger->alert(
+			sprintf("%s handler in progress.", $this->eventName),
+			$this->serializer->normalize($body, 'array')
+		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		if (empty($identifier['team'])) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Team field is empty.'
+				), $identifier
+			);
 			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		$this->checkMetadataValidation($metadata);
@@ -49,6 +73,10 @@ class TeamProjector
 		$teamModel = $this->createTeamModel($identifier['team'], $metadata);
 		$this->persistTeam($teamModel);
 		event(new TeamWasCreatedProjectorEvent($teamModel));
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", $this->eventName),
+			$this->serializer->normalize($teamModel, 'array')
+		);
 	}
 
 	/**
@@ -57,18 +85,41 @@ class TeamProjector
 	 */
 	public function applyTeamWasUpdated(MessageBody $body): void
 	{
+		$this->eventName = config('mediator-event.events.team_was_updated');
+		$this->logger->alert(
+			sprintf("%s handler in progress.", $this->eventName),
+			$this->serializer->normalize($body, 'array')
+		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		if (empty($identifier['team'])) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Team field is empty.'
+				), $identifier
+			);
 			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		if (empty($metadata['name']['original'])) {
-			throw new ProjectionException('OriginalName field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+		if (empty($metadata['fullName'])) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'FullName field is empty.'
+				), $metadata
+			);
+			throw new ProjectionException('FullName field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		$teamModel = $this->checkItemNotExist($identifier['team']);
+		$teamModel = $this->checkItemNotExist($identifier['team'], $this->serializer->normalize($body, 'array'));
 		$teamModel = $this->updateTeamModel($teamModel, $metadata);
 		$this->persistTeam($teamModel);
 		event(new TeamWasUpdatedProjectorEvent($teamModel));
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", $this->eventName),
+			$this->serializer->normalize($teamModel, 'array')
+		);
 	}
 
 	/**
@@ -85,6 +136,13 @@ class TeamProjector
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($metadata[$fieldName])) {
+				$this->logger->alert(
+					sprintf(
+						"%s handler failed because of %s",
+						$this->eventName,
+						sprintf("%s field is empty.", $prettyFieldName)
+					), $metadata
+				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", $prettyFieldName),
 					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
@@ -92,6 +150,13 @@ class TeamProjector
 			}
 		}
 		if (is_null($metadata['active'])) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Active field is empty.'
+				), $metadata
+			);
 			throw new ProjectionException(
 				sprintf("Active field is empty."),
 				ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
@@ -107,6 +172,13 @@ class TeamProjector
 	{
 		$teamItem = $this->teamRepository->find(['id' => $teamId]);
 		if ($teamItem) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					sprintf("Team already exist by following id: %s", $teamId)
+				), $this->serializer->normalize($teamItem, 'array')
+			);
 			throw new ProjectionException(
 				sprintf("Team already exist by following id: %s", $teamId),
 				ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR
@@ -116,13 +188,21 @@ class TeamProjector
 
 	/**
 	 * @param string $teamId
+	 * @param array $body
 	 * @return \App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface
 	 * @throws ProjectionException
 	 */
-	private function checkItemNotExist(string $teamId)
+	private function checkItemNotExist(string $teamId, array $body)
 	{
 		$teamItem = $this->teamRepository->find(['id' => $teamId]);
 		if (!$teamItem) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					sprintf("Team already not exist by following id: %s", $teamId)
+				), $body
+			);
 			throw new ProjectionException(
 				sprintf("Team already not exist by following id: %s", $teamId),
 				ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR
@@ -140,18 +220,18 @@ class TeamProjector
 	{
 		return (new Team())
 			->setId($teamId)
-			->setGender( $metadata[ 'gender' ])
-			->setFounded( $metadata[ 'founded' ] ?? '' )
-			->setCountry( $metadata[ 'country' ] )
-			->setCountryId( $metadata[ 'countryId' ] )
-			->setCity( $metadata[ 'city' ] ?? '' )
-			->setType( $metadata[ 'type' ] )
+			->setGender($metadata['gender'])
+			->setFounded($metadata['founded'] ?? '' )
+			->setCountry($metadata['country'])
+			->setCountryId($metadata['countryId'])
+			->setCity($metadata['city'] ?? '')
+			->setType($metadata['type'])
 			->setCreatedAt(new DateTimeImmutable())
 			->setName(
 				(new TeamName())
-					->setOriginal( $metadata[ 'fullName' ] )
-					->setOfficial( $metadata[ 'officialName' ] )
-					->setShort( $metadata[ 'shortName' ] )
+					->setOriginal($metadata['fullName'])
+					->setOfficial($metadata['officialName'])
+					->setShort($metadata['shortName'])
 			);
 	}
 
@@ -166,9 +246,9 @@ class TeamProjector
 	) {
 		return $teamModel->setName(
 			(new TeamName())
-				->setOriginal($metadata['name']['original'])
-				->setOfficial($metadata['name']['official'])
-				->setShort($metadata['name']['short'])
+				->setOriginal($metadata['fullName'])
+				->setOfficial($metadata['officialName'])
+				->setShort($metadata['shortName'])
 		);
 	}
 
@@ -181,6 +261,13 @@ class TeamProjector
 		try {
 			$this->teamRepository->persist($teamModel);
 		} catch (DynamoDBRepositoryException $exception) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Failed to persist team.'
+				), $this->serializer->normalize($teamModel, 'array')
+			);
 			throw new ProjectionException('Failed to persist team.', $exception->getCode(), $exception);
 		}
 	}

@@ -437,8 +437,8 @@ class EventStrategyHandleTest extends TestCase
 			"body":{
 				"identifiers": {
 					"match":"",
-					"home":"",
-					"away":"",
+					"home":[],
+					"away":[],
 					"competition":""
 				 },
 				"metadata": {}
@@ -472,8 +472,8 @@ class EventStrategyHandleTest extends TestCase
 				 },
 				"metadata": {
 					"coverage": "",
-					"date": "",
-					"time": ""
+					"date": [],
+					"time": []
 				}
 			}
 		}',

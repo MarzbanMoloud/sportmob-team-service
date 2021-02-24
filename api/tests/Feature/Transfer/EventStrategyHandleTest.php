@@ -643,8 +643,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "",
-					"endDate": "",
+					"startDate": [],
+					"endDate": [],
 					"active": "",
 					"type": ""
 				}

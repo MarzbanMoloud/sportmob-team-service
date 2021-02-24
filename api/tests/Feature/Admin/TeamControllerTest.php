@@ -105,7 +105,9 @@ class TeamControllerTest extends TestCase
 		 * check cache was removed.
 		 */
 		$response = $this->teamCacheService->getTeam($fakeTeamId);
-		$this->assertNull($response);
+		$this->assertEquals('Barcelona original', $response->getName()->getOriginal());
+		$this->assertEquals('Barcelona official', $response->getName()->getOfficial());
+		$this->assertEquals('Barcelona short', $response->getName()->getShort());
 	}
 
 	public function testUpdateWhenItemNotExist()

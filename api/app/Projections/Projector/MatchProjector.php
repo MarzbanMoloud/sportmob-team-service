@@ -17,10 +17,11 @@ use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\Interfaces\TeamsMatchCacheServiceInterface;
-use App\Services\Cache\TeamsMatchCacheService;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use DateTime;
 use Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -40,6 +41,9 @@ class MatchProjector
 	private TeamRepository $teamRepository;
 	private TeamsMatchCacheServiceInterface $teamsMatchCacheService;
 	private TeamsMatchService $teamsMatchService;
+	private LoggerInterface $logger;
+	private SerializerInterface $serializer;
+	private string $eventName;
 
 	/**
 	 * MatchProjector constructor.
@@ -48,19 +52,25 @@ class MatchProjector
 	 * @param TeamRepository $teamRepository
 	 * @param TeamsMatchCacheServiceInterface $teamsMatchCacheService
 	 * @param TeamsMatchService $teamsMatchService
+	 * @param LoggerInterface $logger
+	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
 		TeamsMatchRepository $teamsMatchRepository,
 		TeamCacheServiceInterface $teamCacheService,
 		TeamRepository $teamRepository,
 		TeamsMatchCacheServiceInterface $teamsMatchCacheService,
-		TeamsMatchService $teamsMatchService
+		TeamsMatchService $teamsMatchService,
+		LoggerInterface $logger,
+		SerializerInterface $serializer
 	) {
 		$this->teamsMatchRepository = $teamsMatchRepository;
 		$this->teamCacheService = $teamCacheService;
 		$this->teamRepository = $teamRepository;
 		$this->teamsMatchCacheService = $teamsMatchCacheService;
 		$this->teamsMatchService = $teamsMatchService;
+		$this->logger = $logger;
+		$this->serializer = $serializer;
 	}
 
 	/**
@@ -69,6 +79,11 @@ class MatchProjector
 	 */
 	public function applyMatchWasCreated(MessageBody $body): void
 	{
+		$this->eventName = config('mediator-event.events.match_was_created');
+		$this->logger->alert(
+			sprintf("%s handler in progress.", $this->eventName),
+			$this->serializer->normalize($body, 'array')
+		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		$this->checkIdentifiersValidation($identifier);
@@ -77,11 +92,17 @@ class MatchProjector
 		$awayTeamsMatchModel = $this->createTeamsMatchModel($identifier, $metadata, false);
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
-		$this->removeTeamsMatchCache($identifier['home']);
 		event(new MatchWasCreatedProjectorEvent($identifier));
 		/** Create cache by call service */
-		$this->teamsMatchService->getTeamsMatchInfo($identifier['home']);
-		$this->teamsMatchService->getTeamsMatchInfo($identifier['away']);
+		$this->createTeamsMatchCache($identifier['home'], $this->serializer->normalize($body, 'array'));
+		$this->createTeamsMatchCache($identifier['away'], $this->serializer->normalize($body, 'array'));
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", $this->eventName),
+			[
+				'home' => $this->serializer->normalize($homeTeamsMatchModel, 'array'),
+				'away' => $this->serializer->normalize($awayTeamsMatchModel, 'array'),
+			]
+		);
 	}
 
 	/**
@@ -90,23 +111,42 @@ class MatchProjector
 	 */
 	public function applyMatchFinished(MessageBody $body): void
 	{
+		$this->eventName = config('mediator-event.events.match_finished');
+		$this->logger->alert(
+			sprintf("%s handler in progress.", $this->eventName),
+			$this->serializer->normalize($body, 'array')
+		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		if (empty($identifier['match'])){
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Match field is empty.'
+				), $identifier
+			);
 			throw new ProjectionException('Match field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		if (empty($metadata['scores'])){
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Scores field is empty.'
+				), $identifier
+			);
 			throw new ProjectionException('Scores field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		$teamsMatchItems = $this->checkItemExist($identifier['match']);
+		$teamsMatchItems = $this->checkItemExist($identifier['match'], $this->serializer->normalize($body, 'array'));
 		$score = $this->excludeScoreTypes($metadata['scores']);
 		if ($identifier['winner'] == "") {
 			foreach ($teamsMatchItems as $teamsMatch) {
 				/** @var TeamsMatch $teamsMatch */
 				$this->updateTeamsMatchByMatchFinishedEvent($teamsMatch, $score, TeamsMatch::EVALUATION_DRAW);
-				$this->removeTeamsMatchCache($teamsMatch->getTeamId());
+				$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
 			}
-			return;
+			goto successfullyLog;
 		}
 		foreach ($teamsMatchItems as $teamsMatch) {
 			/** @var TeamsMatch $teamsMatch */
@@ -115,8 +155,13 @@ class MatchProjector
 				$score,
 				($identifier['winner'] == $teamsMatch->getTeamId()) ? TeamsMatch::EVALUATION_WIN : TeamsMatch::EVALUATION_LOSS
 			);
-			$this->removeTeamsMatchCache($teamsMatch->getTeamId());
+			$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
 		}
+		successfullyLog:
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", $this->eventName),
+			$this->serializer->normalize($teamsMatchItems, 'array')
+		);
 	}
 
 	/**
@@ -125,19 +170,44 @@ class MatchProjector
 	 */
 	public function applyMatchStatusChanged(MessageBody $body): void
 	{
+		$this->eventName = config('mediator-event.events.match_status_changed');
+		$this->logger->alert(
+			sprintf("%s handler in progress.", $this->eventName),
+			$this->serializer->normalize($body, 'array')
+		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		if (empty($identifier['match'])){
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Match field is empty.'
+				), $identifier
+			);
 			throw new ProjectionException('Match field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		if (empty($metadata['status'])){
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Status field is empty.'
+				), $metadata
+			);
 			throw new ProjectionException('Status field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		$teamsMatchItems = $this->checkItemExist($identifier['match']);
+		$teamsMatchItems = $this->checkItemExist($identifier['match'], $this->serializer->normalize($body, 'array'));
 		$status = ($metadata['status'] == self::MATCH_STATUS_GAME_ENDED) ? TeamsMatch::STATUS_FINISHED : TeamsMatch::STATUS_UNKNOWN;
 		foreach ($teamsMatchItems as $teamsMatch) {
+			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchStatusChanged($teamsMatch, $status);
+			$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
 		}
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", $this->eventName),
+			$this->serializer->normalize($teamsMatchItems, 'array')
+		);
 	}
 
 	/**
@@ -149,6 +219,13 @@ class MatchProjector
 		$requiredFields = ['match', 'home', 'away', 'competition'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($identifier[$fieldName])) {
+				$this->logger->alert(
+					sprintf(
+						"%s handler failed because of %s",
+						$this->eventName,
+						sprintf("%s field is empty.", $fieldName)
+					), $identifier
+				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", ucfirst($fieldName)),
 					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
@@ -163,9 +240,16 @@ class MatchProjector
 	 */
 	private function checkMetadataValidation(array $metadata): void
 	{
-		$requiredFields = ['date' , 'time'];
+		$requiredFields = ['date', 'time'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($metadata[$fieldName])) {
+				$this->logger->alert(
+					sprintf(
+						"%s handler failed because of %s",
+						$this->eventName,
+						sprintf("%s field is empty.", $fieldName)
+					), $metadata
+				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", ucfirst($fieldName)),
 					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
@@ -186,6 +270,13 @@ class MatchProjector
 		/** @var Team $homeTeamItem */
 		$homeTeamItem = $this->findTeam($identifier['home']);
 		if (!$homeTeamItem) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					sprintf('Team Item not found by following id: %s', $identifier['home'])
+				), ['identifier' => $identifier, 'metadata' => $metadata]
+			);
 			throw new ProjectionException();
 		}
 		$homeTeamName = (new TeamName())
@@ -196,6 +287,13 @@ class MatchProjector
 		/** @var Team $awayTeamItem */
 		$awayTeamItem = $this->findTeam($identifier['away']);
 		if (!$awayTeamItem) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					sprintf('Team Item not found by following id: %s', $identifier['away'])
+				), ['identifier' => $identifier, 'metadata' => $metadata]
+			);
 			throw new ProjectionException();
 		}
 		$awayTeamName = (new TeamName())
@@ -217,15 +315,22 @@ class MatchProjector
 	}
 
 	/**
-	 * @param $match
+	 * @param string $match
+	 * @param array $body
 	 * @return array
 	 * @throws ProjectionException
 	 */
-	private function checkItemExist($match
-	): array {
+	private function checkItemExist(string $match, array $body): array {
 		$teamsMatchItems = $this->teamsMatchRepository->findTeamsMatchByMatchId($match);
 		if (!$teamsMatchItems) {
-			throw new ProjectionException('TeamsMatch items not found!');
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'TeamsMatch items not found.'
+				), $body
+			);
+			throw new ProjectionException('TeamsMatch items not found.');
 		}
 		return $teamsMatchItems;
 	}
@@ -282,23 +387,6 @@ class MatchProjector
 	}
 
 	/**
-	 * @param string $teamId
-	 */
-	private function removeTeamsMatchCache(string $teamId): void
-	{
-		foreach ([TeamsMatch::STATUS_UPCOMING, TeamsMatch::STATUS_FINISHED] as $status) {
-			if ($this->teamsMatchCacheService->hasTeamsMatchByTeamId($teamId, $status)) {
-				$this->teamsMatchCacheService->forget(
-					TeamsMatchCacheService::getTeamsMatchByTeamIdKey(
-						$teamId,
-						$status
-					)
-				);
-			}
-		}
-	}
-
-	/**
 	 * @param TeamsMatch $teamsMatch
 	 * @throws ProjectionException
 	 */
@@ -307,7 +395,34 @@ class MatchProjector
 		try {
 			$this->teamsMatchRepository->persist($teamsMatch);
 		} catch (DynamoDBRepositoryException $exception) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Failed to persist teamsMatch.'
+				), $this->serializer->normalize($teamsMatch, 'array')
+			);
 			throw new ProjectionException('Failed to persist teamsMatch.', $exception->getCode(), $exception);
+		}
+	}
+
+	/**
+	 * @param string $teamId
+	 * @param array $body
+	 */
+	private function createTeamsMatchCache(string $teamId, array $body): void
+	{
+		try {
+			$this->teamsMatchService->getTeamsMatchInfo($teamId);
+		} catch (Exception $e) {
+			$this->logger->alert(
+				sprintf(
+					"%s handler failed because of %s",
+					$this->eventName,
+					'Failed create cache for match.'
+				),
+				$body
+			);
 		}
 	}
 }

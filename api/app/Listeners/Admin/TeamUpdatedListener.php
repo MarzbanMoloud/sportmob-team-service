@@ -48,17 +48,17 @@ class TeamUpdatedListener
 	{
 		$messageHeader = (new MessageHeader(
 			config('mediator-event.events.team_was_updated'),
-			1,
+			"1",
 			new DateTimeImmutable()
 		));
 		$messageBody = (new MessageBody(
-			["team" => $event->team->getId()],
 			[
-				'name' => [
-					"official" => $event->team->getName()->getOfficial(),
-					"original" => $event->team->getName()->getOriginal(),
-					"short" => $event->team->getName()->getShort(),
-				]
+				"team" => $event->team->getId()
+			],
+			[
+				"fullName" => $event->team->getName()->getOriginal(),
+				"officialName" => $event->team->getName()->getOfficial(),
+				"shortName" => $event->team->getName()->getShort(),
 			]
 		));
 		$message = (new MediatorMessage())

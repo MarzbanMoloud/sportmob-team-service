@@ -15,13 +15,16 @@ use App\Models\ReadModels\Trophy;
 class TrophyProjectorEvent extends Event
 {
 	public Trophy $trophy;
+	public string $eventName;
 
 	/**
 	 * TrophyProjectorEvent constructor.
 	 * @param Trophy $trophy
+	 * @param string $eventName
 	 */
-	public function __construct(Trophy $trophy)
+	public function __construct(Trophy $trophy, string $eventName)
 	{
 		$this->trophy = $trophy;
+		$this->eventName = $eventName;
 	}
 }

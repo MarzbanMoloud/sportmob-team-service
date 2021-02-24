@@ -76,5 +76,6 @@ class TeamService
 			);
 		}
 		event(new TeamUpdatedEvent($teamItem));
+		//TODO::check
 	}
 }

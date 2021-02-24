@@ -39,6 +39,8 @@
         <env name="EVENT_MATCH_WAS_CREATED" value="MatchWasCreated"/>
         <env name="EVENT_MATCH_FINISHED" value="MatchFinished"/>
         <env name="EVENT_MATCH_STATUS_CHANGED" value="MatchStatusChanged"/>
+        <!-- Sentry-->
+        <env name="SENTRY_DSN" value="http://0f22a7f2ebdc4d63a5ae647c88d5d896@sentry.sportmob.com/14"/>
         <!-- Monolog-->
         <env name="ELASTIC_HOST" value="search-sportmob-log-27rwhqkql6ctdjdmxewzd27gfy.eu-west-2.es.amazonaws.com"/>
         <env name="ELASTIC_USERNAME" value="sportmob-log-usr"/>
