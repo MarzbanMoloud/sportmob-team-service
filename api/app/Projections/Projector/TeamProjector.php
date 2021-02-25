@@ -13,7 +13,6 @@ use App\Models\ReadModels\Team;
 use App\Models\Repositories\TeamRepository;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use App\ValueObjects\ReadModel\TeamName;
-use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -226,7 +225,6 @@ class TeamProjector
 			->setCountryId($metadata['countryId'])
 			->setCity($metadata['city'] ?? '')
 			->setType($metadata['type'])
-			->setCreatedAt(new DateTimeImmutable())
 			->setName(
 				(new TeamName())
 					->setOriginal($metadata['fullName'])

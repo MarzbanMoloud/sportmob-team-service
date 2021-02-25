@@ -4,15 +4,12 @@
 namespace App\Http\Services\Transfer;
 
 
-use App\Events\Admin\PlayerTransferUpdatedEvent;
-use App\Events\UserLikeTransferEvent;
 use App\Exceptions\DynamoDB\DynamoDBException;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UserActionTransferNotAllow;
 use App\Services\Cache\TransferCacheService;
-use App\Utilities\Utility;
 use App\ValueObjects\DTO\PlayerTransferDTO;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ReadModels\Transfer;
@@ -32,6 +29,7 @@ class TransferService
 
 	private TransferRepository $transferRepository;
 	private TransferCacheServiceInterface $transferCacheService;
+	private array $seasons = [];
 
 	/**
 	 * TransferService constructor.
@@ -50,28 +48,21 @@ class TransferService
 	 * @param string $teamId
 	 * @param string|null $season
 	 * @return mixed
-	 * @throws ResourceNotFoundException
 	 */
 	public function listByTeam(string $teamId, ?string $season = null)
 	{
 		if (is_null($season)) {
-			$season = $this->getAllSeasons($teamId)[0] ?? sprintf("%d-%d", date('Y'), date('Y') + 1);
+			$season = $this->seasons[0];
 		}
-		$transfers = $this->transferCacheService->rememberForeverTransferByTeam($teamId, $season,
+		return $this->transferCacheService->rememberForeverTransferByTeam($teamId, $season,
 			function () use ($teamId, $season) {
 				return $this->transferRepository->findByTeamId($teamId, $season);
-			});
-		if (!$transfers) {
-			throw new NotFoundHttpException();
-		}
-		self::sortBySeason($transfers);
-		return $transfers;
+		});
 	}
 
 	/**
 	 * @param string $teamId
 	 * @return mixed
-	 * @throws ResourceNotFoundException
 	 */
 	public function getAllSeasons(string $teamId)
 	{
@@ -79,9 +70,7 @@ class TransferService
 			return $this->transferRepository->getAllSeasons($teamId);
 		});
 		if (! $seasons) {
-			throw new ResourceNotFoundException("Resource not found.", Response::HTTP_NOT_FOUND, null,
-				config('common.error_codes.transfer_team_seasons_not_found')
-			);
+			throw new NotFoundHttpException();
 		}
 		rsort($seasons);
 		return $seasons;
@@ -150,28 +139,8 @@ class TransferService
 		$transferItem = $this->findTransfer($playerTransferDTO->getTransferId());
 		try {
 			$transferItem
-				->setContractDate(
-					(new \DateTimeImmutable())->setDate(
-						date('Y', $playerTransferDTO->getContractDate()),
-						date('m', $playerTransferDTO->getContractDate()),
-						date('d', $playerTransferDTO->getContractDate())
-					)->setTime(
-						date('H', $playerTransferDTO->getContractDate()),
-						date('i', $playerTransferDTO->getContractDate()),
-						date('s', $playerTransferDTO->getContractDate()),
-					)
-				)
-				->setAnnouncedDate(
-					(new \DateTimeImmutable())->setDate(
-						date('Y', $playerTransferDTO->getAnnouncedDate()),
-						date('m', $playerTransferDTO->getAnnouncedDate()),
-						date('d', $playerTransferDTO->getAnnouncedDate())
-					)->setTime(
-						date('H', $playerTransferDTO->getAnnouncedDate()),
-						date('i', $playerTransferDTO->getAnnouncedDate()),
-						date('s', $playerTransferDTO->getAnnouncedDate()),
-					)
-				)
+				->setContractDate((new \DateTimeImmutable())->setTimestamp($playerTransferDTO->getContractDate()))
+				->setAnnouncedDate((new \DateTimeImmutable())->setTimestamp($playerTransferDTO->getAnnouncedDate()))
 				->setMarketValue($playerTransferDTO->getMarketValue());
 			$this->transferRepository->persist($transferItem);
 		} catch (\Exception $exception) {
@@ -207,17 +176,28 @@ class TransferService
 	 */
 	private function findTransfer(string $transfer): Transfer
 	{
-		$transferDecoded = Utility::jsonDecode($transfer);
+		$transferDecoded = base64_decode($transfer);
+		list($playerId, $startDate) = explode('#', $transferDecoded);
 		/**
 		 * @var Transfer $transferItem
 		 */
 		$transferItem = $this->transferRepository->find([
-			'playerId' => $transferDecoded['playerId'],
-			'startDate' => $transferDecoded['startDate']
+			'playerId' => $playerId,
+			'startDate' => $startDate
 		]);
 		if (!$transferItem) {
 			throw new NotFoundHttpException();
 		}
 		return $transferItem;
+	}
+
+	/**
+	 * @param $seasons
+	 * @return $this
+	 */
+	public function setSeasons($seasons): TransferService
+	{
+		$this->seasons = $seasons;
+		return $this;
 	}
 }

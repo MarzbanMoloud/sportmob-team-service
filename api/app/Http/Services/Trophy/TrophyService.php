@@ -40,9 +40,6 @@ class TrophyService
 	{
 		return $this->trophyCacheService->rememberForeverTrophiesByTeam($id, function () use ($id) {
 			$trophies = $this->trophyRepository->findByTeamId($id);
-			if (!$trophies) {
-				throw new NotFoundHttpException();
-			}
 			$excludedTrophies = [];
 			foreach ($trophies as $trophy) {
 				/**

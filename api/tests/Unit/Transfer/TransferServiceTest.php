@@ -54,7 +54,9 @@ class TransferServiceTest extends TestCase
 		$fakeTeamId = $this->faker->uuid;
 		$fakeTeamName = $this->faker->name;
 		$this->persistBatchDataForListByTeam($fakeTeamId, $fakeTeamName);
-		$response = $this->transferService->listByTeam($fakeTeamId);
+		$response = $this->transferService
+			->setSeasons($this->transferService->getAllSeasons($fakeTeamId))
+			->listByTeam($fakeTeamId);
 		foreach ($response as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
@@ -62,17 +64,17 @@ class TransferServiceTest extends TestCase
 
 	public function testListByTeamWhenItemNotExist()
 	{
-		$this->expectException(NotFoundHttpException::class);
 		$response = $this->transferService->listByTeam($this->faker->uuid, '2020-2021');
-		foreach ($response as $transfer) {
-			$this->assertInstanceOf(Transfer::class, $transfer);
-		}
+		$this->assertEmpty($response);
 	}
 
 	public function testListByTeamWhenItemNotExistAndWithoutSeason()
 	{
-		$this->expectException(ResourceNotFoundException::class);
-		$response = $this->transferService->listByTeam($this->faker->uuid);
+		$this->expectException(NotFoundHttpException::class);
+		$fakeTeamId = $this->faker->uuid;
+		$response = $this->transferService
+			->setSeasons($this->transferService->getAllSeasons($fakeTeamId))
+			->listByTeam($fakeTeamId);
 		foreach ($response as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
@@ -90,7 +92,7 @@ class TransferServiceTest extends TestCase
 
 	public function testGetAllSeasonsWhenItemNotExist()
 	{
-		$this->expectException(ResourceNotFoundException::class);
+		$this->expectException(NotFoundHttpException::class);
 		$this->transferService->getAllSeasons($this->faker->uuid);
 	}
 

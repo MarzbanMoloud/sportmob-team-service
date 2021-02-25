@@ -41,10 +41,7 @@ class PlayerTransferResource extends JsonResource
 			'links' => [],
 			'data' => array_map(function (Transfer $transfer) {
 				return [
-					'transferId' => Utility::jsonEncode([
-						'playerId' => $transfer->getPlayerId(),
-						'startDate' => $transfer->getStartDate()->format(DateTimeInterface::ATOM)
-					]),
+					'id' => base64_encode(sprintf('%s#%s', $transfer->getPlayerId(), $transfer->getStartDate()->format(DateTimeInterface::ATOM))),
 					'player' => [
 						'id' => $transfer->getPlayerId(),
 						'name' => $this->client->getByLang($transfer->getPlayerName(), $this->lang),

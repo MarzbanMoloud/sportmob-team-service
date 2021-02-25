@@ -39,20 +39,20 @@ class TransferControllerTest extends TestCase
 
 	public function testListByTeamWithSeasonWhenItemNotExist()
 	{
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s/%s', $this->faker->uuid, '2019-2020'));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s/%s', $this->faker->uuid, '2019-2020'));
 		$response->assertResponseStatus(Response::HTTP_NOT_FOUND);
-		$response = json_decode($response->response->getContent(), true);
+		$response = json_decode($response->response->getContent(), true);;
 		$this->assertNotNull($response['message']);
 		$this->assertEquals(config('common.error_codes.resource_not_found'), $response['code']);
 	}
 
 	public function testListByTeamWithOutSeasonWhenItemNotExist()
 	{
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s', $this->faker->uuid));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s', $this->faker->uuid));
 		$response->assertResponseStatus(Response::HTTP_NOT_FOUND);
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
-		$this->assertEquals(config('common.error_codes.transfer_team_seasons_not_found'), $response['code']);
+		$this->assertEquals(config('common.error_codes.resource_not_found'), $response['code']);
 	}
 
 	public function testListByTeamWithSeason()
@@ -64,14 +64,14 @@ class TransferControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->transferCacheServiceInterface->flush();
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s/%s', $fakeTeamId, '2019-2020'));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s/%s', $fakeTeamId, '2019-2020'));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
 		$this->assertNotEmpty($response['data']['transfers']);
 		$this->assertCount(4, $response['data']['transfers']);
 		foreach ($response['data']['transfers'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -100,14 +100,14 @@ class TransferControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->transferRepository->drop();
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s/%s', $fakeTeamId, '2019-2020'));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s/%s', $fakeTeamId, '2019-2020'));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
 		$this->assertNotEmpty($response['data']['transfers']);
 		$this->assertCount(4, $response['data']['transfers']);
 		foreach ($response['data']['transfers'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -143,14 +143,14 @@ class TransferControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->transferCacheServiceInterface->flush();
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s', $fakeTeamId));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s', $fakeTeamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
 		$this->assertNotEmpty($response['data']['transfers']);
 		$this->assertCount(5, $response['data']['transfers']);
 		foreach ($response['data']['transfers'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -179,14 +179,14 @@ class TransferControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->transferRepository->drop();
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s', $fakeTeamId));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s', $fakeTeamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
 		$this->assertNotEmpty($response['data']['transfers']);
 		$this->assertCount(5, $response['data']['transfers']);
 		foreach ($response['data']['transfers'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -222,10 +222,10 @@ class TransferControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->transferCacheServiceInterface->flush();
-		$response = $this->json('GET', sprintf('/en/teams/transfers/player/%s', $fakePlayerId));
+		$response = $this->json('GET', sprintf('/en/transfers/player/%s', $fakePlayerId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -252,10 +252,10 @@ class TransferControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->transferRepository->drop();
-		$response = $this->json('GET', sprintf('/en/teams/transfers/player/%s', $fakePlayerId));
+		$response = $this->json('GET', sprintf('/en/transfers/player/%s', $fakePlayerId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -282,7 +282,7 @@ class TransferControllerTest extends TestCase
 
 	public function testListByPlayerWhenItemNotExist()
 	{
-		$response = $this->json('GET', sprintf('/en/teams/transfers/player/%s', $this->faker->uuid));
+		$response = $this->json('GET', sprintf('/en/transfers/player/%s', $this->faker->uuid));
 		$response->assertResponseStatus(Response::HTTP_NOT_FOUND);
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
@@ -297,22 +297,23 @@ class TransferControllerTest extends TestCase
 		$fakeTeamId = $this->faker->uuid;
 		$fakeTeamName = $this->faker->name;
 		$this->persistBatchDataForListByTeam($fakeTeamId, $fakeTeamName);
-		$response = $this->json('GET', sprintf('/en/teams/transfers/team/%s/%s', $fakeTeamId, '2019-2020'));
+		$response = $this->json('GET', sprintf('/en/transfers/team/%s/%s', $fakeTeamId, '2019-2020'));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEquals(0, $response['data']['transfers'][0]['like']);
 		$this->assertEquals(0, $response['data']['transfers'][0]['dislike']);
 		/**
 		 * First time.
 		 */
-		$result = $this->json('PUT', sprintf('/en/teams/transfers/like/%s',
-			$response['data']['transfers'][0]['transferId']), ['userId' => $response['data']['transfers'][0]['player']['id']]);
-		$transferDecoded = Utility::jsonDecode($response['data']['transfers'][0]['transferId']);
+		$result = $this->json('PUT', sprintf('/en/transfers/like/%s',
+			$response['data']['transfers'][0]['id']), ['userId' => $response['data']['transfers'][0]['player']['id']]);
+		$transferDecoded = base64_decode($response['data']['transfers'][0]['id']);
+		list($playerId, $startDate) = explode('#', $transferDecoded);
 		/**
 		 * @var Transfer $transferItem
 		 */
 		$transferItem = $this->transferRepository->find([
-			'playerId'  => $transferDecoded['playerId'],
-			'startDate' => $transferDecoded['startDate']
+			'playerId'  => $playerId,
+			'startDate' => $startDate
 		]);
 		$result->assertResponseStatus(ResponseServiceInterface::STATUS_CODE_UPDATE);
 		$this->assertEquals(1, $transferItem->getLike());
@@ -320,15 +321,16 @@ class TransferControllerTest extends TestCase
 		/**
 		 * Second time.
 		 */
-		$result = $this->json('PUT', sprintf('/en/teams/transfers/like/%s',
-			$response['data']['transfers'][0]['transferId']), ['userId' => $response['data']['transfers'][0]['player']['id']]);
-		$transferDecoded = Utility::jsonDecode($response['data']['transfers'][0]['transferId']);
+		$result = $this->json('PUT', sprintf('/en/transfers/like/%s',
+			$response['data']['transfers'][0]['id']), ['userId' => $response['data']['transfers'][0]['player']['id']]);
+		$transferDecoded = base64_decode($response['data']['transfers'][0]['id']);
+		list($playerId, $startDate) = explode('#', $transferDecoded);
 		/**
 		 * @var Transfer $transferItem
 		 */
 		$transferItem = $this->transferRepository->find([
-			'playerId'  => $transferDecoded['playerId'],
-			'startDate' => $transferDecoded['startDate']
+			'playerId'  => $playerId,
+			'startDate' => $startDate
 		]);
 		$result = json_decode($result->response->getContent(), true);
 		$this->assertEquals(1, $transferItem->getLike());
@@ -338,15 +340,16 @@ class TransferControllerTest extends TestCase
 		/**
 		 * Third time.
 		 */
-		$result = $this->json('PUT', sprintf('/en/teams/transfers/dislike/%s',
-			$response['data']['transfers'][0]['transferId']), ['userId' => $response['data']['transfers'][0]['player']['id']]);
-		$transferDecoded = Utility::jsonDecode($response['data']['transfers'][0]['transferId']);
+		$result = $this->json('PUT', sprintf('/en/transfers/dislike/%s',
+			$response['data']['transfers'][0]['id']), ['userId' => $response['data']['transfers'][0]['player']['id']]);
+		$transferDecoded = base64_decode($response['data']['transfers'][0]['id']);
+		list($playerId, $startDate) = explode('#', $transferDecoded);
 		/**
 		 * @var Transfer $transferItem
 		 */
 		$transferItem = $this->transferRepository->find([
-			'playerId'  => $transferDecoded['playerId'],
-			'startDate' => $transferDecoded['startDate']
+			'playerId'  => $playerId,
+			'startDate' => $startDate
 		]);
 		$result->assertResponseStatus(ResponseServiceInterface::STATUS_CODE_UPDATE);
 		$this->assertEquals(0, $transferItem->getLike());
@@ -355,8 +358,8 @@ class TransferControllerTest extends TestCase
 
 	public function testUserActionTransferWhenItemNotExist()
 	{
-		$result = $this->json('PUT', sprintf('/en/teams/transfers/like/%s',
-			'eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyIsInN0YXJ0RGF0ZSI6IjIwMjAtMDEtMDFUMDA6MDA6MDArMDA6MDAifQ=='),
+		$result = $this->json('PUT', sprintf('/en/transfers/like/%s',
+			'MGQyNWEzYzMtZWI2OC0zMDA5LTliZDgtODdiOGM0YTRmMDRmIzIwMjAtMDItMDFUMDA6MDA6MDArMDA6MDA='),
 		[
 			'userId' => $this->faker->uuid
 		]);

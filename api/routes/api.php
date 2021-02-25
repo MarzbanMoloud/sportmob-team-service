@@ -23,7 +23,7 @@ $router->group(['middleware' => 'logging'], function ($router) {
 		});
 	});
 
-	$router->group(['prefix' => '/{lang}/teams', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {
+	$router->group(['prefix' => '/{lang}', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {
 		$router->group(['prefix' => '/transfers'], function ($router) {
 			$router->get('/team/{team}[/{season}]',
 				['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);

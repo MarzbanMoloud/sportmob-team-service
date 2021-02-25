@@ -15,8 +15,6 @@ use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface
  */
 class Team implements DynamoDBRepositoryModelInterface
 {
-	use ReadModelTimestampTrait;
-
 	public const TYPE_CLUB = 'club';
 	public const TYPE_NATIONAL = 'national';
 

@@ -9,7 +9,6 @@ return [
         'validation_failed' => 'TM-400',
         'resource_not_found' => 'TM-404',
         'unprocessable_request' => 'TM-422',
-		'transfer_team_seasons_not_found' => 'TM-001',
 		'User_is_not_allowed_to_like' => 'TM-002',
 		'team_update_failed' => 'TM-003',
 		'transfer_update_failed' => 'TM-004',

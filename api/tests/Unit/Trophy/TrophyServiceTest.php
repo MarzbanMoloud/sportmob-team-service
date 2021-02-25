@@ -45,8 +45,8 @@ class TrophyServiceTest extends TestCase
 
 	public function testGetTrophiesByTeamWhenItemNotExist()
 	{
-		$this->expectException(NotFoundHttpException::class);
-		$this->trophyService->getTrophiesByTeam($this->faker->uuid);
+		$response = $this->trophyService->getTrophiesByTeam($this->faker->uuid);
+		$this->assertEmpty($response);
 	}
 
 	public function testGetTrophiesByCompetition()

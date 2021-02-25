@@ -48,7 +48,7 @@ class TransferControllerTest extends TestCase
 		$response = $this->json('GET', sprintf('/admin/transfers/players/%s', $fakePlayerId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -74,7 +74,7 @@ class TransferControllerTest extends TestCase
 		$response = $this->json('GET', sprintf('/admin/transfers/players/%s', $fakePlayerId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $transferItem) {
-			$this->assertNotNull($transferItem['transferId']);
+			$this->assertNotNull($transferItem['id']);
 			$this->assertNotEmpty($transferItem['player']);
 			$this->assertNotNull($transferItem['player']['id']);
 			$this->assertNotNull($transferItem['player']['name']);
@@ -112,10 +112,7 @@ class TransferControllerTest extends TestCase
 		$fakePlayerName = $this->faker->name;
 		$this->persistBatchDataForListByPlayer($fakePlayerId, $fakePlayerName);
 		$transferItem = $this->transferRepository->findByPlayerId($fakePlayerId);
-		$transferId = Utility::jsonEncode([
-			'playerId' => $transferItem[0]->getPlayerId(),
-			'startDate' => $transferItem[0]->getStartDate()->format(DateTimeInterface::ATOM)
-		]);
+		$transferId = base64_encode(sprintf('%s#%s', $transferItem[0]->getPlayerId(), $transferItem[0]->getStartDate()->format(DateTimeInterface::ATOM)));
 		$response = $this->put('/admin/transfers/players/' . $transferId, [
 			'marketValue' => '12.02$',
 			'announcedDate' => 1612693084,
@@ -138,10 +135,7 @@ class TransferControllerTest extends TestCase
 		$fakePlayerName = $this->faker->name;
 		$this->persistBatchDataForListByPlayer($fakePlayerId, $fakePlayerName);
 		$transferItem = $this->transferRepository->findByPlayerId($fakePlayerId);
-		$transferId = Utility::jsonEncode([
-			'playerId' => $transferItem[0]->getPlayerId(),
-			'startDate' => $transferItem[0]->getStartDate()->format(DateTimeInterface::ATOM)
-		]);
+		$transferId = base64_encode(sprintf('%s#%s', $transferItem[0]->getPlayerId(), $transferItem[0]->getStartDate()->format(DateTimeInterface::ATOM)));
 		$validMarketValues = ['12.33$', '1233', '12.33'];
 		foreach ($validMarketValues as $value) {
 			$response = $this->put('/admin/transfers/players/' . $transferId, [
@@ -167,10 +161,7 @@ class TransferControllerTest extends TestCase
 
 	public function testUpdateWhenItemNotExist()
 	{
-		$transferId = Utility::jsonEncode([
-			'playerId' => $this->faker->uuid,
-			'startDate' => (new \DateTimeImmutable())->format(DateTimeInterface::ATOM)
-		]);
+		$transferId = base64_encode(sprintf('%s#%s', $this->faker->uuid, (new \DateTimeImmutable())->format(DateTimeInterface::ATOM)));
 		$response = $this->put('/admin/transfers/players/' . $transferId, [
 			'marketValue' => '12.00$',
 			'announcedDate' => 1612693084,

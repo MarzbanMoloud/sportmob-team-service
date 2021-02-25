@@ -12,7 +12,7 @@ interface TeamControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/teams/overview/{team}",
+	 *     path="/{lang}/overview/{team}",
 	 *     tags={"Overview"},
 	 *     @OA\Parameter(
 	 *         name="lang",
@@ -161,7 +161,7 @@ interface TeamControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/teams/favorite/{team}",
+	 *     path="/{lang}/favorite/{team}",
 	 *     tags={"Favorite"},
 	 *     @OA\Parameter(
 	 *         name="lang",

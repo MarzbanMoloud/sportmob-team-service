@@ -14,7 +14,7 @@ interface TransferControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/teams/transfers/team/{team}/{season}",
+	 *     path="/{lang}/transfers/team/{team}/{season}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="team",
@@ -61,7 +61,7 @@ interface TransferControllerInterface
 	 *        						@OA\Property(
 	 *                              	property="transferId",
 	 *                              	type="string",
-	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYzZDEtM2JkZC04YmZiLTI5M2NmZWJlNDdiYyIsInN0YXJ0RGF0ZSI6eyJkYXRlIjoiMjAyMC0wMS0wMSAwMDowMDowMC4wMDAwMDAiLCJ0aW1lem9uZV90eXBlIjoxLCJ0aW1lem9uZSI6IiswMDowMCJ9fQ=="
+	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYzZDEtM2JkZC04YmZiLTI5M2NmZWJlNDdiYyIsInN0YXJ0RGF0"
 	 *                           	),
 	 *                         		@OA\Property(
 	 *                              	property="player",
@@ -142,7 +142,7 @@ interface TransferControllerInterface
 	 *                              @OA\Property(
 	 *                                  property="type",
 	 *                                  type="string",
-	 *                                  example="'transfer' or  'freeTransfer' or 'backFromLoan' or 'loan' or 'unknown' or 'playerSwap' or 'trial'"
+	 *                                  enum={"transfer", "freeTransfer", "backFromLoan", "loan", "unknown", "playerSwap", "trial"}
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="like",
@@ -198,7 +198,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/teams/transfers/player/{player}",
+	 *     path="/{lang}/transfers/player/{player}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="player",
@@ -234,7 +234,7 @@ interface TransferControllerInterface
 	 *        					@OA\Property(
 	 *                              property="transferId",
 	 *                              type="string",
-	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYzZDEtM2JkZC04YmZiLTI5M2NmZWJlNDdiYyIsInN0YXJ0RGF0ZSI6eyJkYXRlIjoiMjAyMC0wMS0wMSAwMDowMDowMC4wMDAwMDAiLCJ0aW1lem9uZV90eXBlIjoxLCJ0aW1lem9uZSI6IiswMDowMCJ9fQ=="
+	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYXRlIjoiMjAyMC0wMS0wMSAwMDowMDowMC4wMDAwMDAiLCJ0aW1lem9u"
 	 *                           ),
 	 *                         		@OA\Property(
 	 *                                property="player",
@@ -315,7 +315,7 @@ interface TransferControllerInterface
 	 *                              @OA\Property(
 	 *                                  property="type",
 	 *                                  type="string",
-	 *                                  example="'transfer' or  'freeTransfer' or 'backFromLoan' or 'loan' or 'unknown' or 'playerSwap' or 'trial'"
+	 *     								enum={"transfer", "freeTransfer", "backFromLoan", "loan", "unknown", "playerSwap", "trial"}
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="like",
@@ -363,7 +363,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Put(
-	 *     path="/{lang}/teams/transfers/{action}/{transfer}",
+	 *     path="/{lang}/transfers/{action}/{transfer}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *          name="action",
@@ -386,7 +386,7 @@ interface TransferControllerInterface
 	 *          in="path",
 	 *          required=true,
 	 *          description="transferId",
-	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyIsInN0YXJ0RGF0ZSI6IjIwMjAtMDEtMDFUMDA6MDA6MDArMDA6MDAifQ==",
+	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyI",
 	 *          @OA\Schema(type="string")
 	 *     ),
 	 *     @OA\RequestBody(

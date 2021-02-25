@@ -209,8 +209,7 @@ class TransferProjector
 	{
 		$latestTransfer->setActive( false )
 			->setEndDate( $latestTransfer->getEndDate() ?:
-				new DateTimeImmutable( $metadata[ 'startDate' ] ) )
-			->setUpdatedAt(new DateTimeImmutable());
+				new DateTimeImmutable( $metadata[ 'startDate' ] ) );
 		$this->persistTransfer($latestTransfer);
 	}
 

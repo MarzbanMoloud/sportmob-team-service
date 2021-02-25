@@ -12,7 +12,7 @@ interface TrophyControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/teams/trophies/team/{team}",
+	 *     path="/{lang}/trophies/team/{team}",
 	 *     tags={"Trophy"},
 	 *     @OA\Parameter(
 	 *         name="team",
@@ -97,7 +97,7 @@ interface TrophyControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/teams/trophies/competition/{competition}",
+	 *     path="/{lang}/trophies/competition/{competition}",
 	 *     tags={"Trophy"},
 	 *     @OA\Parameter(
 	 *         name="competition",

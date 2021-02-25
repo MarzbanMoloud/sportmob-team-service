@@ -7,7 +7,6 @@ namespace Tests\Traits;
 use App\ValueObjects\ReadModel\TeamName;
 use App\Models\ReadModels\Team;
 use App\Models\Repositories\TeamRepository;
-use DateTimeImmutable;
 
 
 /**
@@ -41,7 +40,6 @@ trait TeamRepositoryTestTrait
 			->setCity($this->faker->city)
 			->setType($types[$this->faker->numberBetween(0, 1)])
 			->setActive($active[$this->faker->numberBetween(0, 1)])
-			->setCreatedAt(new DateTimeImmutable())
 			->setName(
 				(new TeamName())
 					->setOriginal($this->faker->name)

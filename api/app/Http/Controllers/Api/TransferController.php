@@ -11,7 +11,6 @@ use App\Http\Resources\Api\PlayerTransferResource;
 use App\Http\Resources\Api\TeamTransferResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Transfer\TransferService;
-use App\Utilities\Utility;
 use Illuminate\Http\Request;
 
 
@@ -41,12 +40,13 @@ class TransferController extends Controller implements TransferControllerInterfa
 	 * @param string $team
 	 * @param string|null $season
 	 * @return mixed
-	 * @throws \App\Exceptions\ResourceNotFoundException
 	 */
 	public function listByTeam(string $team, ?string $season = null)
 	{
-		$result['transfers'] = $this->transferService->listByTeam($team, $season);
 		$result['seasons'] = $this->transferService->getAllSeasons($team);
+		$result['transfers'] = $this->transferService
+			->setSeasons($result['seasons'])
+			->listByTeam($team, $season);
 		return $this->responseService->createSuccessResponseObject(
 			new TeamTransferResource($result)
 		);

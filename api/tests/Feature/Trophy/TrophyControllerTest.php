@@ -40,7 +40,7 @@ class TrophyControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->trophyCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/teams/trophies/team/%s', $teamId));
+		$response = $this->json('GET', sprintf('/en/trophies/team/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -64,7 +64,7 @@ class TrophyControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->trophyRepository->drop();
-		$response = $this->json('GET', sprintf('/en/teams/trophies/team/%s', $teamId));
+		$response = $this->json('GET', sprintf('/en/trophies/team/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -88,10 +88,10 @@ class TrophyControllerTest extends TestCase
 
 	public function testTrophiesByTeamWhenItemNotExist()
 	{
-		$response = $this->json('GET', sprintf('/en/teams/trophies/team/%s', $this->faker->uuid));
+		$response = $this->json('GET', sprintf('/en/trophies/team/%s', $this->faker->uuid));
 		$response = json_decode($response->response->getContent(), true);
-		$this->assertNotNull($response['message']);
-		$this->assertEquals(config('common.error_codes.resource_not_found'), $response['code']);
+		$this->assertEmpty($response['links']);
+		$this->assertEmpty($response['data']);
 	}
 
 	public function testTrophiesByCompetition()
@@ -102,7 +102,7 @@ class TrophyControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->trophyCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/teams/trophies/competition/%s', $competitionId));
+		$response = $this->json('GET', sprintf('/en/trophies/competition/%s', $competitionId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $item) {
 			$this->assertNotNull($item['season']);
@@ -116,7 +116,7 @@ class TrophyControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->trophyRepository->drop();
-		$response = $this->json('GET', sprintf('/en/teams/trophies/competition/%s', $competitionId));
+		$response = $this->json('GET', sprintf('/en/trophies/competition/%s', $competitionId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $item) {
 			$this->assertNotNull($item['season']);
@@ -130,7 +130,7 @@ class TrophyControllerTest extends TestCase
 
 	public function testTrophiesByCompetitionWhenItemNotExist()
 	{
-		$response = $this->json('GET', sprintf('/en/teams/trophies/competition/%s', $this->faker->uuid));
+		$response = $this->json('GET', sprintf('/en/trophies/competition/%s', $this->faker->uuid));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
 		$this->assertEquals(config('common.error_codes.resource_not_found'), $response['code']);
