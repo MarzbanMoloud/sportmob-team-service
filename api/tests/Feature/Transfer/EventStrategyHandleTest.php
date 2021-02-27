@@ -57,7 +57,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->createTransferTable();
 	}
 
-	public function testTeamWasCreatedHandleWhenActiveIsTrue()
+	public function testPlayerWasTransferredHandleWhenActiveIsTrue()
 	{
 		$message = sprintf('
 		{
@@ -209,10 +209,10 @@ class EventStrategyHandleTest extends TestCase
 		$teamTransfer = app('cache')->get(
 			$this->transferCacheService->getTransferByTeamKey($message->getBody()->getIdentifiers()['to'], '2019-2020'),
 		);
-		$this->assertInstanceOf(Transfer::class, $teamTransfer[0]);
+		$this->assertNull($teamTransfer);
 	}
 
-	public function testTeamWasCreatedHandleWhenPlayerCacheExist()
+	public function testPlayerWasTransferredHandleWhenPlayerCacheExist()
 	{
 		$fakePlayerId = $this->faker->uuid;
 		$this->brokerMessageCacheService->putPlayerInfo([
@@ -316,7 +316,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($payload['headers']['date']);
 	}
 
-	public function testTeamWasCreatedHandleWhenActiveIsFalse()
+	public function testPlayerWasTransferredHandleWhenActiveIsFalse()
 	{
 		$message = sprintf('
 		{
@@ -438,7 +438,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals($answerMessage->getBody()['position'], $brokerMessageCache['position']);
 	}
 
-	public function testTeamWasCreatedHandleWithActiveTransfer()
+	public function testPlayerWasTransferredHandleWithActiveTransfer()
 	{
 		$fakePlayerID = $this->faker->uuid;
 		$fakeTransferModel = $this->createTransferModel()
@@ -595,7 +595,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($payload['headers']['date']);
 	}
 
-	public function testTeamWasCreatedHandleWithNullIdentifier()
+	public function testPlayerWasTransferredHandleWithNullIdentifier()
 	{
 		$this->expectException(ProjectionException::class);
 		$message = sprintf('
@@ -626,7 +626,7 @@ class EventStrategyHandleTest extends TestCase
 		app(PlayerWasTransferred::class)->handle($message->getBody());
 	}
 
-	public function testTeamWasCreatedHandleWithNullMetaData()
+	public function testPlayerWasTransferredHandleWithNullMetaData()
 	{
 		$this->expectException(ProjectionException::class);
 		$message = sprintf('
@@ -665,7 +665,7 @@ class EventStrategyHandleTest extends TestCase
 		app(PlayerWasTransferred::class)->handle($message->getBody());
 	}
 
-	public function testTeamWasCreatedHandleWhenTeamItemsNotExist()
+	public function testPlayerWasTransferredHandleWhenTeamItemsNotExist()
 	{
 		$this->expectException(ProjectionException::class);
 		$message = sprintf('
@@ -704,7 +704,7 @@ class EventStrategyHandleTest extends TestCase
 		app(PlayerWasTransferred::class)->handle($message->getBody());
 	}
 
-	public function testTeamWasCreatedHandleWithEmptyPlayerInfo()
+	public function testPlayerWasTransferredHandleWithEmptyPlayerInfo()
 	{
 		$message = sprintf('
 		{

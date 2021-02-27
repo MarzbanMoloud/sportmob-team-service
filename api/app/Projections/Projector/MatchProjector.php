@@ -94,6 +94,7 @@ class MatchProjector
 		$this->persistTeamsMatch($awayTeamsMatchModel);
 		event(new MatchWasCreatedProjectorEvent($identifier));
 		/** Create cache by call service */
+		$this->teamsMatchCacheService->forget('teams_match*');
 		$this->createTeamsMatchCache($identifier['home'], $this->serializer->normalize($body, 'array'));
 		$this->createTeamsMatchCache($identifier['away'], $this->serializer->normalize($body, 'array'));
 		$this->logger->alert(
@@ -144,6 +145,7 @@ class MatchProjector
 			foreach ($teamsMatchItems as $teamsMatch) {
 				/** @var TeamsMatch $teamsMatch */
 				$this->updateTeamsMatchByMatchFinishedEvent($teamsMatch, $score, TeamsMatch::EVALUATION_DRAW);
+				$this->teamsMatchCacheService->forget('teams_match*');
 				$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
 			}
 			goto successfullyLog;
@@ -155,6 +157,7 @@ class MatchProjector
 				$score,
 				($identifier['winner'] == $teamsMatch->getTeamId()) ? TeamsMatch::EVALUATION_WIN : TeamsMatch::EVALUATION_LOSS
 			);
+			$this->teamsMatchCacheService->forget('teams_match*');
 			$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
 		}
 		successfullyLog:
@@ -202,6 +205,7 @@ class MatchProjector
 		foreach ($teamsMatchItems as $teamsMatch) {
 			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchStatusChanged($teamsMatch, $status);
+			$this->teamsMatchCacheService->forget('teams_match*');
 			$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
 		}
 		$this->logger->alert(

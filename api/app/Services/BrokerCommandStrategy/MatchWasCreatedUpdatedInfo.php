@@ -5,11 +5,13 @@ namespace App\Services\BrokerCommandStrategy;
 
 
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
+use App\Http\Services\TeamsMatch\TeamsMatchService;
 use App\Listeners\Projection\MatchWasCreatedProjectorListener;
 use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\Services\Cache\Interfaces\TeamsMatchCacheServiceInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Psr\Log\LoggerInterface;
@@ -28,10 +30,14 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 	private HubInterface $sentryHub;
 	private SerializerInterface $serializer;
 	private LoggerInterface $logger;
+	private TeamsMatchCacheServiceInterface $teamsMatchCacheService;
+	private TeamsMatchService $teamsMatchService;
 
 	/**
 	 * MatchWasCreatedUpdatedInfo constructor.
 	 * @param TeamsMatchRepository $teamsMatchRepository
+	 * @param TeamsMatchService $teamsMatchService
+	 * @param TeamsMatchCacheServiceInterface $teamsMatchCacheService
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param HubInterface $sentryHub
 	 * @param SerializerInterface $serializer
@@ -39,6 +45,8 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 	 */
 	public function __construct(
 		TeamsMatchRepository $teamsMatchRepository,
+		TeamsMatchService $teamsMatchService,
+		TeamsMatchCacheServiceInterface $teamsMatchCacheService,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		HubInterface $sentryHub,
 		SerializerInterface $serializer,
@@ -49,6 +57,8 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 		$this->sentryHub = $sentryHub;
 		$this->serializer = $serializer;
 		$this->logger = $logger;
+		$this->teamsMatchCacheService = $teamsMatchCacheService;
+		$this->teamsMatchService = $teamsMatchService;
 	}
 
 	/**
@@ -92,6 +102,7 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 			return;
 		}
 		[$matchId, $homeTeamId, $awayTeamId] = explode('#', $commandQuery->getHeaders()->getId());
+		$this->teamsMatchCacheService->forget('teams_match*');
 		$this->updateTeamsMatch($matchId, $homeTeamId, $commandQuery->getBody()['competitionName']);
 		$this->updateTeamsMatch($matchId, $awayTeamId, $commandQuery->getBody()['competitionName']);
 		/**
@@ -135,6 +146,11 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 				$this->serializer->normalize($teamsMatchItem, 'array')
 			);
 			$this->sentryHub->captureException($exception);
+		}
+		/**	create cache */
+		try {
+			$this->teamsMatchService->getTeamsMatchInfo($teamId);
+		} catch (\Exception $exception) {
 		}
 	}
 }

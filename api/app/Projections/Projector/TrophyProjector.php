@@ -13,6 +13,8 @@ use App\Models\ReadModels\Team;
 use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TrophyRepository;
+use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
+use App\Services\Cache\TrophyCacheService;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -29,6 +31,7 @@ class TrophyProjector
 	private TrophyService $trophyService;
 	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
+	private TrophyCacheServiceInterface $trophyCacheService;
 	private string $eventName;
 
 	/**
@@ -36,6 +39,7 @@ class TrophyProjector
 	 * @param TrophyRepository $trophyRepository
 	 * @param TeamRepository $teamRepository
 	 * @param TrophyService $trophyService
+	 * @param TrophyCacheServiceInterface $trophyCacheService
 	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
@@ -43,6 +47,7 @@ class TrophyProjector
 		TrophyRepository $trophyRepository,
 		TeamRepository $teamRepository,
 		TrophyService $trophyService,
+		TrophyCacheServiceInterface $trophyCacheService,
 		LoggerInterface $logger,
 		SerializerInterface $serializer
 	) {
@@ -51,6 +56,7 @@ class TrophyProjector
 		$this->trophyService = $trophyService;
 		$this->logger = $logger;
 		$this->serializer = $serializer;
+		$this->trophyCacheService = $trophyCacheService;
 	}
 
 	/**
@@ -107,6 +113,8 @@ class TrophyProjector
 		event(new TrophyProjectorEvent($trophyModel, $this->eventName));
 		/** Create cache by call service */
 		try {
+			$this->trophyCacheService->forget(TrophyCacheService::getTrophyByCompetitionKey($identifiers['competition']));
+			$this->trophyCacheService->forget(TrophyCacheService::getTrophyByTeamKey($identifiers['team']));
 			$this->trophyService->getTrophiesByTeam($identifiers['team']);
 			$this->trophyService->getTrophiesByCompetition($identifiers['competition']);
 		} catch (\Exception $e) {

@@ -5,6 +5,7 @@ namespace App\Services\BrokerCommandStrategy;
 
 
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
+use App\Http\Services\Transfer\TransferService;
 use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
 use App\Listeners\Traits\PlayerWasTransferredNotificationTrait;
 use App\Models\ReadModels\Transfer;
@@ -12,6 +13,7 @@ use App\Models\Repositories\TransferRepository;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Psr\Log\LoggerInterface;
@@ -33,10 +35,14 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	private SerializerInterface $serializer;
 	private BrokerInterface $broker;
 	private LoggerInterface $logger;
+	private TransferCacheServiceInterface $transferCacheService;
+	private TransferService $transferService;
 
 	/**
 	 * PlayerWasTransferredUpdateInfo constructor.
 	 * @param TransferRepository $transferRepository
+	 * @param TransferCacheServiceInterface $transferCacheService
+	 * @param TransferService $transferService
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param HubInterface $sentryHub
 	 * @param BrokerInterface $broker
@@ -45,6 +51,8 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	 */
 	public function __construct(
 		TransferRepository $transferRepository,
+		TransferCacheServiceInterface $transferCacheService,
+		TransferService $transferService,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		HubInterface $sentryHub,
 		BrokerInterface $broker,
@@ -57,6 +65,8 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->logger = $logger;
+		$this->transferCacheService = $transferCacheService;
+		$this->transferService = $transferService;
 	}
 
 	/**
@@ -116,6 +126,11 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 				$this->serializer->normalize($transfer, 'array')
 			);
 			$this->sentryHub->captureException($exception);
+		}
+		try {
+			$this->transferCacheService->forget('transfer_by_*');//per playerId and teamId
+			$this->transferService->listByPlayer($playerId);
+		} catch (\Exception $e) {
 		}
 		/**
 		 * Put playerInfo in cache.

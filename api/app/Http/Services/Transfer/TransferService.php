@@ -56,7 +56,7 @@ class TransferService
 		}
 		return $this->transferCacheService->rememberForeverTransferByTeam($teamId, $season,
 			function () use ($teamId, $season) {
-				return $this->transferRepository->findByTeamId($teamId, $season);
+				return $this->transferRepository->findByTeamIdAndSeason($teamId, $season);
 		});
 	}
 

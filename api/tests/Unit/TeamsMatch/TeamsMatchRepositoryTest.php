@@ -142,9 +142,72 @@ class TeamsMatchRepositoryTest extends TestCase
 		$this->assertEmpty($unknownResponse);
 	}
 
+	public function testFindTeamsMatchByOpponentId()
+	{
+		$teamId = $this->faker->uuid;
+		$opponentId = $this->faker->uuid;
+		$teamName = $this->faker->name;
+		$opponentName = $this->faker->name;
+		/**
+		 * Upcoming status.
+		 */
+		$fakeMatchIdForUpcoming = $this->faker->uuid;
+
+		$this->createTeamsMatchModel(
+			$teamId,
+			$opponentId,
+			$teamName,
+			$opponentName,
+			$fakeMatchIdForUpcoming,
+			true
+		);
+		$this->createTeamsMatchModel(
+			$opponentId,
+			$teamId,
+			$opponentName,
+			$teamName,
+			$fakeMatchIdForUpcoming,
+			false
+		);
+		/**
+		 * Finished status.
+		 */
+		$fakeMatchIdForFinished = $this->faker->uuid;
+
+		$this->createTeamsMatchModel(
+			$teamId,
+			$opponentId,
+			$teamName,
+			$opponentName,
+			$fakeMatchIdForFinished,
+			true,
+			TeamsMatch::STATUS_FINISHED
+		);
+		$this->createTeamsMatchModel(
+			$opponentId,
+			$teamId,
+			$opponentName,
+			$teamName,
+			$fakeMatchIdForFinished,
+			false,
+			TeamsMatch::STATUS_FINISHED
+		);
+		$response = $this->teamsMatchRepository->findTeamsMatchByOpponentId($opponentId);
+		$this->assertCount(2, $response);
+		foreach ($response as $teamsMatch) {
+			$this->assertInstanceOf(TeamsMatch::class, $teamsMatch);
+		}
+	}
+
 	public function testFindTeamsMatchByTeamIdWhenItemNotExist()
 	{
 		$response = $this->teamsMatchRepository->findTeamsMatchByTeamId($this->faker->uuid, TeamsMatch::STATUS_FINISHED);
+		$this->assertEmpty($response);
+	}
+
+	public function testFindTeamsMatchByOpponentIdWhenItemNotExist()
+	{
+		$response = $this->teamsMatchRepository->findTeamsMatchByOpponentId($this->faker->uuid);
 		$this->assertEmpty($response);
 	}
 

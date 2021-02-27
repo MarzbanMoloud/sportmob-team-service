@@ -5,11 +5,13 @@ namespace App\Services\BrokerCommandStrategy;
 
 
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
+use App\Http\Services\Trophy\TrophyService;
 use App\Listeners\Projection\TrophyProjectorListener;
 use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TrophyRepository;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Psr\Log\LoggerInterface;
@@ -28,11 +30,15 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 	private TrophyRepository $trophyRepository;
 	private SerializerInterface $serializer;
 	private LoggerInterface $logger;
+	private TrophyService $trophyService;
+	private TrophyCacheServiceInterface $trophyCacheService;
 
 	/**
 	 * TrophyUpdateInfo constructor.
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param HubInterface $sentryHub
+	 * @param TrophyService $trophyService
+	 * @param TrophyCacheServiceInterface $trophyCacheService
 	 * @param TrophyRepository $trophyRepository
 	 * @param SerializerInterface $serializer
 	 * @param LoggerInterface $logger
@@ -40,6 +46,8 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 	public function __construct(
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		HubInterface $sentryHub,
+		TrophyService $trophyService,
+		TrophyCacheServiceInterface $trophyCacheService,
 		TrophyRepository $trophyRepository,
 		SerializerInterface $serializer,
 		LoggerInterface $logger
@@ -49,6 +57,8 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 		$this->trophyRepository = $trophyRepository;
 		$this->serializer = $serializer;
 		$this->logger = $logger;
+		$this->trophyService = $trophyService;
+		$this->trophyCacheService = $trophyCacheService;
 	}
 
 	/**
@@ -109,6 +119,11 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 				$this->serializer->normalize($trophy, 'array')
 			);
 			$this->sentryHub->captureException($exception);
+		}
+		try {
+			$this->trophyCacheService->forget('trophies_by_*');//per teamId and competitionId.
+			$this->trophyService->getTrophiesByTeam($teamId);
+		} catch (\Exception $e) {
 		}
 		$data = $commandQuery->getBody();
 		unset($data['entity']);

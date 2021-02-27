@@ -15,6 +15,8 @@ use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TransferRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
+use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
+use App\Services\Cache\TransferCacheService;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
@@ -35,6 +37,7 @@ class TransferProjector
 	private TransferService $transferService;
 	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
+	private TransferCacheServiceInterface $transferCacheService;
 	private string $eventName;
 
 	/**
@@ -43,6 +46,7 @@ class TransferProjector
 	 * @param TeamRepository $teamRepository
 	 * @param TeamCacheServiceInterface $teamCacheService
 	 * @param TransferService $transferService
+	 * @param TransferCacheServiceInterface $transferCacheService
 	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
@@ -51,6 +55,7 @@ class TransferProjector
 		TeamRepository $teamRepository,
 		TeamCacheServiceInterface $teamCacheService,
 		TransferService $transferService,
+		TransferCacheServiceInterface $transferCacheService,
 		LoggerInterface $logger,
 		SerializerInterface $serializer
 	) {
@@ -60,6 +65,7 @@ class TransferProjector
 		$this->transferService = $transferService;
 		$this->logger = $logger;
 		$this->serializer = $serializer;
+		$this->transferCacheService = $transferCacheService;
 	}
 
 	/**
@@ -88,6 +94,8 @@ class TransferProjector
 		event(new PlayerWasTransferredProjectorEvent($transferModel));
 		/** Create cache by call service */
 		try {
+			$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($identifier['to'], $transferModel->getSeason()));
+			$this->transferCacheService->forget(TransferCacheService::getTransferByPlayerKey($identifier['player']));
 			$this->transferService->listByPlayer($identifier['player']);
 			$this->transferService->listByTeam($identifier['to'], $transferModel->getSeason());
 		} catch (ResourceNotFoundException $exception) {

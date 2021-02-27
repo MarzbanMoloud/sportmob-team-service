@@ -59,7 +59,7 @@ interface TransferControllerInterface
 	 *                          	property="transfers",
 	 *                          	type="object",
 	 *        						@OA\Property(
-	 *                              	property="transferId",
+	 *                              	property="id",
 	 *                              	type="string",
 	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYzZDEtM2JkZC04YmZiLTI5M2NmZWJlNDdiYyIsInN0YXJ0RGF0"
 	 *                           	),
@@ -232,7 +232,7 @@ interface TransferControllerInterface
 	 *                          property="data",
 	 *                          type="object",
 	 *        					@OA\Property(
-	 *                              property="transferId",
+	 *                              property="id",
 	 *                              type="string",
 	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYXRlIjoiMjAyMC0wMS0wMSAwMDowMDowMC4wMDAwMDAiLCJ0aW1lem9u"
 	 *                           ),
@@ -385,7 +385,7 @@ interface TransferControllerInterface
 	 *          name="transfer",
 	 *          in="path",
 	 *          required=true,
-	 *          description="transferId",
+	 *          description="id",
 	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyI",
 	 *          @OA\Schema(type="string")
 	 *     ),

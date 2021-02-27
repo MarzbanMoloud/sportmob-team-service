@@ -79,7 +79,7 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 	 * @param string $season
 	 * @return array
 	 */
-	public function findByTeamId(string $teamId, string $season): array
+	public function findByTeamIdAndSeason(string $teamId, string $season): array
 	{
 		try {
 			$Result =
@@ -124,6 +124,26 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 		},
 			$Result[ 'Items' ] );
 		return array_unique( $Seasons );
+	}
+
+	/**
+	 * @param string $teamId
+	 * @return array
+	 */
+	public function findByTeamId(string $teamId): array
+	{
+		try {
+			$Result =
+				$this->dynamoDbClient->scan( [
+					'TableName'                 => static::getTableName(),
+					'FilterExpression'          => 'fromTeamId = :team or toTeamId = :team',
+					'ExpressionAttributeValues' => $this->marshalJson( [ ':team' => $teamId ] )
+				] );
+		} catch (\Exception $e) {
+			$this->sentryHub->captureException( $e );
+			return [];
+		}
+		return $this->deserializeResult( $Result );
 	}
 
 	/**

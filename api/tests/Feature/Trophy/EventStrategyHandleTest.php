@@ -234,12 +234,6 @@ class EventStrategyHandleTest extends TestCase
 		 */
 		$response = app('cache')->get($this->trophyCacheService->getTrophyByTeamKey($runnerUpMessage->getBody()->getIdentifiers()['team']));
 		$this->assertInstanceOf(Trophy::class, $response[0]);
-		$response = app('cache')->get($this->trophyCacheService->getTrophyByTeamKey($winnerMessage->getBody()->getIdentifiers()['team']));
-		$this->assertInstanceOf(Trophy::class, $response[0]);
-		$response = app('cache')->get($this->trophyCacheService->getTrophyByCompetitionKey($winnerMessage->getBody()->getIdentifiers()['competition']));
-		$this->assertInstanceOf(Trophy::class, $response[0]);
-		$response = app('cache')->get($this->trophyCacheService->getTrophyByCompetitionKey($runnerUpMessage->getBody()->getIdentifiers()['competition']));
-		$this->assertInstanceOf(Trophy::class, $response[0]);
 	}
 
 	public function testTeamBecameWinnerHandleWithNullIdentifier()
