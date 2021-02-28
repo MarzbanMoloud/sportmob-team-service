@@ -63,9 +63,11 @@ class Headers
 
 	/**
 	 * @param string $id
+	 * @return Headers
 	 */
-	public function setId(string $id): void
+	public function setId(string $id): Headers
 	{
 		$this->id = $id;
+		return $this;
 	}
 }
