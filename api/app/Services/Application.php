@@ -16,7 +16,7 @@ class Application extends LumenApplication
     {
         $this->singleton( 'Psr\Log\LoggerInterface',
             function() {
-                return new Logger( env( 'APP_NAME' ), [ $this->getMonologHandler() ] );
+                return new MonologLogger( env( 'APP_NAME' ), [ $this->getMonologHandler() ] );
             } );
     }
 
