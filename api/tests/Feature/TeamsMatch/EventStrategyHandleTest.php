@@ -94,7 +94,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$fakeHomeId,
 			$fakeAwayId,
@@ -155,7 +155,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.competition_name'),
 				'id' => $payload['body']['id'],
@@ -224,7 +224,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$fakeHomeId,
 			$fakeAwayId,
@@ -285,7 +285,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.competition_name'),
 				'id' => $payload['body']['id'],
@@ -346,7 +346,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$fakeHomeId,
 			$fakeAwayId,
@@ -406,7 +406,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([]);
 		/**
 		 * Handle answer message from player service for update player info in transfer model.
@@ -445,7 +445,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_was_created'),
-			Carbon::now()->toDateTimeString());
+			Carbon::now()->format('c'));
 		/**
 		 * @var Message $message
 		 */
@@ -478,7 +478,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid,
@@ -519,7 +519,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$fakeHomeId,
 			$fakeAwayId,
@@ -598,7 +598,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_finished'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakeMatchIdForUpcoming,
 			$teamId);
 		/**
@@ -690,7 +690,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_finished'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakeMatchIdForUpcoming, null);
 		/**
 		 * @var Message $message
@@ -726,7 +726,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_finished'),
-			Carbon::now()->toDateTimeString());
+			Carbon::now()->format('c'));
 		/**
 		 * @var Message $message
 		 */
@@ -755,7 +755,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_finished'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid);
 		/**
@@ -802,7 +802,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_finished'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid);
 		/**
@@ -857,7 +857,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_status_changed'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakeMatchIdForUpcoming);
 		/**
 		 * @var Message $message
@@ -917,7 +917,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_status_changed'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakeMatchIdForUpcoming);
 		/**
 		 * @var Message $message
@@ -950,7 +950,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_status_changed'),
-			Carbon::now()->toDateTimeString());
+			Carbon::now()->format('c'));
 		/**
 		 * @var Message $message
 		 */
@@ -978,7 +978,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.match_status_changed'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid);
 		/**
 		 * @var Message $message

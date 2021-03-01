@@ -69,7 +69,7 @@ class TrophyProjectorListener
 							$event->trophy->getTournamentId(), $event->trophy->getTeamId()))
 						->setDestination(config('broker.services.competition_name'))
 						->setSource(config('broker.services.team_name'))
-						->setDate(Carbon::now()->toDateTimeString())
+						->setDate(Carbon::now()->format('c'))
 				)->setBody([
 					'entity' => config('broker.services.tournament_name'),
 					'id' => $event->trophy->getTournamentId()

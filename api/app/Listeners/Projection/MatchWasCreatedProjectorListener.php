@@ -74,7 +74,7 @@ class MatchWasCreatedProjectorListener
 							$event->identifier['away']))
 						->setDestination(config('broker.services.competition_name'))
 						->setSource(config('broker.services.team_name'))
-						->setDate(Carbon::now()->toDateTimeString())
+						->setDate(Carbon::now()->format('c'))
 				)->setBody([
 					'entity' => config('broker.services.competition_name'),
 					'id' => $event->identifier['competition']

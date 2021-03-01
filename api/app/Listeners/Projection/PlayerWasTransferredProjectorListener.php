@@ -28,7 +28,7 @@ class PlayerWasTransferredProjectorListener
 	use PlayerWasTransferredNotificationTrait;
 
 	const BROKER_EVENT_KEY = 'PlayerWasTransferredUpdateInfo';
-	const BROKER_NOTIFICATION_KEY = 'PlayerWasTransferredNotification';
+	const BROKER_NOTIFICATION_KEY = 'transfer-player';
 
 	private BrokerInterface $broker;
 	private SerializerInterface $serializer;
@@ -76,7 +76,7 @@ class PlayerWasTransferredProjectorListener
 						)
 						->setDestination(config('broker.services.player_name'))
 						->setSource(config('broker.services.team_name'))
-						->setDate(Carbon::now()->toDateTimeString())
+						->setDate(Carbon::now()->format('c'))
 				)->setBody([
 					'entity' => config('broker.services.player_name'),
 					'id' => $event->transfer->getPlayerId()

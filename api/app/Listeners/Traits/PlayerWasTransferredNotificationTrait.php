@@ -29,22 +29,22 @@ trait PlayerWasTransferredNotificationTrait
 				(new NotificationHeaders())
 					->setEvent($event)
 					->setDate(new DateTimeImmutable())
+					->setId($transfer->getPlayerId())
 			)
 			->setBody(
 				(new NotificationBody())
 					->setId([
-						'from' => $transfer->getFromTeamId(),
-						'to' => $transfer->getToTeamId(),
-						'player' => $transfer->getPlayerId()
+						'team' => [
+							$transfer->getFromTeamId(),
+							$transfer->getToTeamId()
+						],
+						'player' => $transfer->getPlayerId(),
+						'owner' => $transfer->getToTeamName()
 					])
 					->setMetadata([
-						'playerPosition' => $transfer->getPlayerPosition(),
-						'playerName' => $transfer->getPlayerName(),
-						'fromTeamName' => $transfer->getFromTeamName(),
-						'toTeamName' => $transfer->getToTeamName(),
-						'startDate' => $transfer->getStartDate(),
-						'endDate' => $transfer->getEndDate(),
-						'season' => $transfer->getSeason(),
+						'player_name' => $transfer->getPlayerName(),
+						'old_team_name' => $transfer->getFromTeamName(),
+						'team_name' => $transfer->getToTeamName(),
 					])
 			);
 		$this->broker->flushMessages()->addMessage(

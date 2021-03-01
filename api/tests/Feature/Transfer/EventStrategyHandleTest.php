@@ -81,7 +81,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 		config('mediator-event.events.player_was_transferred'),
-		Carbon::now()->toDateTimeString(),
+		Carbon::now()->format('c'),
 		$this->faker->uuid,
 		$this->faker->uuid,
 		$this->faker->uuid);
@@ -149,7 +149,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.player_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.player_name'),
 				'id' => $message->getBody()->getIdentifiers()['player'],
@@ -187,19 +187,16 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertCount(2, $payload['body']);
 		$this->assertCount(3, $payload['body']['id']);
 		$this->assertNotNull($payload['body']['id']['player']);
-		$this->assertNotNull($payload['body']['id']['to']);
-		$this->assertNotNull($payload['body']['id']['from']);
-		$this->assertCount(7, $payload['body']['metadata']);
-		$this->assertNotNull($payload['body']['metadata']['playerPosition']);
-		$this->assertNotNull($payload['body']['metadata']['playerName']);
-		$this->assertNotNull($payload['body']['metadata']['fromTeamName']);
-		$this->assertNotNull($payload['body']['metadata']['toTeamName']);
-		$this->assertNotNull($payload['body']['metadata']['startDate']);
-		$this->assertNotNull($payload['body']['metadata']['endDate']);
-		$this->assertNotNull($payload['body']['metadata']['season']);
-		$this->assertCount(2, $payload['headers']);
+		$this->assertNotNull($payload['body']['id']['owner']);
+		$this->assertCount(2, $payload['body']['id']['team']);
+		$this->assertCount(3, $payload['body']['metadata']);
+		$this->assertNotNull($payload['body']['metadata']['player_name']);
+		$this->assertNotNull($payload['body']['metadata']['old_team_name']);
+		$this->assertNotNull($payload['body']['metadata']['team_name']);
+		$this->assertCount(3, $payload['headers']);
 		$this->assertNotNull($payload['headers']['event']);
 		$this->assertNotNull($payload['headers']['date']);
+		$this->assertNotNull($payload['headers']['id']);
 		/**
 		 * Read from Cache
 		 */
@@ -243,7 +240,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakePlayerId,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -301,19 +298,16 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertCount(2, $payload['body']);
 		$this->assertCount(3, $payload['body']['id']);
 		$this->assertNotNull($payload['body']['id']['player']);
-		$this->assertNotNull($payload['body']['id']['to']);
-		$this->assertNotNull($payload['body']['id']['from']);
-		$this->assertCount(7, $payload['body']['metadata']);
-		$this->assertNotNull($payload['body']['metadata']['playerPosition']);
-		$this->assertNotNull($payload['body']['metadata']['playerName']);
-		$this->assertNotNull($payload['body']['metadata']['fromTeamName']);
-		$this->assertNotNull($payload['body']['metadata']['toTeamName']);
-		$this->assertNotNull($payload['body']['metadata']['startDate']);
-		$this->assertNotNull($payload['body']['metadata']['endDate']);
-		$this->assertNotNull($payload['body']['metadata']['season']);
-		$this->assertCount(2, $payload['headers']);
+		$this->assertNotNull($payload['body']['id']['owner']);
+		$this->assertCount(2, $payload['body']['id']['team']);
+		$this->assertCount(3, $payload['body']['metadata']);
+		$this->assertNotNull($payload['body']['metadata']['player_name']);
+		$this->assertNotNull($payload['body']['metadata']['old_team_name']);
+		$this->assertNotNull($payload['body']['metadata']['team_name']);
+		$this->assertCount(3, $payload['headers']);
 		$this->assertNotNull($payload['headers']['event']);
 		$this->assertNotNull($payload['headers']['date']);
+		$this->assertNotNull($payload['headers']['id']);
 	}
 
 	public function testPlayerWasTransferredHandleWhenActiveIsFalse()
@@ -340,7 +334,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -408,7 +402,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.player_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.player_name'),
 				'id' => $message->getBody()->getIdentifiers()['player'],
@@ -468,7 +462,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakePlayerID,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -542,7 +536,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.player_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.player_name'),
 				'id' => $message->getBody()->getIdentifiers()['player'],
@@ -580,19 +574,16 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertCount(2, $payload['body']);
 		$this->assertCount(3, $payload['body']['id']);
 		$this->assertNotNull($payload['body']['id']['player']);
-		$this->assertNotNull($payload['body']['id']['to']);
-		$this->assertNotNull($payload['body']['id']['from']);
-		$this->assertCount(7, $payload['body']['metadata']);
-		$this->assertNotNull($payload['body']['metadata']['playerPosition']);
-		$this->assertNotNull($payload['body']['metadata']['playerName']);
-		$this->assertNotNull($payload['body']['metadata']['fromTeamName']);
-		$this->assertNotNull($payload['body']['metadata']['toTeamName']);
-		$this->assertNotNull($payload['body']['metadata']['startDate']);
-		$this->assertNotNull($payload['body']['metadata']['endDate']);
-		$this->assertNotNull($payload['body']['metadata']['season']);
-		$this->assertCount(2, $payload['headers']);
+		$this->assertNotNull($payload['body']['id']['owner']);
+		$this->assertCount(2, $payload['body']['id']['team']);
+		$this->assertCount(3, $payload['body']['metadata']);
+		$this->assertNotNull($payload['body']['metadata']['player_name']);
+		$this->assertNotNull($payload['body']['metadata']['old_team_name']);
+		$this->assertNotNull($payload['body']['metadata']['team_name']);
+		$this->assertCount(3, $payload['headers']);
 		$this->assertNotNull($payload['headers']['event']);
 		$this->assertNotNull($payload['headers']['date']);
+		$this->assertNotNull($payload['headers']['id']);
 	}
 
 	public function testPlayerWasTransferredHandleWithNullIdentifier()
@@ -615,7 +606,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString());
+			Carbon::now()->format('c'));
 		/**
 		 * @var Message $message
 		 */
@@ -651,7 +642,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -690,7 +681,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -728,7 +719,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.player_was_transferred'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -796,7 +787,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.player_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([]);
 		/**
 		 * Handle answer message from player service for update player info in transfer model.

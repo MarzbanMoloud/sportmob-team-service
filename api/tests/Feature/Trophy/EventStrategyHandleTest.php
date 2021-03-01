@@ -76,7 +76,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_became_winner'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -97,7 +97,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_became_runner_up'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -182,7 +182,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload_winner['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.tournament_name'),
 				'id' => $payload_winner['body']['id'],
@@ -197,7 +197,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($payload_runner['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.tournament_name'),
 				'id' => $payload_runner['body']['id'],
@@ -256,7 +256,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_became_winner'),
-			Carbon::now()->toDateTimeString());
+			Carbon::now()->format('c'));
 		/**
 		 * @var Message $message
 		 */
@@ -287,7 +287,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_became_winner'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -320,7 +320,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_became_winner'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->uuid,
 			$this->faker->uuid);
@@ -382,7 +382,7 @@ class EventStrategyHandleTest extends TestCase
 					->setId($message->getBody()->getIdentifiers()['tournament'])
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.competition_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([]);
 		/**
 		 * Handle answer message from competition service for update trophy info in trophy model.
