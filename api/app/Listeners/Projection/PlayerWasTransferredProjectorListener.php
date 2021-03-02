@@ -113,6 +113,8 @@ class PlayerWasTransferredProjectorListener
 			);
 			throw new ProjectionException('Failed to update transfer.', $exception->getCode());
 		}
-		$this->sendNotification($event->transfer, self::BROKER_NOTIFICATION_KEY); //TODO:: Notification
+		if (strpos($event->transfer->getSeason(), date('Y')) != false) {
+			$this->sendNotification($event->transfer, self::BROKER_NOTIFICATION_KEY);
+		}
 	}
 }

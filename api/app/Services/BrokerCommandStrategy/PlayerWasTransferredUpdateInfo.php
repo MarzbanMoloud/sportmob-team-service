@@ -142,12 +142,9 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		 * Notification message.
 		 * @var Transfer $activeTransfer
 		 */
-		$activeTransfer = $this->transferRepository->findActiveTransfer($playerId);
-		if (!$activeTransfer) {
-			goto successfullyLog;
+		if (strpos($transfer->getSeason(), date('Y')) != false) {
+			$this->sendNotification($transfer, PlayerWasTransferredProjectorListener::BROKER_NOTIFICATION_KEY);
 		}
-		$this->sendNotification($activeTransfer[0], PlayerWasTransferredProjectorListener::BROKER_NOTIFICATION_KEY);//TODO:: notification
-		successfullyLog:
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY),
 			$this->serializer->normalize($transfer, 'array')

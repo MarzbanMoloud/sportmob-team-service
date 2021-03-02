@@ -73,8 +73,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "2020-02-10",
-					"endDate": "2021-02-11",
+					"startDate": "2021-02-10",
+					"endDate": "2022-02-11",
 					"active": true,
 					"type": "transferred"
 				}
@@ -232,8 +232,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "2020-02-10",
-					"endDate": "2021-02-11",
+					"startDate": "2021-02-10",
+					"endDate": "2022-02-11",
 					"active": true,
 					"type": "transferred"
 				}
@@ -326,8 +326,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "2020-02-10",
-					"endDate": "2021-02-11",
+					"startDate": "2021-02-10",
+					"endDate": "2022-02-11",
 					"active": false,
 					"type": "transferred"
 				}
@@ -454,8 +454,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "2020-02-10",
-					"endDate": "2021-02-11",
+					"startDate": "2021-02-10",
+					"endDate": "2022-02-11",
 					"active": true,
 					"type": "transferred"
 				}
@@ -673,8 +673,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "2020-02-10",
-					"endDate": "2021-02-11",
+					"startDate": "2021-02-10",
+					"endDate": "2022-02-11",
 					"active": true,
 					"type": "transferred"
 				}
@@ -711,8 +711,8 @@ class EventStrategyHandleTest extends TestCase
 					"to": "%s"
 				 },
 				"metadata": {
-					"startDate": "2020-02-10",
-					"endDate": "2021-02-11",
+					"startDate": "2021-02-10",
+					"endDate": "2022-02-11",
 					"active": true,
 					"type": "transferred"
 				}

@@ -23,7 +23,6 @@ trait PlayerWasTransferredNotificationTrait
 	 */
 	private function sendNotification(Transfer $transfer, string $event)
 	{
-		//TODO:: Log for notification
 		$notificationMessage = (new NotificationMessage())
 			->setHeaders(
 				(new NotificationHeaders())
