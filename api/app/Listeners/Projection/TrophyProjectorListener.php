@@ -7,8 +7,6 @@ namespace App\Listeners\Projection;
 use App\Events\Projection\TrophyProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
-use App\Listeners\Traits\TeamBecameWinnerNotificationTrait;
-use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TrophyRepository;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
@@ -25,11 +23,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class TrophyProjectorListener
 {
-	use TeamBecameWinnerNotificationTrait;
-
 	const BROKER_EVENT_KEY = 'TrophyUpdateInfo';
-	const BROKER_NOTIFICATION_KEY = 'team-champion';
-
 
 	private BrokerInterface $broker;
 	private SerializerInterface $serializer;
@@ -114,10 +108,6 @@ class TrophyProjectorListener
 				), $trophyArray
 			);
 			throw new ProjectionException('Failed to update trophy.', $exception->getCode(), $exception);
-		}
-
-		if (($event->trophy->getPosition() == Trophy::POSITION_WINNER) && (strpos($event->trophy->getTournamentSeason(), date('Y')) != false)){
-			$this->sendNotification($event->trophy,self::BROKER_NOTIFICATION_KEY);
 		}
 	}
 }
