@@ -7,7 +7,6 @@
     "require": {
         "php": "^7.4",
         "ext-json": "^7.4",
-        "ext-rdkafka": "^4.0",
         "aws/aws-sdk-php": "^3.140",
         "darkaonline/swagger-lume": "^7.0",
         "illuminate/redis": "^7.22",
