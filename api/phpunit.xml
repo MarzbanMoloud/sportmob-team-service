@@ -21,7 +21,7 @@
         <env name="AWS_ACCOUNT_ID" value="589655022411"/>
         <env name="AWS_ACCESS_KEY_ID" value="AKIAYSSRNTNFR7FP3QHH"/>
         <env name="AWS_SECRET_ACCESS_KEY" value="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"/>
-        <env name="AWS_DYNAMODB_ENDPOINT" value="http://dynamodb:8000"/>
+        <env name="AWS_DYNAMODB_ENDPOINT" value="http://dynamoDb:8000"/>
         <env name="AWS_REGION" value="eu-west-2"/>
         <env name="AWS_VERSION" value="latest"/>
         <!--Broker-->
