@@ -34,8 +34,8 @@ services:
             team-service-network:
 
     #DynamoDb locally Service
-    dynamoDb:
-        container_name: team_service_dynamo
+    dynamodb:
+        container_name: es_service_dynamo
         image: amazon/dynamodb-local:latest
         ports:
             - 8883:8000

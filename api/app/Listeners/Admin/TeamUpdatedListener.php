@@ -5,6 +5,7 @@ namespace App\Listeners\Admin;
 
 
 use App\Events\Admin\TeamUpdatedEvent;
+use App\Http\Services\Team\Traits\TeamTraits;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\TeamCacheService;
@@ -21,6 +22,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class TeamUpdatedListener
 {
+	use TeamTraits;
+
 	private SerializerInterface $serializer;
 	private BrokerInterface $broker;
 	private TeamCacheServiceInterface $teamCacheService;
@@ -71,6 +74,10 @@ class TeamUpdatedListener
 		/**
 		 * Remove Team cache.
 		 */
-		$this->teamCacheService->forget(TeamCacheService::getTeamKey($event->team->getId()));
+		try {
+			$this->teamCacheService->forget(TeamCacheService::getTeamKey($event->team->getId()));
+			$this->findTeam($event->team->getId());
+		} catch (\Exception $e) {
+		}
 	}
 }
