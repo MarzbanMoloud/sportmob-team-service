@@ -33,7 +33,7 @@ services:
             es-service-network:
 
     #DynamoDb locally Service
-    dynamoDb:
+    dynamodb:
         container_name: es_service_dynamo
         image: amazon/dynamodb-local:latest
         ports:
