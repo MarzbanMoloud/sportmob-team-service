@@ -6,6 +6,7 @@ namespace App\Listeners\Admin;
 
 use App\Events\Admin\TeamUpdatedEvent;
 use App\Http\Services\Team\Traits\TeamTraits;
+use App\Models\Repositories\TeamRepository;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\TeamCacheService;
@@ -27,21 +28,25 @@ class TeamUpdatedListener
 	private SerializerInterface $serializer;
 	private BrokerInterface $broker;
 	private TeamCacheServiceInterface $teamCacheService;
+	private TeamRepository $teamRepository;
 
 	/**
 	 * TeamUpdatedListener constructor.
 	 * @param BrokerInterface $broker
 	 * @param TeamCacheServiceInterface $teamCacheService
 	 * @param SerializerInterface $serializer
+	 * @param TeamRepository $teamRepository
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		TeamCacheServiceInterface $teamCacheService,
-		SerializerInterface $serializer
+		SerializerInterface $serializer,
+		TeamRepository $teamRepository
 	) {
 		$this->broker = $broker;
 		$this->teamCacheService = $teamCacheService;
 		$this->serializer = $serializer;
+		$this->teamRepository = $teamRepository;
 	}
 
 	/**
