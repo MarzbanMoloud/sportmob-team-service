@@ -10,7 +10,7 @@ namespace App\Services\EventStrategy;
 
 
 use App\Services\EventStrategy\Interfaces\EventInterface;
-use App\Services\EventStrategy\interfaces\EventStrategyInterface;
+use App\Services\EventStrategy\Interfaces\EventStrategyInterface;
 use App\ValueObjects\Broker\Mediator\Message;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
