@@ -1,0 +1,31 @@
+version: '3'
+services:
+    #PHP Service
+    php:
+        container_name: team_service_php
+        build:
+            context: ./docker/config/php
+        volumes:
+            - ./api:/var/www
+        networks:
+            team-service-network:
+
+    #Nginx Service
+    nginx:
+        container_name: team_service_nginx
+        image: nginx:latest
+        ports:
+            - 8006:80
+        volumes:
+            - ./api:/var/www
+            - ./docker/config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            team-service-network:
+
+        depends_on:
+            - php
+
+networks:
+    team-service-network:
+
+

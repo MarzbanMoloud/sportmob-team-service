@@ -76,6 +76,6 @@
         <env name="ELASTIC_USERNAME" value="sportmob-log-usr"/>
         <env name="ELASTIC_PASSWORD" value="vZJtcRqW5#mJ6qF3mHDTz"/>
         <!-- Sentry-->
-        <env name="SENTRY_DSN" value="http://0f22a7f2ebdc4d63a5ae647c88d5d896@sentry.sportmob.com/14"/>
+        <env name="SENTRY_DSN" value="http://07a0bb4f72904898a2112abe06feffbd@sentry.sportmob.com/2"/>
     </php>
 </phpunit>
