@@ -17,7 +17,7 @@ services:
         ports:
             - 8091:80
         volumes:
-            - ./api:/usr/share/nginx
+            - ./api:/var/www
             - ./Docker/config/nginx/default.conf:/etc/nginx/conf.d/default.conf
 
         networks:
@@ -35,7 +35,7 @@ services:
 
     #DynamoDb locally Service
     dynamodb:
-        container_name: es_service_dynamo
+        container_name: team_service_dynamo
         image: amazon/dynamodb-local:latest
         ports:
             - 8883:8000
