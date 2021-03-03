@@ -223,6 +223,7 @@ class BrokerService implements BrokerInterface
                 throw new \InvalidArgumentException('No queueUrl exists.');
             }
 
+            $messages = [];
             $result = $this->sqsClient->receiveMessage([
                 'AttributeNames' => ['SentTimestamp'],
                 'MessageAttributeNames' => ['All'],
@@ -232,7 +233,7 @@ class BrokerService implements BrokerInterface
                 'WaitTimeSeconds' => $timeout, //The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. - Valid values: 0 to 20
             ]);
             if (!$result) {
-                return [];
+                return $messages;
             }
             $messages = $result->get('Messages');
             $metaData = $result->get('@metadata');
@@ -241,9 +242,6 @@ class BrokerService implements BrokerInterface
                 throw new RuntimeException('Your request has encountered a problem');
             }
 
-            if (empty($messages)) {
-                return;
-            }
         } catch (\Throwable $exception) {
             throw new RuntimeException($exception->getMessage());
         }
