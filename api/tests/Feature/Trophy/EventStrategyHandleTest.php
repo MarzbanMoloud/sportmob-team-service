@@ -234,6 +234,205 @@ class EventStrategyHandleTest extends TestCase
 		 */
 		$response = app('cache')->get($this->trophyCacheService->getTrophyByTeamKey($runnerUpMessage->getBody()->getIdentifiers()['team']));
 		$this->assertInstanceOf(Trophy::class, $response[0]);
+
+		$response = $this->brokerService->consumePureMessage([config('broker.queues.notification')], 10);
+		$this->assertNotEmpty($response);
+		$playerMessage = json_decode(json_encode($response[0]), true);
+		$payload = json_decode($playerMessage, true);
+		$this->assertCount(2, $payload['body']);
+		$this->assertCount(2, $payload['body']['id']);
+		$this->assertNotNull($payload['body']['id']['team']);
+		$this->assertNotNull($payload['body']['id']['competition']);
+		$this->assertCount(2, $payload['body']['metadata']);
+		$this->assertNotNull($payload['body']['metadata']['competitionName']);
+		$this->assertNotNull($payload['body']['metadata']['teamName']);
+		$this->assertCount(3, $payload['headers']);
+		$this->assertNotNull($payload['headers']['event']);
+		$this->assertNotNull($payload['headers']['date']);
+		$this->assertNotNull($payload['headers']['id']);
+	}
+
+	/** because season is old, we dont send notification.	*/
+	public function testTeamBecameWinnerHandleWhenSeasonIsOld()
+	{
+		$winnerMessage = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"competition": "%s",
+					"tournament": "%s",
+					"team": "%s"
+				 },
+				"metadata": {}
+			}
+		}',
+			config('mediator-event.events.team_became_winner'),
+			Carbon::now()->format('c'),
+			$this->faker->uuid,
+			$this->faker->uuid,
+			$this->faker->uuid);
+		$runnerUpMessage = sprintf('
+		{
+			"headers":{
+                "event": "%s",
+                "priority": "1",
+                "date": "%s"
+            },
+			"body":{
+				"identifiers": {
+					"competition": "%s",
+					"tournament": "%s",
+					"team": "%s"
+				 },
+				"metadata": {}
+			}
+		}',
+			config('mediator-event.events.team_became_runner_up'),
+			Carbon::now()->format('c'),
+			$this->faker->uuid,
+			$this->faker->uuid,
+			$this->faker->uuid);
+		/**
+		 * @var Message $winnerMessage
+		 */
+		$winnerMessage = $this->serializer->deserialize($winnerMessage, Message::class, 'json');
+		/**
+		 * @var Message $runnerUpMessage
+		 */
+		$runnerUpMessage = $this->serializer->deserialize($runnerUpMessage, Message::class, 'json');
+		/**
+		 * persist team item.
+		 */
+		$fakeTeamModelWinner = $this->createTeamModel()
+			->setId($winnerMessage->getBody()->getIdentifiers()['team']);
+		$this->teamRepository->persist($fakeTeamModelWinner);
+		$fakeTeamModelRunner = $this->createTeamModel()
+			->setId($runnerUpMessage->getBody()->getIdentifiers()['team']);
+		$this->teamRepository->persist($fakeTeamModelRunner);
+		/**
+		 * Handle event.
+		 */
+		app(TeamBecameWinner::class)->handle($winnerMessage->getBody());
+		app(TeamBecameRunnerUp::class)->handle($runnerUpMessage->getBody());
+		/**
+		 * Read from DB
+		 * @var Trophy $trophy
+		 */
+		$trophies = $this->trophyRepository->findAll();
+		$winner = ($trophies[0]->getPosition() == Trophy::POSITION_WINNER) ? $trophies[0]: $trophies[1];
+		$runner = ($trophies[0]->getPosition() == Trophy::POSITION_RUNNER_UP) ? $trophies[0]: $trophies[1];
+
+		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['team'], $winner->getTeamId());
+		$this->assertEquals($fakeTeamModelWinner->getName()->getOfficial(), $winner->getTeamName());
+		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['tournament'], $winner->getTournamentId());
+		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['competition'], $winner->getCompetitionId());
+		$this->assertNull($winner->getCompetitionName());
+		$this->assertEquals("0", $winner->getTournamentSeason());
+		$this->assertEquals(Trophy::POSITION_WINNER, $winner->getPosition());
+		$this->assertNotNull($winner->getSortKey());
+
+		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['team'], $runner->getTeamId());
+		$this->assertEquals($fakeTeamModelRunner->getName()->getOfficial(), $runner->getTeamName());
+		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['tournament'], $runner->getTournamentId());
+		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['competition'], $runner->getCompetitionId());
+		$this->assertNull($runner->getCompetitionName());
+		$this->assertEquals("0", $runner->getTournamentSeason());
+		$this->assertEquals(Trophy::POSITION_RUNNER_UP, $runner->getPosition());
+		$this->assertNotNull($runner->getSortKey());
+
+		/**
+		 * Consume question message for get competition info from competition_service.
+		 */
+		$response = $this->brokerService->consumePureMessage([config('broker.queues.question')], 10);
+		$this->assertNotEmpty($response);
+		$playerMessage_winner = json_decode(json_encode($response[0]), true);
+		$payload_winner = json_decode($playerMessage_winner, true);
+		$this->assertEquals(config('broker.services.team_name'), $payload_winner['headers']['source']);
+		$this->assertEquals(config('broker.services.competition_name'), $payload_winner['headers']['destination']);
+		$this->assertEquals(TrophyProjectorListener::BROKER_EVENT_KEY, $payload_winner['headers']['key']);
+		$this->assertNotNull($payload_winner['headers']['id']);
+		$this->assertEquals(config('broker.services.tournament_name'), $payload_winner['body']['entity']);
+		$this->assertNotNull($payload_winner['body']['id']);
+
+		$playerMessage_runner = json_decode(json_encode($response[1]), true);
+		$payload_runner = json_decode($playerMessage_runner, true);
+		$this->assertEquals(config('broker.services.team_name'), $payload_runner['headers']['source']);
+		$this->assertEquals(config('broker.services.competition_name'), $payload_runner['headers']['destination']);
+		$this->assertEquals(TrophyProjectorListener::BROKER_EVENT_KEY, $payload_runner['headers']['key']);
+		$this->assertNotNull($payload_runner['headers']['id']);
+		$this->assertEquals(config('broker.services.tournament_name'), $payload_runner['body']['entity']);
+		$this->assertNotNull($payload_runner['body']['id']);
+
+		/**
+		 * Produce answer message from player service for update player info in transfer model.
+		 */
+		$answerMessageWinner = (new CommandQueryMessage())
+			->setHeaders(
+				(new Headers())
+					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
+					->setId($payload_winner['headers']['id'])
+					->setDestination(config('broker.services.team_name'))
+					->setSource(config('broker.services.competition_name'))
+					->setDate(Carbon::now()->format('c'))
+			)->setBody([
+				'entity' => config('broker.services.tournament_name'),
+				'id' => $payload_winner['body']['id'],
+				'competitionName' => $this->faker->name,
+				'season' => '2019-2020'
+			]);
+
+		$answerMessageRunner = (new CommandQueryMessage())
+			->setHeaders(
+				(new Headers())
+					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
+					->setId($payload_runner['headers']['id'])
+					->setDestination(config('broker.services.team_name'))
+					->setSource(config('broker.services.competition_name'))
+					->setDate(Carbon::now()->format('c'))
+			)->setBody([
+				'entity' => config('broker.services.tournament_name'),
+				'id' => $payload_runner['body']['id'],
+				'competitionName' => $this->faker->name,
+				'season' => '2020-2021'
+			]);
+		/**
+		 * Handle answer message from competition service for update trophy info in trophy model.
+		 */
+		app(TrophyUpdateInfo::class)->handle($answerMessageWinner);
+		app(TrophyUpdateInfo::class)->handle($answerMessageRunner);
+		/**
+		 * Read from DB
+		 * @var Trophy $trophy
+		 */
+		$trophies = $this->trophyRepository->findAll();
+		$winner = ($trophies[0]->getPosition() == Trophy::POSITION_WINNER) ? $trophies[0]: $trophies[1];
+		$runner = ($trophies[0]->getPosition() == Trophy::POSITION_RUNNER_UP) ? $trophies[0]: $trophies[1];
+		$this->assertEquals($answerMessageWinner->getBody()['competitionName'], $winner->getCompetitionName());
+		$this->assertEquals($answerMessageWinner->getBody()['season'], $winner->getTournamentSeason());
+		$this->assertEquals($answerMessageRunner->getBody()['competitionName'], $runner->getCompetitionName());
+		$this->assertEquals($answerMessageRunner->getBody()['season'], $runner->getTournamentSeason());
+		/**
+		 * Check broker message cache for trophy info.
+		 */
+		$brokerMessageCache = $this->brokerMessageCacheService->getTournamentInfo($winnerMessage->getBody()->getIdentifiers()['tournament']);
+		$this->assertEquals($answerMessageWinner->getBody()['competitionName'], $brokerMessageCache['competitionName']);
+		$this->assertEquals($answerMessageWinner->getBody()['season'], $brokerMessageCache['season']);
+		$brokerMessageCache = $this->brokerMessageCacheService->getTournamentInfo($runnerUpMessage->getBody()->getIdentifiers()['tournament']);
+		$this->assertEquals($answerMessageRunner->getBody()['competitionName'], $brokerMessageCache['competitionName']);
+		$this->assertEquals($answerMessageRunner->getBody()['season'], $brokerMessageCache['season']);
+		/**
+		 * Read from cache.
+		 */
+		$response = app('cache')->get($this->trophyCacheService->getTrophyByTeamKey($runnerUpMessage->getBody()->getIdentifiers()['team']));
+		$this->assertInstanceOf(Trophy::class, $response[0]);
+
+		$response = $this->brokerService->consumePureMessage([config('broker.queues.notification')], 10);
+		$this->assertEmpty($response);
 	}
 
 	public function testTeamBecameWinnerHandleWithNullIdentifier()

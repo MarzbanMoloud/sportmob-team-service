@@ -190,9 +190,9 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($payload['body']['id']['owner']);
 		$this->assertCount(2, $payload['body']['id']['team']);
 		$this->assertCount(3, $payload['body']['metadata']);
-		$this->assertNotNull($payload['body']['metadata']['player_name']);
-		$this->assertNotNull($payload['body']['metadata']['old_team_name']);
-		$this->assertNotNull($payload['body']['metadata']['team_name']);
+		$this->assertNotNull($payload['body']['metadata']['playerName']);
+		$this->assertNotNull($payload['body']['metadata']['oldTeamName']);
+		$this->assertNotNull($payload['body']['metadata']['teamName']);
 		$this->assertCount(3, $payload['headers']);
 		$this->assertNotNull($payload['headers']['event']);
 		$this->assertNotNull($payload['headers']['date']);
@@ -301,9 +301,9 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($payload['body']['id']['owner']);
 		$this->assertCount(2, $payload['body']['id']['team']);
 		$this->assertCount(3, $payload['body']['metadata']);
-		$this->assertNotNull($payload['body']['metadata']['player_name']);
-		$this->assertNotNull($payload['body']['metadata']['old_team_name']);
-		$this->assertNotNull($payload['body']['metadata']['team_name']);
+		$this->assertNotNull($payload['body']['metadata']['playerName']);
+		$this->assertNotNull($payload['body']['metadata']['oldTeamName']);
+		$this->assertNotNull($payload['body']['metadata']['teamName']);
 		$this->assertCount(3, $payload['headers']);
 		$this->assertNotNull($payload['headers']['event']);
 		$this->assertNotNull($payload['headers']['date']);
@@ -577,9 +577,9 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($payload['body']['id']['owner']);
 		$this->assertCount(2, $payload['body']['id']['team']);
 		$this->assertCount(3, $payload['body']['metadata']);
-		$this->assertNotNull($payload['body']['metadata']['player_name']);
-		$this->assertNotNull($payload['body']['metadata']['old_team_name']);
-		$this->assertNotNull($payload['body']['metadata']['team_name']);
+		$this->assertNotNull($payload['body']['metadata']['playerName']);
+		$this->assertNotNull($payload['body']['metadata']['oldTeamName']);
+		$this->assertNotNull($payload['body']['metadata']['teamName']);
 		$this->assertCount(3, $payload['headers']);
 		$this->assertNotNull($payload['headers']['event']);
 		$this->assertNotNull($payload['headers']['date']);

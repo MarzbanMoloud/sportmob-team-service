@@ -7,9 +7,11 @@ namespace App\Services\BrokerCommandStrategy;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Http\Services\Trophy\TrophyService;
 use App\Listeners\Projection\TrophyProjectorListener;
+use App\Listeners\Traits\TeamBecameWinnerNotificationTrait;
 use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TrophyRepository;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
+use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\ValueObjects\Broker\CommandQuery\Headers;
@@ -25,6 +27,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class TrophyUpdateInfo implements BrokerCommandEventInterface
 {
+	use TeamBecameWinnerNotificationTrait;
+
 	private BrokerMessageCacheServiceInterface $brokerMessageCacheService;
 	private HubInterface $sentryHub;
 	private TrophyRepository $trophyRepository;
@@ -32,6 +36,7 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 	private LoggerInterface $logger;
 	private TrophyService $trophyService;
 	private TrophyCacheServiceInterface $trophyCacheService;
+	private BrokerInterface $broker;
 
 	/**
 	 * TrophyUpdateInfo constructor.
@@ -42,6 +47,7 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 	 * @param TrophyRepository $trophyRepository
 	 * @param SerializerInterface $serializer
 	 * @param LoggerInterface $logger
+	 * @param BrokerInterface $broker
 	 */
 	public function __construct(
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
@@ -50,7 +56,8 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 		TrophyCacheServiceInterface $trophyCacheService,
 		TrophyRepository $trophyRepository,
 		SerializerInterface $serializer,
-		LoggerInterface $logger
+		LoggerInterface $logger,
+		BrokerInterface $broker
 	) {
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->sentryHub = $sentryHub;
@@ -59,6 +66,7 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 		$this->logger = $logger;
 		$this->trophyService = $trophyService;
 		$this->trophyCacheService = $trophyCacheService;
+		$this->broker = $broker;
 	}
 
 	/**
@@ -128,5 +136,12 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 		$data = $commandQuery->getBody();
 		unset($data['entity']);
 		$this->brokerMessageCacheService->putTournamentInfo($data);
+		if (($trophy->getPosition() == Trophy::POSITION_WINNER) && (strpos($trophy->getTournamentSeason(), date('Y')) != false)) {
+			$this->sendNotification($trophy, TrophyProjectorListener::BROKER_NOTIFICATION_KEY);
+		}
+		$this->logger->alert(
+			sprintf("%s handler completed successfully.", TrophyProjectorListener::BROKER_EVENT_KEY),
+			$this->serializer->normalize($trophy, 'array')
+		);
 	}
 }

@@ -4,46 +4,40 @@
 namespace App\Listeners\Traits;
 
 
-use App\Models\ReadModels\Transfer;
+use App\Models\ReadModels\Trophy;
 use App\ValueObjects\Broker\Notification\Body as NotificationBody;
 use App\ValueObjects\Broker\Notification\Headers as NotificationHeaders;
 use App\ValueObjects\Broker\Notification\Message as NotificationMessage;
 use DateTimeImmutable;
 
-
 /**
- * Trait PlayerWasTransferredNotificationTrait
+ * Trait TeamBecameWinnerNotificationTrait
  * @package App\Listeners\Traits
  */
-trait PlayerWasTransferredNotificationTrait
+trait TeamBecameWinnerNotificationTrait
 {
 	/**
-	 * @param Transfer $transfer
+	 * @param Trophy $trophy
 	 * @param string $event
 	 */
-	private function sendNotification(Transfer $transfer, string $event)
+	private function sendNotification(Trophy $trophy, string $event)
 	{
 		$notificationMessage = (new NotificationMessage())
 			->setHeaders(
 				(new NotificationHeaders())
 					->setEvent($event)
 					->setDate(new DateTimeImmutable())
-					->setId($transfer->getPlayerId())
+					->setId($trophy->getSortKey())
 			)
 			->setBody(
 				(new NotificationBody())
 					->setId([
-						'team' => [
-							$transfer->getFromTeamId(),
-							$transfer->getToTeamId()
-						],
-						'player' => $transfer->getPlayerId(),
-						'owner' => $transfer->getToTeamName()
+						'team' => $trophy->getTeamId(),
+						'competition' => $trophy->getCompetitionId(),
 					])
 					->setMetadata([
-						'playerName' => $transfer->getPlayerName(),
-						'oldTeamName' => $transfer->getFromTeamName(),
-						'teamName' => $transfer->getToTeamName(),
+						'competitionName' => $trophy->getCompetitionName(),
+						'teamName' => $trophy->getTeamName()
 					])
 			);
 		$this->broker->flushMessages()->addMessage(
