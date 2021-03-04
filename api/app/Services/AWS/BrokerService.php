@@ -108,7 +108,9 @@ class BrokerService implements BrokerInterface
     {
         $queueUrl = $queueUrl[0];
         $messages = $this->receiveMessage($queueUrl,$timeout,$limit);
-
+        if (!is_array( $messages )) {
+            return;
+        }
         foreach ($messages as $message) {
             $BrokerMessage = new Message($message['Body'], ['MessageId' => $message['MessageId']], $message['Attributes']);
             $event->setMessage($BrokerMessage);
