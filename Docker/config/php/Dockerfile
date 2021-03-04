@@ -10,4 +10,4 @@ ADD supervisor /etc/supervisor/conf.d/
 
 RUN printf '[PHP]\nmemory_limit=1G\n' > /usr/local/etc/php/conf.d/memory.ini
 
-WORKDIR /var/www
+WORKDIR /usr/share/nginx
