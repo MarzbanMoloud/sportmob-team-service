@@ -11,8 +11,8 @@ namespace App\ValueObjects\ReadModel;
 class TeamName
 {
 	private string $original;
-	private string $official;
-	private string $short;
+	private ?string $official;
+	private ?string $short;
 
 	/**
 	 * @return string
@@ -33,36 +33,36 @@ class TeamName
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getOfficial(): string
+	public function getOfficial(): ?string
 	{
 		return $this->official;
 	}
 
 	/**
-	 * @param string $official
+	 * @param string|null $official
 	 * @return TeamName
 	 */
-	public function setOfficial(string $official): TeamName
+	public function setOfficial(?string $official): TeamName
 	{
 		$this->official = $official;
 		return $this;
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getShort(): string
+	public function getShort(): ?string
 	{
 		return $this->short;
 	}
 
 	/**
-	 * @param string $short
+	 * @param string|null $short
 	 * @return TeamName
 	 */
-	public function setShort(string $short): TeamName
+	public function setShort(?string $short): TeamName
 	{
 		$this->short = $short;
 		return $this;
