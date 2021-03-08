@@ -69,10 +69,8 @@ class MakeTableCommand extends Command
 				if (!in_array($repositoryClass::getTableName(),
 					$this->$repository->getDynamoDbClient()->listTables()->toArray()['TableNames'])) {
 					$this->$repository->createTable();
-				} else {
-					throw new \Exception(sprintf('Exist %s Table', $repositoryClass::getTableName()));
 				}
-			} catch (DynamoDBRepositoryException $e) {
+			} catch (\Exception $e) {
 			}
 		}
     }
