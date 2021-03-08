@@ -4,6 +4,7 @@
 namespace App\Console\Commands\DaynamoDB;
 
 
+use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Models\Repositories\TransferRepository;
@@ -52,33 +53,27 @@ class MakeTableCommand extends Command
 		$this->teamsMatchRepository = $teamsMatchRepository;
 	}
 
-    /**
-     * @throws \App\Exceptions\DynamoDB\DynamoDBRepositoryException
-     */
-    public function handle()
+	/**
+	 * @throws \Exception
+	 */
+	public function handle()
     {
-		if (! in_array(TransferRepository::getTableName(), $this->transferRepository->getDynamoDbClient()->listTables()->toArray()['TableNames'])) {
-			$this->transferRepository->createTable();
-		} else {
-			throw new \Exception(sprintf('Exist %s Table', TransferRepository::getTableName()));
-		}
-
-		if (! in_array(TrophyRepository::getTableName(), $this->trophyRepository->getDynamoDbClient()->listTables()->toArray()['TableNames'])) {
-			$this->trophyRepository->createTable();
-		} else {
-			throw new \Exception(sprintf('Exist %s Table', TrophyRepository::getTableName()));
-		}
-
-		if (! in_array(TeamRepository::getTableName(), $this->teamRepository->getDynamoDbClient()->listTables()->toArray()['TableNames'])) {
-			$this->teamRepository->createTable();
-		} else {
-			throw new \Exception(sprintf('Exist %s Table', TeamRepository::getTableName()));
-		}
-
-		if (! in_array(TeamsMatchRepository::getTableName(), $this->teamsMatchRepository->getDynamoDbClient()->listTables()->toArray()['TableNames'])) {
-			$this->teamsMatchRepository->createTable();
-		} else {
-			throw new \Exception(sprintf('Exist %s Table', TeamsMatchRepository::getTableName()));
+    	$repositories = [
+			'transferRepository' => TransferRepository::class,
+			'trophyRepository' => TrophyRepository::class,
+			'teamRepository' => TeamRepository::class,
+			'teamsMatchRepository' => TeamsMatchRepository::class
+		];
+    	foreach ($repositories as $repository => $repositoryClass) {
+			try {
+				if (!in_array($repositoryClass::getTableName(),
+					$this->$repository->getDynamoDbClient()->listTables()->toArray()['TableNames'])) {
+					$this->$repository->createTable();
+				} else {
+					throw new \Exception(sprintf('Exist %s Table', $repositoryClass::getTableName()));
+				}
+			} catch (DynamoDBRepositoryException $e) {
+			}
 		}
     }
 }
