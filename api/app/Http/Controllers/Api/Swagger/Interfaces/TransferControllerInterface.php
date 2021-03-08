@@ -121,23 +121,23 @@ interface TransferControllerInterface
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="startDate",
-	 *                                  type="string",
-	 *                                  example="1577836800"
+	 *                                  type="integer",
+	 *                                  example=1577836800
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="endDate",
-	 *                                  type="string",
-	 *                                  example="1610431027"
+	 *                                  type="integer",
+	 *                                  example=1610431027
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="announcedDate",
-	 *                                  type="string",
-	 *                                  example="1610431027"
+	 *                                  type="integer",
+	 *                                  example=1610431027
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="contractDate",
-	 *                                  type="string",
-	 *                                  example="1610431027"
+	 *                                  type="integer",
+	 *                                  example=1610431027
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="type",
@@ -294,23 +294,23 @@ interface TransferControllerInterface
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="startDate",
-	 *                                  type="string",
-	 *                                  example="1577836800"
+	 *                                  type="integer",
+	 *                                  example=1577836800
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="endDate",
-	 *                                  type="string",
-	 *                                  example="1610431027"
+	 *                                  type="integer",
+	 *                                  example=1610431027
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="announcedDate",
-	 *                                  type="string",
-	 *                                  example="1610431027"
+	 *                                  type="integer",
+	 *                                  example=1610431027
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="contractDate",
-	 *                                  type="string",
-	 *                                  example="1610431027"
+	 *                                  type="integer",
+	 *                                  example=1610431027
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="type",
