@@ -51,7 +51,7 @@ class QueryStrategyHandle extends TestCase
 					->setId($fakeTeamModel->getId())
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.player_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.team_name'),
 				'id' => $fakeTeamModel->getId(),
@@ -93,7 +93,7 @@ class QueryStrategyHandle extends TestCase
 					->setId($fakeTeamId)
 					->setDestination(config('broker.services.team_name'))
 					->setSource(config('broker.services.player_name'))
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody([
 				'entity' => config('broker.services.team_name'),
 				'id' => $fakeTeamId,

@@ -89,7 +89,7 @@ class TeamInformation implements BrokerQueryEventInterface
 					->setId($commandQuery->getHeaders()->getId())
 					->setDestination($commandQuery->getHeaders()->getSource())
 					->setSource($commandQuery->getHeaders()->getDestination())
-					->setDate(Carbon::now()->toDateTimeString())
+					->setDate(Carbon::now()->format('c'))
 			)->setBody($teamItemArray);
 		$this->broker->flushMessages()->addMessage(
 			$commandQuery->getHeaders()->getKey(),

@@ -100,7 +100,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid);
 		/**
 		 * @var Message $message
@@ -172,7 +172,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$fakeTeamModel->getId());
 		/**
 		 * @var Message $message
@@ -199,7 +199,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_created'),
-			Carbon::now()->toDateTimeString());
+			Carbon::now()->format('c'));
 		/**
 		 * @var Message $message
 		 */
@@ -229,7 +229,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_created'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid);
 		/**
 		 * @var Message $message
@@ -296,7 +296,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_updated'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$teamModel->getId(),
 			$this->faker->name,
 			$this->faker->name,
@@ -417,7 +417,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_updated'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$this->faker->uuid,
 			$this->faker->name,
 			$this->faker->name,
@@ -447,7 +447,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_updated'),
-			Carbon::now()->toDateTimeString()
+			Carbon::now()->format('c')
 		);
 		/**
 		 * @var Message $message
@@ -480,7 +480,7 @@ class EventStrategyHandleTest extends TestCase
 			}
 		}',
 			config('mediator-event.events.team_was_updated'),
-			Carbon::now()->toDateTimeString(),
+			Carbon::now()->format('c'),
 			$teamModel->getId()
 		);
 		/**
