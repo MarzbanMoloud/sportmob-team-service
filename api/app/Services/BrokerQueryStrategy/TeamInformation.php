@@ -98,7 +98,7 @@ class TeamInformation implements BrokerQueryEventInterface
 
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", $commandQuery->getHeaders()->getKey()),
-			$teamItemArray
+			$this->serializer->normalize($message, 'array')
 		);
 	}
 }

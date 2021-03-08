@@ -141,7 +141,7 @@ class TrophyUpdateInfo implements BrokerCommandEventInterface
 		}
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", TrophyProjectorListener::BROKER_EVENT_KEY),
-			$this->serializer->normalize($trophy, 'array')
+			$this->serializer->normalize($commandQuery, 'array')
 		);
 	}
 }

@@ -147,7 +147,7 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		}
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY),
-			$this->serializer->normalize($transfer, 'array')
+			$this->serializer->normalize($commandQuery, 'array')
 		);
 	}
 }
