@@ -53,10 +53,10 @@ class EventContext implements EventStrategyInterface
                 $event->handle($message->getBody());
                 return;
             }
-			$this->logger->alert(
-				sprintf("Event %s rejected (lack of ownership).", $message->getHeaders()->getEvent()),
-				$this->serializer->normalize($message, 'array')
-			);
         }
+		$this->logger->alert(
+			sprintf("Event %s rejected (lack of ownership).", $message->getHeaders()->getEvent()),
+			$this->serializer->normalize($message, 'array')
+		);
     }
 }

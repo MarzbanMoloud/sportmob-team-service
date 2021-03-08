@@ -48,10 +48,10 @@ class BrokerCommandContext implements BrokerCommandStrategyInterface
                 $event->handle($message);
                 return;
             }
-			$this->logger->alert(
-				sprintf("Answer %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
-				$this->serializer->normalize($message, 'array')
-			);
         }
+		$this->logger->alert(
+			sprintf("Answer %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
+			$this->serializer->normalize($message, 'array')
+		);
     }
 }

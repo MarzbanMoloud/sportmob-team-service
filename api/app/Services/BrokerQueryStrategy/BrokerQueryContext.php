@@ -49,10 +49,10 @@ class BrokerQueryContext implements BrokerQueryStrategyInterface
                 $event->handle($message);
                 return;
             }
-			$this->logger->alert(
-				sprintf("Question %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
-				$this->serializer->normalize($message, 'array')
-			);
         }
+		$this->logger->alert(
+			sprintf("Question %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
+			$this->serializer->normalize($message, 'array')
+		);
     }
 }
