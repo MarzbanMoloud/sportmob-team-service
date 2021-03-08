@@ -74,7 +74,7 @@ class TeamTransferResource extends JsonResource
 				],
 				'marketValue' => $transfer->getMarketValue(),
 				'startDate' => $transfer->getStartDate()->getTimestamp(),
-				'endDate' => $transfer->getEndDate()->getTimestamp() ?? '',
+				'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : '',
 				'announcedDate' => $transfer->getAnnouncedDate()->getTimestamp(),
 				'contractDate' => $transfer->getContractDate()->getTimestamp(),
 				'type' => $transfer->getType(),

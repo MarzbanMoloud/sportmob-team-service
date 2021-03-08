@@ -43,7 +43,7 @@ class PlayerTransferResource extends JsonResource
 						]
 					],
 					'startDate' => $transfer->getStartDate()->getTimestamp(),
-					'endDate' => $transfer->getEndDate()->getTimestamp() ?? '',
+					'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : '',
 					'marketValue' => $transfer->getMarketValue(),
 					'announcedDate' => $transfer->getAnnouncedDate()->getTimestamp(),
 					'contractDate' => $transfer->getContractDate()->getTimestamp(),
