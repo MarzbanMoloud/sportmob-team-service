@@ -40,7 +40,7 @@ class BrokerQueryContext implements BrokerQueryStrategyInterface
     public function handle(Message $message)
     {
 		$this->logger->alert(
-			sprintf("Event %s received.", $message->getHeaders()->getKey()),
+			sprintf("Question %s by %s received.", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
 			$this->serializer->normalize($message, 'array')
 		);
 
@@ -50,7 +50,7 @@ class BrokerQueryContext implements BrokerQueryStrategyInterface
                 return;
             }
 			$this->logger->alert(
-				sprintf("Event %s rejected (lack of ownership).", $message->getHeaders()->getKey()),
+				sprintf("Question %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
 				$this->serializer->normalize($message, 'array')
 			);
         }
