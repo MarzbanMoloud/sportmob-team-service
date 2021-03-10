@@ -69,7 +69,7 @@
         <env name="EVENT_MATCH_FINISHED" value="MatchFinished"/>
         <env name="EVENT_MATCH_STATUS_CHANGED" value="MatchStatusChanged"/>
         <!-- Monolog-->
-        <env name="MONOLOG_INDEX" value="sportmob"/>
+        <env name="MONOLOG_INDEX" value="sportmob_test"/>
         <env name="ELASTIC_HOST" value="search-sportmob-log-27rwhqkql6ctdjdmxewzd27gfy.eu-west-2.es.amazonaws.com"/>
         <env name="ELASTIC_PORT" value="443"/>
         <env name="ELASTIC_TRANSPORT" value="https"/>
