@@ -4,7 +4,6 @@
 namespace Tests\Unit\Transfer;
 
 
-use App\Exceptions\ResourceNotFoundException;
 use App\Http\Services\Transfer\TransferService;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TransferRepository;

@@ -345,7 +345,7 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	 */
 	public function prePersist()
 	{
-		if (!$this->fromTeamId && !$this->toTeamId || $this->fromTeamId === $this->toTeamId) {
+		if (!$this->fromTeamId && !$this->toTeamId) {
 			throw new ReadModelValidatorException( 'fromTeamId and toTeamId could not be null at same time.' );
 		}
 		$year         = (int)$this->startDate->format( 'Y' );

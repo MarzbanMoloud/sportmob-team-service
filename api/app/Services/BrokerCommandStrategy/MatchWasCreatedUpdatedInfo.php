@@ -103,14 +103,14 @@ class MatchWasCreatedUpdatedInfo implements BrokerCommandEventInterface
 		}
 		[$matchId, $homeTeamId, $awayTeamId] = explode('#', $commandQuery->getHeaders()->getId());
 		$this->teamsMatchCacheService->forget('teams_match*');
-		$this->updateTeamsMatch($matchId, $homeTeamId, $commandQuery->getBody()['competitionName']);
-		$this->updateTeamsMatch($matchId, $awayTeamId, $commandQuery->getBody()['competitionName']);
+		$this->updateTeamsMatch($matchId, $homeTeamId, $commandQuery->getBody()['name']);
+		$this->updateTeamsMatch($matchId, $awayTeamId, $commandQuery->getBody()['name']);
 		/**
 		 * Put competitionName in cache.
 		 */
 		$this->brokerMessageCacheService->putCompetitionName([
 			'id' => $commandQuery->getBody()['id'],
-			'name' => $commandQuery->getBody()['competitionName']
+			'name' => $commandQuery->getBody()['name']
 		]);
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", MatchWasCreatedProjectorListener::BROKER_EVENT_KEY),

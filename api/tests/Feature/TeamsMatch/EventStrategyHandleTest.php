@@ -159,7 +159,7 @@ class EventStrategyHandleTest extends TestCase
 			)->setBody([
 				'entity' => config('broker.services.competition_name'),
 				'id' => $payload['body']['id'],
-				'competitionName' => 'Premier League',
+				'name' => 'Premier League',
 			]);
 		/**
 		 * Handle answer message from player service for update player info in transfer model.
@@ -289,7 +289,7 @@ class EventStrategyHandleTest extends TestCase
 			)->setBody([
 				'entity' => config('broker.services.competition_name'),
 				'id' => $payload['body']['id'],
-				'competitionName' => 'Premier League',
+				'name' => 'Premier League',
 			]);
 		/**
 		 * Handle answer message from player service for update player info in transfer model.

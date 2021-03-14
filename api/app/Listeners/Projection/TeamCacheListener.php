@@ -4,7 +4,6 @@
 namespace App\Listeners\Projection;
 
 
-use App\Events\Projection\TeamWasCreatedProjectorEvent;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 
 
