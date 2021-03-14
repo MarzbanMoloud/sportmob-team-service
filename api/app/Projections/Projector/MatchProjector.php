@@ -244,7 +244,7 @@ class MatchProjector
 	 */
 	private function checkMetadataValidation(array $metadata): void
 	{
-		$requiredFields = ['date', 'time'];
+		$requiredFields = ['date'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($metadata[$fieldName])) {
 				$this->logger->alert(
