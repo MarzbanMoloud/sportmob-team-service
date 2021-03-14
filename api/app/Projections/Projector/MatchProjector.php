@@ -86,8 +86,8 @@ class MatchProjector
 		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
-		$this->checkIdentifiersValidation($identifier);
-		$this->checkMetadataValidation($metadata);
+		$this->checkIdentifiersValidation($body);
+		$this->checkMetadataValidation($body);
 		$homeTeamsMatchModel = $this->createTeamsMatchModel($identifier, $metadata);
 		$awayTeamsMatchModel = $this->createTeamsMatchModel($identifier, $metadata, false);
 		$this->persistTeamsMatch($homeTeamsMatchModel);
@@ -125,7 +125,7 @@ class MatchProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Match field is empty.'
-				), $identifier
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('Match field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
@@ -135,7 +135,7 @@ class MatchProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Scores field is empty.'
-				), $identifier
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('Scores field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
@@ -186,7 +186,7 @@ class MatchProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Match field is empty.'
-				), $identifier
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('Match field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
@@ -196,7 +196,7 @@ class MatchProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Status field is empty.'
-				), $metadata
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('Status field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
@@ -215,20 +215,20 @@ class MatchProjector
 	}
 
 	/**
-	 * @param array $identifier
+	 * @param MessageBody $body
 	 * @throws ProjectionException
 	 */
-	private function checkIdentifiersValidation(array $identifier): void
+	private function checkIdentifiersValidation(MessageBody $body): void
 	{
 		$requiredFields = ['match', 'home', 'away', 'competition'];
 		foreach ($requiredFields as $fieldName) {
-			if (empty($identifier[$fieldName])) {
+			if (empty($body->getIdentifiers()[$fieldName])) {
 				$this->logger->alert(
 					sprintf(
 						"%s handler failed because of %s",
 						$this->eventName,
 						sprintf("%s field is empty.", $fieldName)
-					), $identifier
+					), $this->serializer->normalize($body, 'array')
 				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", ucfirst($fieldName)),
@@ -239,20 +239,20 @@ class MatchProjector
 	}
 
 	/**
-	 * @param array $metadata
+	 * @param MessageBody $body
 	 * @throws ProjectionException
 	 */
-	private function checkMetadataValidation(array $metadata): void
+	private function checkMetadataValidation(MessageBody $body): void
 	{
 		$requiredFields = ['date'];
 		foreach ($requiredFields as $fieldName) {
-			if (empty($metadata[$fieldName])) {
+			if (empty($body->getMetadata()[$fieldName])) {
 				$this->logger->alert(
 					sprintf(
 						"%s handler failed because of %s",
 						$this->eventName,
 						sprintf("%s field is empty.", $fieldName)
-					), $metadata
+					), $this->serializer->normalize($body, 'array')
 				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", ucfirst($fieldName)),
@@ -315,7 +315,22 @@ class MatchProjector
 			->setIsHome(($home) ? true : false)
 			->setStatus(TeamsMatch::STATUS_UPCOMING)
 			->setCoverage(($metadata['coverage']) ? $metadata['coverage'] : TeamsMatch::COVERAGE_LOW)
-			->setSortKey(TeamsMatch::generateSortKey(new DateTime($metadata['date'] . $metadata['time']), TeamsMatch::STATUS_UPCOMING));
+			->setSortKey(TeamsMatch::generateSortKey($this->generateDateTime($metadata['date'], $metadata['time']), TeamsMatch::STATUS_UPCOMING));
+	}
+
+	/**
+	 * @param string $date
+	 * @param string|null $time
+	 * @return DateTime
+	 * @throws Exception
+	 */
+	private function generateDateTime(string $date, ?string $time): DateTime
+	{
+		$dateTime = (new DateTime($date))->setTime(0, 0, 0);
+		if ($time) {
+			$dateTime = new DateTime($date . $time);
+		}
+		return $dateTime;
 	}
 
 	/**

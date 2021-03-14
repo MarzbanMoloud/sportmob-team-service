@@ -82,8 +82,8 @@ class TransferProjector
 		);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
-		$this->checkIdentifierValidation($identifier);
-		$this->checkMetadataValidation($metadata);
+		$this->checkIdentifierValidation($body);
+		$this->checkMetadataValidation($body);
 		if ($metadata['active'] == true) {
 			if ($latestTransfers = $this->transferRepository->findActiveTransfer($identifier['player'])) {
 				$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $metadata);
@@ -125,23 +125,23 @@ class TransferProjector
 	}
 
 	/**
-	 * @param array $identifier
+	 * @param MessageBody $body
 	 * @throws ProjectionException
 	 */
-	private function checkIdentifierValidation(array $identifier): void
+	private function checkIdentifierValidation(MessageBody $body): void
 	{
 		$requiredFields = [
 			'player' => 'Player',
 			'to' => 'To',
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
-			if (empty($identifier[$fieldName])) {
+			if (empty($body->getIdentifiers()[$fieldName])) {
 				$this->logger->alert(
 					sprintf(
 						"%s handler failed because of %s",
 						$this->eventName,
 						sprintf("%s field is empty.", $prettyFieldName)
-					), $identifier
+					), $this->serializer->normalize($body, 'array')
 				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", $prettyFieldName),
@@ -152,11 +152,12 @@ class TransferProjector
 	}
 
 	/**
-	 * @param array $metadata
+	 * @param MessageBody $body
 	 * @throws ProjectionException
 	 */
-	private function checkMetadataValidation(array $metadata): void
+	private function checkMetadataValidation(MessageBody $body): void
 	{
+		$metadata = $body->getMetadata();
 		$requiredFields = [
 			'startDate' => 'Start Date',
 			'type' => 'Type',
@@ -168,7 +169,7 @@ class TransferProjector
 						"%s handler failed because of %s",
 						$this->eventName,
 						sprintf("%s field is empty.", $prettyFieldName)
-					), $metadata
+					), $this->serializer->normalize($body, 'array')
 				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", $prettyFieldName),
@@ -182,7 +183,7 @@ class TransferProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Active field is empty.'
-				), $metadata
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException(
 				'Active field is empty.',

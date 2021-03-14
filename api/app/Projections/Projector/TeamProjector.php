@@ -117,11 +117,11 @@ class TeamProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Team field is empty.'
-				), $identifier
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		$this->checkMetadataValidation($metadata);
+		$this->checkMetadataValidation($body);
 		$this->checkItemExist($identifier['team']);
 		$teamModel = $this->createTeamModel($identifier['team'], $metadata);
 		$this->persistTeam($teamModel);
@@ -151,7 +151,7 @@ class TeamProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Team field is empty.'
-				), $identifier
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
@@ -161,7 +161,7 @@ class TeamProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'FullName field is empty.'
-				), $metadata
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException('FullName field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
@@ -177,11 +177,12 @@ class TeamProjector
 	}
 
 	/**
-	 * @param array $metadata
+	 * @param MessageBody $body
 	 * @throws ProjectionException
 	 */
-	private function checkMetadataValidation(array $metadata): void
+	private function checkMetadataValidation(MessageBody $body): void
 	{
+		$metadata = $body->getMetadata();
 		$requiredFields = [
 			'fullName' => 'Full Name',
 			'type' => 'Type',
@@ -195,7 +196,7 @@ class TeamProjector
 						"%s handler failed because of %s",
 						$this->eventName,
 						sprintf("%s field is empty.", $prettyFieldName)
-					), $metadata
+					), $this->serializer->normalize($body, 'array')
 				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", $prettyFieldName),
@@ -209,7 +210,7 @@ class TeamProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					'Active field is empty.'
-				), $metadata
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException(
 				sprintf("Active field is empty."),

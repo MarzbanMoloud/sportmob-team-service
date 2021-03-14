@@ -95,7 +95,7 @@ class TrophyProjector
 	private function applyEventByPosition(MessageBody $body, string $position)
 	{
 		$identifiers = $body->getIdentifiers();
-		$this->checkIdentifiersValidation($identifiers);
+		$this->checkIdentifiersValidation($body);
 		/** @var Team $team */
 		if (!$team = $this->teamRepository->find(['id' => $identifiers['team']])) {
 			$this->logger->alert(
@@ -103,7 +103,7 @@ class TrophyProjector
 					"%s handler failed because of %s",
 					$this->eventName,
 					sprintf('Could not find team by given Id : %s', $identifiers['team'])
-				), $identifiers
+				), $this->serializer->normalize($body, 'array')
 			);
 			throw new ProjectionException(sprintf('Could not find team by given Id : %s', $identifiers['team']));
 		}
@@ -133,10 +133,10 @@ class TrophyProjector
 	}
 
 	/**
-	 * @param array $identifiers
+	 * @param MessageBody $body
 	 * @throws ProjectionException
 	 */
-	private function checkIdentifiersValidation(array $identifiers): void
+	private function checkIdentifiersValidation(MessageBody $body): void
 	{
 		$requiredFields = [
 			'competition' => 'Competition',
@@ -144,13 +144,13 @@ class TrophyProjector
 			'team' => 'Team'
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
-			if (empty($identifiers[$fieldName])) {
+			if (empty($body->getIdentifiers()[$fieldName])) {
 				$this->logger->alert(
 					sprintf(
 						"%s handler failed because of %s",
 						$this->eventName,
 						sprintf("%s field is empty.", $prettyFieldName)
-					), $identifiers
+					), $this->serializer->normalize($body, 'array')
 				);
 				throw new ProjectionException(
 					sprintf("%s field is empty.", $prettyFieldName),
