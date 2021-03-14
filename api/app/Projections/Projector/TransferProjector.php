@@ -8,7 +8,6 @@ use App\Events\Projection\PlayerWasTransferredProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Exceptions\ReadModelValidatorException;
-use App\Exceptions\ResourceNotFoundException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Team\Traits\TeamTraits;
 use App\Http\Services\Transfer\TransferService;

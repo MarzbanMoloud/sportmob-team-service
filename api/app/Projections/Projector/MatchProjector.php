@@ -93,6 +93,7 @@ class MatchProjector
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
 		event(new MatchWasCreatedProjectorEvent($identifier));
+		$this->teamsMatchCacheService->forget('teams_match*');
 		$this->createTeamsMatchCache([$identifier['home'], $identifier['away']]);
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", $this->eventName),
@@ -138,6 +139,7 @@ class MatchProjector
 		}
 		$teamsMatchItems = $this->checkItemExist($identifier['match'], $this->serializer->normalize($body, 'array'));
 		$score = $this->excludeScoreTypes($metadata['scores']);
+		$this->teamsMatchCacheService->forget('teams_match*');
 		if ($identifier['winner'] == "") {
 			foreach ($teamsMatchItems as $teamsMatch) {
 				/** @var TeamsMatch $teamsMatch */
@@ -197,6 +199,7 @@ class MatchProjector
 		}
 		$teamsMatchItems = $this->checkItemExist($identifier['match'], $this->serializer->normalize($body, 'array'));
 		$status = ($metadata['status'] == self::MATCH_STATUS_GAME_ENDED) ? TeamsMatch::STATUS_FINISHED : TeamsMatch::STATUS_UNKNOWN;
+		$this->teamsMatchCacheService->forget('teams_match*');
 		foreach ($teamsMatchItems as $teamsMatch) {
 			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchStatusChanged($teamsMatch, $status);
@@ -425,7 +428,6 @@ class MatchProjector
 	private function createTeamsMatchCache(array $teams): void
 	{
 		try {
-			$this->teamsMatchCacheService->forget('teams_match*');
 			foreach ($teams as $teamId) {
 				$this->teamsMatchService->getTeamsMatchInfo($teamId);
 			}
