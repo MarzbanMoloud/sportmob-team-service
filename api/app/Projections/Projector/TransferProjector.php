@@ -105,18 +105,11 @@ class TransferProjector
 		event(new PlayerWasTransferredProjectorEvent($transferModel));
 		/** Create cache by call service */
 		try {
-			$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($identifier['to'], $transferModel->getSeason()));
+			$this->transferCacheService->forget('transfer_by_team*');
 			$this->transferCacheService->forget(TransferCacheService::getTransferByPlayerKey($identifier['player']));
 			$this->transferService->listByPlayer($identifier['player']);
 			$this->transferService->listByTeam($identifier['to'], $transferModel->getSeason());
-		} catch (ResourceNotFoundException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed create cache.'
-				), $this->serializer->normalize($transferModel, 'array')
-			);
+		} catch (\Exception $exception) {
 		}
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", $this->eventName),

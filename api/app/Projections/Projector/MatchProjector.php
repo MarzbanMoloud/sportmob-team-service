@@ -93,10 +93,7 @@ class MatchProjector
 		$this->persistTeamsMatch($homeTeamsMatchModel);
 		$this->persistTeamsMatch($awayTeamsMatchModel);
 		event(new MatchWasCreatedProjectorEvent($identifier));
-		/** Create cache by call service */
-		$this->teamsMatchCacheService->forget('teams_match*');
-		$this->createTeamsMatchCache($identifier['home'], $this->serializer->normalize($body, 'array'));
-		$this->createTeamsMatchCache($identifier['away'], $this->serializer->normalize($body, 'array'));
+		$this->createTeamsMatchCache([$identifier['home'], $identifier['away']]);
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", $this->eventName),
 			[
@@ -145,8 +142,7 @@ class MatchProjector
 			foreach ($teamsMatchItems as $teamsMatch) {
 				/** @var TeamsMatch $teamsMatch */
 				$this->updateTeamsMatchByMatchFinishedEvent($teamsMatch, $score, TeamsMatch::EVALUATION_DRAW);
-				$this->teamsMatchCacheService->forget('teams_match*');
-				$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
+				$this->createTeamsMatchCache([$teamsMatch->getTeamId()]);
 			}
 			goto successfullyLog;
 		}
@@ -157,8 +153,7 @@ class MatchProjector
 				$score,
 				($identifier['winner'] == $teamsMatch->getTeamId()) ? TeamsMatch::EVALUATION_WIN : TeamsMatch::EVALUATION_LOSS
 			);
-			$this->teamsMatchCacheService->forget('teams_match*');
-			$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
+			$this->createTeamsMatchCache([$teamsMatch->getTeamId()]);
 		}
 		successfullyLog:
 		$this->logger->alert(
@@ -205,8 +200,7 @@ class MatchProjector
 		foreach ($teamsMatchItems as $teamsMatch) {
 			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchStatusChanged($teamsMatch, $status);
-			$this->teamsMatchCacheService->forget('teams_match*');
-			$this->createTeamsMatchCache($teamsMatch->getTeamId(), $this->serializer->normalize($body, 'array'));
+			$this->createTeamsMatchCache([$teamsMatch->getTeamId()]);
 		}
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", $this->eventName),
@@ -426,22 +420,16 @@ class MatchProjector
 	}
 
 	/**
-	 * @param string $teamId
-	 * @param array $body
+	 * @param array $teams
 	 */
-	private function createTeamsMatchCache(string $teamId, array $body): void
+	private function createTeamsMatchCache(array $teams): void
 	{
 		try {
-			$this->teamsMatchService->getTeamsMatchInfo($teamId);
+			$this->teamsMatchCacheService->forget('teams_match*');
+			foreach ($teams as $teamId) {
+				$this->teamsMatchService->getTeamsMatchInfo($teamId);
+			}
 		} catch (Exception $e) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed create cache for match.'
-				),
-				$body
-			);
 		}
 	}
 }

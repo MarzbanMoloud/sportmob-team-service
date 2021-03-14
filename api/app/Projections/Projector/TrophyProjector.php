@@ -118,13 +118,6 @@ class TrophyProjector
 			$this->trophyService->getTrophiesByTeam($identifiers['team']);
 			$this->trophyService->getTrophiesByCompetition($identifiers['competition']);
 		} catch (\Exception $e) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed create cache for trophy.'
-				), $this->serializer->normalize($trophyModel, 'array')
-			);
 		}
 		$this->logger->alert(
 			sprintf("%s handler completed successfully.", $this->eventName),
