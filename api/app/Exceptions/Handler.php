@@ -7,6 +7,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
+use Sentry\State\HubInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -61,6 +62,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+		app(HubInterface::class)->captureException($exception);
         if ($exception instanceof ValidationException) {
             return response()->json([
                 'message' => 'Input data is invalid.',
