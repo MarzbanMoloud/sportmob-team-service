@@ -6,7 +6,6 @@ namespace App\Http\Resources\Api;
 
 use App\Models\ReadModels\Transfer;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
-use App\Utilities\Utility;
 use DateTimeInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 use SportMob\Translation\Client;
@@ -74,9 +73,9 @@ class TeamTransferResource extends JsonResource
 				],
 				'marketValue' => $transfer->getMarketValue(),
 				'startDate' => $transfer->getStartDate()->getTimestamp(),
-				'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : '',
-				'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : '',
-				'contractDate' => $transfer->getContractDate() ? $transfer->getContractDate()->getTimestamp() : '',
+				'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : null,
+				'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null,
+				'contractDate' => $transfer->getContractDate() ? $transfer->getContractDate()->getTimestamp() : null,
 				'type' => $transfer->getType(),
 				'like' => $transfer->getLike(),
 				'dislike' => $transfer->getDislike(),

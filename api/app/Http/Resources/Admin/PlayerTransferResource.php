@@ -5,7 +5,6 @@ namespace App\Http\Resources\Admin;
 
 
 use App\Models\ReadModels\Transfer;
-use App\Utilities\Utility;
 use DateTimeInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -43,10 +42,10 @@ class PlayerTransferResource extends JsonResource
 						]
 					],
 					'startDate' => $transfer->getStartDate()->getTimestamp(),
-					'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : '',
+					'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : null,
 					'marketValue' => $transfer->getMarketValue(),
-					'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : '',
-					'contractDate' => $transfer->getContractDate()? $transfer->getContractDate()->getTimestamp() : '',
+					'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null,
+					'contractDate' => $transfer->getContractDate()? $transfer->getContractDate()->getTimestamp() : null,
 					'type' => $transfer->getType(),
 					'season' => $transfer->getSeason()
 				];
