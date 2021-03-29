@@ -17,36 +17,35 @@ trait AmazonBrokerTrait
 
     private function setupAWSBroker()
     {
-        $this->brokerService = app( BrokerService::class );
-        $this->snsClient     = $this->brokerService->getSnsClient();
-        $this->sqsClient     = $this->brokerService->getSqsClient();
+        $this->brokerService = app(BrokerService::class);
+        $this->snsClient = $this->brokerService->getSnsClient();
+        $this->sqsClient = $this->brokerService->getSqsClient();
         $this->initAWSBroker();
     }
 
-    private static function getQueuePolicy($queueName, $topicArn)
+    private static function getQueuePolicy($queueName)
     {
-        $QueueArn = sprintf( "arn:aws:sqs:%s:%s:%s",
-                             config( 'aws.sqs.region' ),
-                             config( 'aws.account' ),
-                             $queueName );
+        $QueueArn = sprintf("arn:aws:sqs:%s:%s:%s",
+            config('aws.sqs.region'),
+            config('aws.account'),
+            $queueName);
         return [
-            'Version'   => '2012-10-17',
-            'Id'        => sprintf( "%s/SQSDefaultPolicy", $QueueArn ),
+            'Version' => '2012-10-17',
+            'Id' => sprintf("%s/SQSDefaultPolicy", $QueueArn),
             'Statement' => [
-                'Effect'    => 'Allow',
-                'Principal' => [ 'Service' => 'sns.amazonaws.com' ],
-                'Action'    => [
+                'Effect' => 'Allow',
+                'Principal' => ['Service' => 'sns.amazonaws.com'],
+                'Action' => [
                     'sqs:SendMessage',
                     'sqs:ReceiveMessage'
                 ],
-                'Resource'  => $QueueArn
+                'Resource' => $QueueArn
             ]
         ];
     }
 
     private function initAWSBroker()
     {
-
         $ExistTopics = [];
         $ExistQueues = [];
         foreach (array_map( function($topic) {
@@ -77,49 +76,51 @@ trait AmazonBrokerTrait
             foreach (config( 'broker.topics' ) as $key => $topic) {
                 $Topic =
                     $this->snsClient->createTopic( [
-                                                       'Name'       => sprintf( "%s.fifo", $topic ),
-                                                       'Attributes' => [
-                                                           'FifoTopic'                 => 'true',
-                                                           'ContentBasedDeduplication' => 'false',
-                                                       ]
-                                                   ] );
+                        'Name'       => sprintf( "%s.fifo", $topic ),
+                        'Attributes' => [
+                            'FifoTopic'                 => 'true',
+                            'ContentBasedDeduplication' => 'false',
+                        ]
+                    ] );
                 config( [ sprintf( "broker.topics.%s", $key ) => $Topic->get( 'TopicArn' ) ] );
             }
         }
         if (!$ExistQueues) {
+            foreach (config('broker.queues') as $key => $queue) {
+                $Queue = $this->sqsClient->createQueue([
+                    'QueueName' => sprintf("%s.fifo", $queue),
+                    'Attributes' => [
+                        'FifoQueue' => 'true',
+                        'ContentBasedDeduplication' => 'false',
+                        'Policy' => json_encode(self::getQueuePolicy(sprintf("%s.fifo", $queue)))
+                    ]
+                ]);
+                $QueueAttr[$key] =
+                    $this->sqsClient->getQueueAttributes([
+                        'QueueUrl' => $Queue->get('QueueUrl'),
+                        'AttributeNames' => ['QueueArn']
+                    ]);
 
-            foreach (config( 'broker.queues' ) as $key => $queue) {
-                $Queue = $this->sqsClient->createQueue( [
-                                                            'QueueName'  => sprintf( "%s.fifo", $queue ),
-                                                            'Attributes' => [
-                                                                'FifoQueue'                 => 'true',
-                                                                'ContentBasedDeduplication' => 'false',
-                                                                'Policy'                    => json_encode( self::getQueuePolicy( sprintf( "%s.fifo",
-                                                                                                                                           $queue ),
-                                                                                                                                  config( 'broker.topics' )[ $key ] ) )
-                                                            ]
-                                                        ] );
-                $QueueAttr[ $key ] =
-                    $this->sqsClient->getQueueAttributes( [
-                                                              'QueueUrl'       => $Queue->get( 'QueueUrl' ),
-                                                              'AttributeNames' => [ 'QueueArn' ]
-                                                          ] );
+                config([sprintf("broker.queues.%s", $key) => $Queue->get('QueueUrl')]);
 
-                config( [ sprintf( "broker.queues.%s", $key ) => $Queue->get( 'QueueUrl' ) ] );
-                $this->snsClient->subscribe( [
-                                                 'Attributes' => [ 'RawMessageDelivery' => 'true' ],
-                                                 'Endpoint'   => $QueueAttr[ $key ]->get( 'Attributes' )[ 'QueueArn' ],
-                                                 'Protocol'   => 'sqs',
-                                                 'TopicArn'   => config( 'broker.topics' )[ $key ]
-                                             ] );
+                foreach (config('broker.topics') as $topicKey => $value) {
+                    if (strpos($topicKey, $key) === 0){
+                        $this->snsClient->subscribe([
+                            'Attributes' => ['RawMessageDelivery' => 'true'],
+                            'Endpoint' => $QueueAttr[$key]->get('Attributes')['QueueArn'],
+                            'Protocol' => 'sqs',
+                            'TopicArn' => $value
+                        ]);
+                    }
+                }
             }
         }
     }
 
     private function tearDownAwsBroker()
     {
-        foreach (config( 'broker.queues' ) as $queue) {
-            $this->sqsClient->purgeQueue( [ 'QueueUrl' => $queue ] );
+        foreach (config('broker.queues') as $queue) {
+            $this->sqsClient->purgeQueue(['QueueUrl' => $queue]);
         }
     }
 }
