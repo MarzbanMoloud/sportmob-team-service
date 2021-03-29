@@ -58,7 +58,8 @@ trait AmazonBrokerTrait
                 }
             }
         }
-        foreach ($this->sqsClient->listQueues()->get( 'QueueUrls' ) as $queueUrl) {
+        $queues = $this->sqsClient->listQueues()->get( 'QueueUrls' ) ?: [];
+        foreach ($queues as $queueUrl) {
             foreach (config( 'broker.queues' ) as $key => $queue) {
                 if (strstr( $queueUrl, $queue )) {
                     $ExistQueues[ $key ] = $queueUrl;
