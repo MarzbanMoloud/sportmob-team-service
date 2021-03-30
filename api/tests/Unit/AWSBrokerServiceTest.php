@@ -14,26 +14,30 @@ class AWSBrokerServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->createApplication();
-        $this->setupAWSBroker();
+
     }
 
     public function testProduceMessage()
     {
-        $FirstMessage  = [
+        config(['broker.topics.event_AWSBrokerServiceTest' => env('APP_NAME', 'Lumen') . 'AWSBrokerServiceTest']);
+        $this->setupAWSBroker();
+
+        $FirstMessage = [
             'FirstName' => 'John',
-            'Date'      => microtime()
+            'Date' => microtime()
         ];
         $SecondMessage = [
             'LastName' => 'Smith',
-            'Date'     => microtime()
+            'Date' => microtime()
         ];
-        $this->brokerService->addMessage( 'TestFromLocalMessage', json_encode( $FirstMessage ) )
-                            ->addMessage( 'TestFromLocalMessage', json_encode( $SecondMessage ) )
-                            ->produceMessage( config('broker.topics.event') );
-        $Messages = $this->brokerService->consumePureMessage( [ config('broker.queues.event') ], 1 );
-        $this->assertCount( 2, $Messages );
-        $this->assertEquals( $FirstMessage, json_decode( $Messages[ 0 ], true ) );
-        $this->assertEquals( $SecondMessage, json_decode( $Messages[ 1 ], true ) );
+        $this->brokerService
+            ->addMessage('TestFromLocalMessage', json_encode($FirstMessage))
+            ->addMessage('TestFromLocalMessage', json_encode($SecondMessage))
+            ->produceMessage(config('broker.topics.event_AWSBrokerServiceTest'));
+        $Messages = $this->brokerService->consumePureMessage([config('broker.queues.event')], 1);
+        $this->assertCount(2, $Messages);
+        $this->assertEquals($FirstMessage, json_decode($Messages[0], true));
+        $this->assertEquals($SecondMessage, json_decode($Messages[1], true));
     }
 
 }
