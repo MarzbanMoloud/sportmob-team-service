@@ -18,7 +18,7 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function received(string $messageName, ?string $param2 , $context)
+	public static function received($context, string $messageName, ?string $param2)
     {
         self::logger()->alert(
             sprintf('Message "%s" received from the data puller.', $messageName),
@@ -33,7 +33,7 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function handled(string $messageName, string $handlerClassName, ?string $param3, $context)
+	public static function handled($context, string $messageName, string $handlerClassName, ?string $param3)
     {
         self::logger()->alert(
             sprintf('Message "%s" will handle by "%s".', $messageName, $handlerClassName),
@@ -46,7 +46,7 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function processing(string $messageName, $context)
+	public static function processing($context, string $messageName)
     {
         self::logger()->alert(
             sprintf('"%s" handler in progress.', $messageName),
@@ -60,7 +60,7 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function failed(string $messageName, string $reason, $context)
+	public static function failed($context, string $messageName, string $reason)
     {
         self::logger()->alert(
             sprintf('%s" handler failed because of "%s".', $messageName, $reason),
@@ -73,7 +73,7 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function succeeded(string $messageName, $context)
+	public static function succeeded($context, string $messageName)
     {
         self::logger()->alert(
             sprintf('"%s" handler completed successfully.', $messageName),

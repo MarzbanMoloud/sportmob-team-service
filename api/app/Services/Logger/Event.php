@@ -20,7 +20,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function received(string $eventName, ?string $param2 = null, $context)
+	public static function received($context, string $eventName, ?string $param2 = null)
     {
         self::logger()->alert(
             sprintf('Event "%s" received.', $eventName),
@@ -35,7 +35,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function rejected(string $eventName, string $reason, ?string $param3 = null, $context)
+	public static function rejected($context, string $eventName, string $reason, ?string $param3 = null)
     {
         self::logger()->alert(
             sprintf('Event "%" rejected (%s)', $eventName, $reason),
@@ -50,7 +50,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function handled(string $eventName, string $handlerClassName, ?string $param3 = null, $context)
+	public static function handled($context, string $eventName, string $handlerClassName, ?string $param3 = null)
     {
         self::logger()->alert(
             sprintf('Event "%s" will handle by "%s".', $eventName, $handlerClassName),
@@ -63,7 +63,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function processing(string $eventName, $context)
+	public static function processing($context, string $eventName)
     {
         self::logger()->alert(
             sprintf('"%s" handler in progress', $eventName),
@@ -77,7 +77,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function failed(string $eventName, string $reason, $context)
+	public static function failed($context, string $eventName, string $reason)
     {
         self::logger()->alert(
             sprintf('"%s" handler failed because of "%s"', $eventName, $reason),
@@ -90,7 +90,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function succeeded(string $eventName, $context)
+	public static function succeeded($context, string $eventName)
     {
         self::logger()->alert(
             sprintf('"%s" handler completed successfully.', $eventName),
@@ -105,7 +105,7 @@ class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function needToAsk(string $eventName, string $questionKey, string $destination, $context)
+	public static function needToAsk($context, string $eventName, string $questionKey, string $destination)
     {
         self::logger()->alert(
             sprintf('"%s" handler needs to ask "%s" from "%s"', $eventName, $questionKey, $destination),
