@@ -46,44 +46,19 @@ trait AmazonBrokerTrait
 
     private function initAWSBroker()
     {
-        $ExistTopics = [];
-        $ExistQueues = [];
-        foreach (array_map( function($topic) {
-            return $topic[ 'TopicArn' ];
-        },
-            $this->snsClient->listTopics()->get( 'Topics' ) ) as $topicArn) {
-            foreach (config( 'broker.topics' ) as $key => $topic) {
-                if (strstr( $topicArn, $topic )) {
-                    $ExistTopics[ $key ] = $topicArn;
-                }
-            }
-        }
-        $queues = $this->sqsClient->listQueues()->get( 'QueueUrls' ) ?: [];
-        foreach ($queues as $queueUrl) {
-            foreach (config( 'broker.queues' ) as $key => $queue) {
-                if (strstr( $queueUrl, $queue )) {
-                    $ExistQueues[ $key ] = $queueUrl;
-                }
-            }
-        }
-        foreach ($ExistTopics as $key => $topic) {
-            config( [ sprintf( "broker.topics.%s", $key ) => $topic ] );
-        }
-        foreach ($ExistQueues as $key => $queueUrl) {
-            config( [ sprintf( "broker.queues.%s", $key ) => $queueUrl ] );
-        }
+        list($ExistTopics,$ExistQueues) = $this->setupTopicsAndQueues();
 
         if (!$ExistTopics) {
-            foreach (config( 'broker.topics' ) as $key => $topic) {
+            foreach (config('broker.topics') as $key => $topic) {
                 $Topic =
-                    $this->snsClient->createTopic( [
-                        'Name'       => sprintf( "%s.fifo", $topic ),
+                    $this->snsClient->createTopic([
+                        'Name' => sprintf("%s.fifo", $topic),
                         'Attributes' => [
-                            'FifoTopic'                 => 'true',
+                            'FifoTopic' => 'true',
                             'ContentBasedDeduplication' => 'false',
                         ]
-                    ] );
-                config( [ sprintf( "broker.topics.%s", $key ) => $Topic->get( 'TopicArn' ) ] );
+                    ]);
+                config([sprintf("broker.topics.%s", $key) => $Topic->get('TopicArn')]);
             }
         }
         if (!$ExistQueues) {
@@ -105,7 +80,7 @@ trait AmazonBrokerTrait
                 config([sprintf("broker.queues.%s", $key) => $Queue->get('QueueUrl')]);
 
                 foreach (config('broker.topics') as $topicKey => $value) {
-                    if (strpos($topicKey, $key) === 0){
+                    if (strpos($topicKey, $key) === 0) {
                         $this->snsClient->subscribe([
                             'Attributes' => ['RawMessageDelivery' => 'true'],
                             'Endpoint' => $QueueAttr[$key]->get('Attributes')['QueueArn'],
@@ -118,10 +93,59 @@ trait AmazonBrokerTrait
         }
     }
 
+    private function setupTopicsAndQueues(){
+        $ExistTopics = [];
+        $ExistQueues = [];
+        foreach (array_map(function ($topic) {
+            return $topic['TopicArn'];
+        },
+            $this->snsClient->listTopics()->get('Topics')) as $topicArn) {
+            foreach (config('broker.topics') as $key => $topic) {
+                if (strstr($topicArn, $topic)) {
+                    $ExistTopics[$key] = $topicArn;
+                }
+            }
+        }
+        $queues = $this->sqsClient->listQueues()->get('QueueUrls') ?: [];
+        foreach ($queues as $queueUrl) {
+            foreach (config('broker.queues') as $key => $queue) {
+                if (strstr($queueUrl, $queue)) {
+                    $ExistQueues[$key] = $queueUrl;
+                }
+            }
+        }
+        foreach ($ExistTopics as $key => $topic) {
+            config([sprintf("broker.topics.%s", $key) => $topic]);
+        }
+        foreach ($ExistQueues as $key => $queueUrl) {
+            config([sprintf("broker.queues.%s", $key) => $queueUrl]);
+        }
+
+        return [$ExistTopics,$ExistQueues];
+    }
+
     private function tearDownAwsBroker()
     {
+        $this->setupTopicsAndQueues();
         foreach (config('broker.queues') as $queue) {
             $this->sqsClient->purgeQueue(['QueueUrl' => $queue]);
+
+            $this->sqsClient->deleteQueue(['QueueUrl' => $queue]);
+        }
+
+        foreach (config('broker.topics') as $topic) {
+            $this->snsClient->deleteTopic([
+                'TopicArn' => $topic
+            ]);
+        }
+
+        $subscriptions = $this->snsClient->listSubscriptions()->get('Subscriptions') ?: [];
+        foreach ($subscriptions as $subscription) {
+            if (in_array($subscription['TopicArn'], config('broker.topics'))) {
+                $this->snsClient->unsubscribe([
+                    "SubscriptionArn" => $subscription['SubscriptionArn']
+                ]);
+            }
         }
     }
 }
