@@ -4,6 +4,7 @@
 namespace App\Console;
 
 
+use App\Console\Commands\Broker\RemoveTopicsAndQueuesCommand;
 use App\Console\Commands\Consumer\CommandEventsConsumerCommand;
 use App\Console\Commands\Consumer\QueryEventsConsumerCommand;
 use App\Console\Commands\Consumer\MediatorEventsConsumerCommand;
@@ -28,6 +29,7 @@ class Kernel extends ConsoleKernel
         QueryEventsConsumerCommand::class,
         CommandEventsConsumerCommand::class,
         MakeTableCommand::class,
+        RemoveTopicsAndQueuesCommand::class
     ];
 
     /**
