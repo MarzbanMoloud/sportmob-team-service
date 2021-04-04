@@ -14,7 +14,7 @@ interface SmLoggerInterface
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function received(string $eventName, ?string $source, $context);
+	public static function received($context, string $eventName, ?string $source);
 
 	/**
 	 * @param string $eventName
@@ -23,14 +23,14 @@ interface SmLoggerInterface
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function handled(string $eventName, string $source, string $className, $context);
+	public static function handled($context, string $eventName, string $source, string $className);
 
 	/**
 	 * @param string $eventName
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function processing(string $eventName, $context);
+	public static function processing($context, string $eventName);
 
 	/**
 	 * @param string $eventName
@@ -38,12 +38,12 @@ interface SmLoggerInterface
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function failed(string $eventName, string $source, $context);
+	public static function failed($context, string $eventName, string $source);
 
 	/**
 	 * @param string $eventName
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function succeeded(string $eventName, $context);
+	public static function succeeded($context, string $eventName);
 }

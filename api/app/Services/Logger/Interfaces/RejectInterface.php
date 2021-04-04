@@ -15,5 +15,5 @@ interface RejectInterface
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function rejected(string $param1, string $param2, ?string $param3 = null, $context);
+	public static function rejected($context, string $param1, string $param2, ?string $param3 = null);
 }

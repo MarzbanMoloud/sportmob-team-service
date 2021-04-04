@@ -15,5 +15,5 @@ interface NeedToAskInterface
 	 * @param $context
 	 * @return mixed
 	 */
-	public static function needToAsk(string $eventName, string $questionKey, string $destination, $context);
+	public static function needToAsk($context, string $eventName, string $questionKey, string $destination);
 }

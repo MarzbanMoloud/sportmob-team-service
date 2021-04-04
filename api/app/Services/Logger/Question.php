@@ -19,7 +19,7 @@ class Question implements SmLoggerInterface, RejectInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function received(string $questionKey, ?string $source = null, $context)
+	public static function received($context, string $questionKey, ?string $source = null)
     {
         self::logger()->alert(
             sprintf('Question "%s" by "%s" received.', $questionKey, $source),
@@ -34,7 +34,7 @@ class Question implements SmLoggerInterface, RejectInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function rejected(string $questionKey, string $source, ?string $reason = null, $context)
+	public static function rejected($context, string $questionKey, string $source, ?string $reason = null)
     {
         self::logger()->alert(
             sprintf('Question "%s" by "%s" rejected (%s).', $questionKey, $source, $reason),
@@ -49,7 +49,7 @@ class Question implements SmLoggerInterface, RejectInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function handled(string $questionKey, string $source, ?string $handlerClassName = null, $context)
+	public static function handled($context, string $questionKey, string $source, ?string $handlerClassName = null)
     {
         self::logger()->alert(
             sprintf('Question "%s" by "%s" will handle by "%s".', $questionKey, $source, $handlerClassName),
@@ -62,7 +62,7 @@ class Question implements SmLoggerInterface, RejectInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function processing(string $questionKey, $context)
+	public static function processing($context, string $questionKey)
     {
         self::logger()->alert(
             sprintf('"%s" handler in progress.', $questionKey),
@@ -76,7 +76,7 @@ class Question implements SmLoggerInterface, RejectInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function failed(string $questionKey, string $reason, $context)
+	public static function failed($context, string $questionKey, string $reason)
     {
         self::logger()->alert(
             sprintf('"%s" handler failed because of "%s".', $questionKey, $reason),
@@ -89,7 +89,7 @@ class Question implements SmLoggerInterface, RejectInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function succeeded(string $questionKey, $context)
+	public static function succeeded($context, string $questionKey)
     {
         self::logger()->alert(
             sprintf('"%s" handler completed successfully.', $questionKey),
