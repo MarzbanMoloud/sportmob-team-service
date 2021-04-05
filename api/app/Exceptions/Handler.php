@@ -77,8 +77,8 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof DynamoDBRepositoryException) {
             return response()->json([
-                'message' => 'Unprocessable_request.',
-                'code' => config('common.error_codes.Unprocessable_request')
+                'message' => 'Unprocessable request.',
+                'code' => config('common.error_codes.unprocessable_request')
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
