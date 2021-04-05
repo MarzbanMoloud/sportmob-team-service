@@ -4,7 +4,6 @@
 namespace App\Services\BrokerCommandStrategy\Interfaces;
 
 
-use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 
 
@@ -14,17 +13,6 @@ use App\ValueObjects\Broker\CommandQuery\Message;
  */
 interface BrokerCommandEventInterface
 {
-    /**
-     *
-     */
-    const TAG_NAME = 'BrokerCommandEvent';
-
-	/**
-	 * @param Headers $headers
-	 * @return bool
-	 */
-    public function support(Headers $headers): bool;
-
     /**
      * @param Message $commandQuery
      */

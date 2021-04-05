@@ -4,8 +4,8 @@
 namespace App\Services\BrokerQueryStrategy;
 
 
-use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryStrategyInterface;
+use App\Services\Logger\Question;
 use App\ValueObjects\Broker\CommandQuery\Message;
 
 
@@ -15,17 +15,22 @@ use App\ValueObjects\Broker\CommandQuery\Message;
  */
 class BrokerQueryContext implements BrokerQueryStrategyInterface
 {
+    private array $strategies = [];
+
     /**
      * @param Message $message
      * @return mixed|void
      */
     public function handle(Message $message)
     {
-        foreach (app()->tagged(BrokerQueryEventInterface::TAG_NAME) as $event) {
-            if ($event->support($message)) {
-                $event->handle($message);
-                return;
-            }
+        Question::received($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource());
+
+        if ( !isset($this->strategies[$message->getBody()['entity']]) ) {
+            Question::rejected($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource(), 'lack of ownership');
+            return;
         }
+
+        $eventClass = $this->strategies[$message->getBody()['entity']];
+        app($eventClass)->handle($message);
     }
 }

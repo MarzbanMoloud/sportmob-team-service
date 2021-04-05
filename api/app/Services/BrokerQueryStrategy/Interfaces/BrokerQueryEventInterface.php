@@ -14,17 +14,6 @@ use App\ValueObjects\Broker\CommandQuery\Message;
 interface BrokerQueryEventInterface
 {
     /**
-     *
-     */
-    const TAG_NAME = 'BrokerQueryEvent';
-
-    /**
-     * @param Message $commandQuery
-     * @return bool
-     */
-    public function support(Message $commandQuery): bool;
-
-    /**
      * @param Message $commandQuery
      */
     public function handle(Message $commandQuery): void;
