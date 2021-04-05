@@ -5,10 +5,7 @@ namespace App\Providers;
 
 
 use App\Services\AWS\BrokerService;
-use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\BrokerInterface;
-use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
-use App\Services\EventStrategy\Interfaces\EventInterface;
 use Illuminate\Support\ServiceProvider;
 use Sentry\SentrySdk;
 use SportMob\Translation\Client;
@@ -54,18 +51,6 @@ class AppServiceProvider extends ServiceProvider
     	    BrokerInterface::class,
             BrokerService::class
         );
-
-    	/*------ Event Mediator Strategy ------*/
-        $this->app->tag([
-        ], [EventInterface::TAG_NAME]);
-
-        /*------ Broker Command Strategy ------*/
-        $this->app->tag([
-        ], [BrokerCommandEventInterface::TAG_NAME]);
-
-        /*------ Broker Query Strategy ------*/
-        $this->app->tag([
-        ], [BrokerQueryEventInterface::TAG_NAME]);
 
         /*------ Services ------*/
 
