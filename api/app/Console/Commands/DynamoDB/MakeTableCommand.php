@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Console\Commands\DaynamoDB;
+namespace App\Console\Commands\DynamoDB;
 
 
 use Illuminate\Console\Command;
@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 /**
  * Class MakeTableCommand
- * @package App\Console\Commands\DaynamoDB
+ * @package App\Console\Commands\DynamoDB
  */
 class MakeTableCommand extends Command
 {
