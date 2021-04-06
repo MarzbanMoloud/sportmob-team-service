@@ -15,22 +15,21 @@ use App\ValueObjects\Broker\CommandQuery\Message;
  */
 class BrokerCommandContext implements BrokerCommandStrategyInterface
 {
-    private array $strategies = [];
-
     /**
      * @param Message $message
      * @return mixed|void
      */
     public function handle(Message $message): void
     {
+		$strategies = [];
         Answer::received($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource());
 
-        if ( !isset($this->strategies[$message->getHeaders()->getKey()]) ) {
+        if ( !isset($strategies[$message->getHeaders()->getKey()]) ) {
             Answer::rejected($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource(), 'lack of ownership');
             return;
         }
 
-        $eventClass = $this->strategies[$message->getHeaders()->getKey()];
+        $eventClass = $strategies[$message->getHeaders()->getKey()];
         app($eventClass)->handle($message);
     }
 }
