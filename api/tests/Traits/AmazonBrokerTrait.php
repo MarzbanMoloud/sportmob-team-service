@@ -46,10 +46,10 @@ trait AmazonBrokerTrait
 
     private function initAWSBroker()
     {
-        list($ExistTopics,$ExistQueues) = $this->setupTopicsAndQueues();
+        list($ExistTopics, $ExistQueues) = $this->setupTopicsAndQueues();
 
-        if (!$ExistTopics) {
-            foreach (config('broker.topics') as $key => $topic) {
+        if ($topics = array_diff_key (config('broker.topics'), $ExistTopics)) {
+            foreach ($topics as $key => $topic) {
                 $Topic =
                     $this->snsClient->createTopic([
                         'Name' => sprintf("%s.fifo", $topic),
@@ -61,8 +61,9 @@ trait AmazonBrokerTrait
                 config([sprintf("broker.topics.%s", $key) => $Topic->get('TopicArn')]);
             }
         }
-        if (!$ExistQueues) {
-            foreach (config('broker.queues') as $key => $queue) {
+
+        if ($queues = array_diff_key (config('broker.queues'), $ExistQueues)) {
+            foreach ($queues as $key => $queue) {
                 $Queue = $this->sqsClient->createQueue([
                     'QueueName' => sprintf("%s.fifo", $queue),
                     'Attributes' => [
@@ -93,7 +94,8 @@ trait AmazonBrokerTrait
         }
     }
 
-    private function setupTopicsAndQueues(){
+    private function setupTopicsAndQueues()
+    {
         $ExistTopics = [];
         $ExistQueues = [];
         foreach (array_map(function ($topic) {
@@ -121,31 +123,78 @@ trait AmazonBrokerTrait
             config([sprintf("broker.queues.%s", $key) => $queueUrl]);
         }
 
-        return [$ExistTopics,$ExistQueues];
+        return [$ExistTopics, $ExistQueues];
     }
 
     private function tearDownAwsBroker()
     {
         $this->setupTopicsAndQueues();
         foreach (config('broker.queues') as $queue) {
-            $this->sqsClient->purgeQueue(['QueueUrl' => $queue]);
+            $this->sqsClient->purgeQueue([
+                'QueueUrl' => $queue
+            ]);
 
-            $this->sqsClient->deleteQueue(['QueueUrl' => $queue]);
-        }
-
-        foreach (config('broker.topics') as $topic) {
-            $this->snsClient->deleteTopic([
-                'TopicArn' => $topic
+            $this->sqsClient->deleteQueue([
+                'QueueUrl' => $queue
             ]);
         }
 
+        foreach (config('broker.topics') as $topic) {
+            $this->removeTopicByTopicName($topic);
+        }
+
+        $this->unsubscription();
+    }
+
+    /**
+     * @param string $topicName
+     */
+    private function removeBrokerByTopicName(string $topicName)
+    {
+        $this->removeSubscriptionByTopicName($topicName);
+        $this->removeTopicByTopicName($topicName);
+    }
+
+    /**
+     * @param string $topicName
+     */
+    private function removeTopicByTopicName(string $topicName)
+    {
+        $this->snsClient->deleteTopic([
+            'TopicArn' => $topicName
+        ]);
+    }
+
+    /**
+     * @param string $topicName
+     */
+    private function removeSubscriptionByTopicName(string $topicName)
+    {
         $subscriptions = $this->snsClient->listSubscriptions()->get('Subscriptions') ?: [];
         foreach ($subscriptions as $subscription) {
-            if (in_array($subscription['TopicArn'], config('broker.topics'))) {
+            if ($subscription['TopicArn'] === $topicName) {
                 $this->snsClient->unsubscribe([
                     "SubscriptionArn" => $subscription['SubscriptionArn']
                 ]);
             }
         }
+    }
+
+    private function unsubscription()
+    {
+        $nextToken = null;
+        do {
+            $subscriptions = $this->snsClient->listSubscriptions([
+                'NextToken' => $nextToken
+            ]);
+            foreach ($subscriptions->get('Subscriptions') ?: [] as $subscription) {
+                if (in_array($subscription['TopicArn'], config('broker.topics'))) {
+                    $this->snsClient->unsubscribe([
+                        "SubscriptionArn" => $subscription['SubscriptionArn']
+                    ]);
+                }
+            }
+            $nextToken = $subscriptions->get('NextToken');
+        } while ($nextToken);
     }
 }
