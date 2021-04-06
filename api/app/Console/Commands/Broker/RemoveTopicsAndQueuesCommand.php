@@ -56,6 +56,49 @@ class RemoveTopicsAndQueuesCommand extends Command
 
     public function handle()
     {
+        $this->deleteTopics();
+        $this->alert('Topics deleted successfully.');
+
+        $this->deleteQueues();
+        $this->alert('Queues deleted successfully.');
+
+        $this->unsubscription();
+        $this->alert('Subscriptions were successfully unsubscribed.');
+    }
+
+    private function unsubscription(): void
+    {
+        $nextToken = null;
+        do {
+            $subscriptions = $this->snsClient->listSubscriptions([
+                'NextToken' => $nextToken
+            ]);
+            foreach ($subscriptions->get('Subscriptions') ?: [] as $subscription) {
+                if (in_array($subscription['TopicArn'], config('broker.topics'))) {
+                    $this->snsClient->unsubscribe([
+                        "SubscriptionArn" => $subscription['SubscriptionArn']
+                    ]);
+                }
+            }
+            $nextToken = $subscriptions->get('NextToken');
+        } while ($nextToken);
+    }
+
+    private function deleteQueues(): void
+    {
+        $queues = $this->sqsClient->listQueues()->get('QueueUrls') ?: [];
+        foreach ($queues as $queueUrl) {
+            foreach (config('broker.queues') as $key => $queue) {
+                if ($queueUrl == $queue) {
+                    $this->sqsClient->purgeQueue(['QueueUrl' => $queue]);
+                    $this->sqsClient->deleteQueue(['QueueUrl' => $queue]);
+                }
+            }
+        }
+    }
+
+    private function deleteTopics(): void
+    {
         foreach (array_map(function ($topic) {
             return $topic['TopicArn'];
         },
@@ -68,30 +111,5 @@ class RemoveTopicsAndQueuesCommand extends Command
                 }
             }
         }
-
-        $this->alert('Topics deleted successfully.');
-
-        $queues = $this->sqsClient->listQueues()->get('QueueUrls') ?: [];
-        foreach ($queues as $queueUrl) {
-            foreach (config('broker.queues') as $key => $queue) {
-                if ($queueUrl == $queue) {
-                    $this->sqsClient->purgeQueue(['QueueUrl' => $queue]);
-                    $this->sqsClient->deleteQueue(['QueueUrl' => $queue]);
-                }
-            }
-        }
-
-        $this->alert('Queues deleted successfully.');
-
-        $subscriptions = $this->snsClient->listSubscriptions()->get('Subscriptions') ?: [];
-        foreach ($subscriptions as $subscription) {
-            if (in_array($subscription['TopicArn'], config('broker.topics'))) {
-                $this->snsClient->unsubscribe([
-                    "SubscriptionArn" => $subscription['SubscriptionArn']
-                ]);
-            }
-        }
-
-        $this->alert('Subscriptions were successfully unsubscribed.');
     }
 }
