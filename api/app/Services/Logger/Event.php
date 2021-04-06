@@ -3,14 +3,13 @@
 namespace App\Services\Logger;
 
 use App\Services\Logger\Interfaces\NeedToAskInterface;
-use App\Services\Logger\Interfaces\RejectInterface;
 use App\Services\Logger\Interfaces\SmLoggerInterface;
 
 /**
  * Class Event
  * @package App\Services\Logger
  */
-class Event implements SmLoggerInterface, RejectInterface, NeedToAskInterface
+class Event implements SmLoggerInterface, NeedToAskInterface
 {
     use SmLoggerTrait;
 
