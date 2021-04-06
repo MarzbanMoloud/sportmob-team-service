@@ -2,14 +2,13 @@
 
 namespace App\Services\Logger;
 
-use App\Services\Logger\Interfaces\RejectInterface;
 use App\Services\Logger\Interfaces\SmLoggerInterface;
 
 /**
  * Class Question
  * @package App\Services\Logger
  */
-class Question implements SmLoggerInterface, RejectInterface
+class Question implements SmLoggerInterface
 {
     use SmLoggerTrait;
 
