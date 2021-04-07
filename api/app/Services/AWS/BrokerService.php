@@ -175,13 +175,18 @@ class BrokerService implements BrokerInterface
      */
     private function checkExistTopic(string $topicArn)
     {
-        $result = $this->snsClient->listTopics();
-        $topics = $result->get('Topics');
-        foreach ($topics as $topic) {
-            if ($topic['TopicArn'] == $topicArn) {
-                return true;
+        $nextToken = null;
+        do {
+            $result = $this->snsClient->listTopics([
+                'NextToken' => $nextToken
+            ]);
+            foreach ($result->get('Topics') ?: [] as $topic) {
+                if ($topic['TopicArn'] == $topicArn) {
+                    return true;
+                }
             }
-        }
+            $nextToken = $result->get('NextToken');
+        } while ($nextToken);
         return false;
     }
 
@@ -191,9 +196,18 @@ class BrokerService implements BrokerInterface
      */
     private function checkExistQueue(string $queueUrl)
     {
-        $result = $this->sqsClient->listQueues();
-        $queues = $result->get('QueueUrls')?:[];
-        return in_array($queueUrl, $queues);
+        $nextToken = [];
+        do {
+            $queues = $this->sqsClient->listQueues($nextToken);
+
+            foreach ($queues->get('QueueUrls') ?: [] as $queue) {
+                if ($queue == $queueUrl) {
+                    return true;
+                }
+            }
+            $nextToken = $queues->get('NextToken') ? ['NextToken' => $queues->get('NextToken')] : null;
+        } while ($nextToken);
+        return false;
     }
 
     /**
