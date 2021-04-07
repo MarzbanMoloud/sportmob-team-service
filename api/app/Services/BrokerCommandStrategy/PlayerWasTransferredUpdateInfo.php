@@ -14,9 +14,8 @@ use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
-use App\ValueObjects\Broker\CommandQuery\Headers;
+use App\Services\Logger\Answer;
 use App\ValueObjects\Broker\CommandQuery\Message;
-use Psr\Log\LoggerInterface;
 use Sentry\State\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -34,7 +33,6 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	private HubInterface $sentryHub;
 	private SerializerInterface $serializer;
 	private BrokerInterface $broker;
-	private LoggerInterface $logger;
 	private TransferCacheServiceInterface $transferCacheService;
 	private TransferService $transferService;
 
@@ -47,7 +45,6 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	 * @param HubInterface $sentryHub
 	 * @param BrokerInterface $broker
 	 * @param SerializerInterface $serializer
-	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		TransferRepository $transferRepository,
@@ -56,28 +53,15 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		HubInterface $sentryHub,
 		BrokerInterface $broker,
-		SerializerInterface $serializer,
-		LoggerInterface $logger
+		SerializerInterface $serializer
 	) {
 		$this->transferRepository = $transferRepository;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->sentryHub = $sentryHub;
 		$this->serializer = $serializer;
 		$this->broker = $broker;
-		$this->logger = $logger;
 		$this->transferCacheService = $transferCacheService;
 		$this->transferService = $transferService;
-	}
-
-	/**
-	 * @param Headers $headers
-	 * @return bool
-	 */
-	public function support(Headers $headers): bool
-	{
-		return
-			($headers->getDestination() == config('broker.services.team_name')) &&
-			($headers->getKey() == PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
 	}
 
 	/**
@@ -85,28 +69,10 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	 */
 	public function handle(Message $commandQuery): void
 	{
-		$this->logger->alert(
-			sprintf(
-				"Answer %s by %s will handle by %s.",
-				PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY,
-				$commandQuery->getHeaders()->getSource(),
-				__CLASS__
-			),
-			$this->serializer->normalize($commandQuery, 'array')
-		);
-		$this->logger->alert(
-			sprintf("%s handler in progress.", PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY),
-			$this->serializer->normalize($commandQuery, 'array')
-		);
+		Answer::handled($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, $commandQuery->getHeaders()->getSource(), __CLASS__);
+		Answer::processing($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
 		if (empty($commandQuery->getBody())) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s.",
-					PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY,
-					'Data not found.'
-				),
-				$this->serializer->normalize($commandQuery, 'array')
-			);
+			Answer::failed($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, 'Data not found.');
 			return;
 		}
 		[$playerId, $startDate] = explode('#', $commandQuery->getHeaders()->getId());
@@ -117,14 +83,7 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		try {
 			$this->transferRepository->persist($transfer);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s.",
-					PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY,
-					'Failed to persist transfer.'
-				),
-				$this->serializer->normalize($transfer, 'array')
-			);
+			Answer::failed($transfer, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, 'Failed to persist transfer.');
 			$this->sentryHub->captureException($exception);
 		}
 		try {
@@ -145,9 +104,6 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		if (strpos($transfer->getSeason(), date('Y')) != false) {
 			$this->sendNotification($transfer, PlayerWasTransferredProjectorListener::BROKER_NOTIFICATION_KEY);
 		}
-		$this->logger->alert(
-			sprintf("%s handler completed successfully.", PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY),
-			$this->serializer->normalize($commandQuery, 'array')
-		);
+		Answer::succeeded($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
 	}
 }

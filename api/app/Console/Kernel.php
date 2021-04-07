@@ -4,10 +4,11 @@
 namespace App\Console;
 
 
+use App\Console\Commands\Broker\RemoveTopicsAndQueuesCommand;
 use App\Console\Commands\Consumer\CommandEventsConsumerCommand;
 use App\Console\Commands\Consumer\QueryEventsConsumerCommand;
 use App\Console\Commands\Consumer\MediatorEventsConsumerCommand;
-use App\Console\Commands\DaynamoDB\MakeTableCommand;
+use App\Console\Commands\DynamoDB\MakeTableCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -28,6 +29,7 @@ class Kernel extends ConsoleKernel
         QueryEventsConsumerCommand::class,
         CommandEventsConsumerCommand::class,
         MakeTableCommand::class,
+        RemoveTopicsAndQueuesCommand::class
     ];
 
     /**

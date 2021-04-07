@@ -7,9 +7,9 @@ namespace App\Services\BrokerQueryStrategy;
 use App\Models\Repositories\TeamRepository;
 use App\Services\BrokerInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
+use App\Services\Logger\Question;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Carbon\Carbon;
 
@@ -23,36 +23,21 @@ class TeamInformation implements BrokerQueryEventInterface
 	private SerializerInterface $serializer;
 	private BrokerInterface $broker;
 	private TeamRepository $teamRepository;
-	private LoggerInterface $logger;
 
 	/**
 	 * TeamInformation constructor.
 	 * @param BrokerInterface $broker
 	 * @param TeamRepository $teamRepository
 	 * @param SerializerInterface $serializer
-	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		TeamRepository $teamRepository,
-		SerializerInterface $serializer,
-		LoggerInterface $logger
+		SerializerInterface $serializer
 	) {
 		$this->broker = $broker;
 		$this->serializer = $serializer;
 		$this->teamRepository = $teamRepository;
-		$this->logger = $logger;
-	}
-
-	/**
-	 * @param Message $commandQuery
-	 * @return bool
-	 */
-	public function support(Message $commandQuery): bool
-	{
-		return
-			($commandQuery->getHeaders()->getDestination() == config('broker.services.team_name')) &&
-			($commandQuery->getBody()['entity'] == config('broker.services.team_name'));
 	}
 
 	/**
@@ -60,19 +45,8 @@ class TeamInformation implements BrokerQueryEventInterface
 	 */
 	public function handle(Message $commandQuery): void
 	{
-		$this->logger->alert(
-			sprintf(
-				"Question %s by %s will handle by %s.",
-				$commandQuery->getHeaders()->getKey(),
-				$commandQuery->getHeaders()->getSource(),
-				__CLASS__
-			),
-			$this->serializer->normalize($commandQuery, 'array')
-		);
-		$this->logger->alert(
-			sprintf("%s handler in progress.", $commandQuery->getHeaders()->getKey()),
-			$this->serializer->normalize($commandQuery, 'array')
-		);
+		Question::handled($commandQuery, $commandQuery->getHeaders()->getKey(), $commandQuery->getHeaders()->getSource(), __CLASS__);
+		Question::processing($commandQuery, $commandQuery->getHeaders()->getKey());
 
 		$teamItem = $this->teamRepository->find(['id' => $commandQuery->getBody()['id']]);
 
@@ -94,11 +68,8 @@ class TeamInformation implements BrokerQueryEventInterface
 		$this->broker->flushMessages()->addMessage(
 			$commandQuery->getHeaders()->getKey(),
 			$this->serializer->serialize($message, 'json')
-		)->produceMessage(config('broker.topics.answer'));
+		)->produceMessage(config(sprintf('broker.topics.answer_%s', $commandQuery->getHeaders()->getSource())));
 
-		$this->logger->alert(
-			sprintf("%s handler completed successfully.", $commandQuery->getHeaders()->getKey()),
-			$this->serializer->normalize($message, 'array')
-		);
+		Question::succeeded($message, $commandQuery->getHeaders()->getKey());
 	}
 }

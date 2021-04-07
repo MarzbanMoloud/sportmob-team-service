@@ -10,10 +10,10 @@ use App\Models\ReadModels\TeamsMatch;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\Services\Logger\Event;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Carbon\Carbon;
-use Psr\Log\LoggerInterface;
 use Sentry\State\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -31,7 +31,6 @@ class MatchWasCreatedProjectorListener
 	private TeamsMatchRepository $teamsMatchRepository;
 	private SerializerInterface $serializer;
 	private HubInterface $sentryHub;
-	private LoggerInterface $logger;
 	private string $eventName;
 
 	/**
@@ -41,22 +40,19 @@ class MatchWasCreatedProjectorListener
 	 * @param TeamsMatchRepository $teamsMatchRepository
 	 * @param HubInterface $sentryHub
 	 * @param SerializerInterface $serializer
-	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		TeamsMatchRepository $teamsMatchRepository,
 		HubInterface $sentryHub,
-		SerializerInterface $serializer,
-		LoggerInterface $logger
+		SerializerInterface $serializer
 	) {
 		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->teamsMatchRepository = $teamsMatchRepository;
 		$this->sentryHub = $sentryHub;
-		$this->logger = $logger;
 	}
 
 	/**
@@ -82,17 +78,8 @@ class MatchWasCreatedProjectorListener
 			$this->broker->flushMessages()->addMessage(
 				self::BROKER_EVENT_KEY,
 				$this->serializer->serialize($message, 'json')
-			)->produceMessage(config('broker.topics.question'));
-
-			$this->logger->alert(
-				sprintf(
-					"%s handler needs to ask %s from %s",
-					$this->eventName,
-					self::BROKER_EVENT_KEY,
-					config('broker.services.competition_name')
-				),
-				$this->serializer->normalize($message, 'array')
-			);
+			)->produceMessage(config('broker.topics.question_competition'));
+			Event::needToAsk($message, $this->eventName, self::BROKER_EVENT_KEY, config('broker.services.competition_name'));
 			return;
 		}
 		$competitionName = $this->brokerMessageCacheService->getCompetitionName($event->identifier['competition']);
@@ -119,13 +106,7 @@ class MatchWasCreatedProjectorListener
 		try {
 			$this->teamsMatchRepository->persist($teamsMatchItem);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to update teamsMatch.'
-				), $this->serializer->normalize($teamsMatchItem, 'array')
-			);
+			Event::failed($teamsMatchItem, $this->eventName, 'Failed to update teamsMatch.');
 			$this->sentryHub->captureException($exception);
 		}
 	}

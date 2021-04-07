@@ -4,10 +4,12 @@
 namespace App\Services\BrokerCommandStrategy;
 
 
-use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
+use App\Listeners\Projection\MatchWasCreatedProjectorListener;
+use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
+use App\Listeners\Projection\TrophyProjectorListener;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandStrategyInterface;
+use App\Services\Logger\Answer;
 use App\ValueObjects\Broker\CommandQuery\Message;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -17,19 +19,14 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class BrokerCommandContext implements BrokerCommandStrategyInterface
 {
-	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
 
 	/**
 	 * BrokerCommandContext constructor.
-	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
-	public function __construct(
-		LoggerInterface $logger,
-		SerializerInterface $serializer
-	) {
-		$this->logger = $logger;
+	public function __construct(SerializerInterface $serializer)
+	{
 		$this->serializer = $serializer;
 	}
 
@@ -39,19 +36,19 @@ class BrokerCommandContext implements BrokerCommandStrategyInterface
      */
     public function handle(Message $message): void
     {
-		$this->logger->alert(
-			sprintf("Answer %s by %s received.", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
-			$this->serializer->normalize($message, 'array')
-		);
-        foreach (app()->tagged(BrokerCommandEventInterface::TAG_NAME) as $event) {
-            if ($event->support($message->getHeaders())) {
-                $event->handle($message);
-                return;
-            }
+		$strategies = [
+			PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY => PlayerWasTransferredUpdateInfo::class,
+			TrophyProjectorListener::BROKER_EVENT_KEY => TrophyUpdateInfo::class,
+			MatchWasCreatedProjectorListener::BROKER_EVENT_KEY => MatchWasCreatedUpdatedInfo::class,
+		];
+        Answer::received($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource());
+
+        if ( !isset($strategies[$message->getHeaders()->getKey()]) ) {
+            Answer::rejected($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource(), 'lack of ownership');
+            return;
         }
-		$this->logger->alert(
-			sprintf("Answer %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
-			$this->serializer->normalize($message, 'array')
-		);
+
+        $eventClass = $strategies[$message->getHeaders()->getKey()];
+        app($eventClass)->handle($message);
     }
 }

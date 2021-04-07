@@ -9,10 +9,9 @@
 namespace App\Services\EventStrategy;
 
 
-use App\Services\EventStrategy\Interfaces\EventInterface;
 use App\Services\EventStrategy\Interfaces\EventStrategyInterface;
+use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\Message;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -22,19 +21,14 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class EventContext implements EventStrategyInterface
 {
-	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
 
 	/**
 	 * EventContext constructor.
-	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
-	public function __construct(
-		LoggerInterface $logger,
-		SerializerInterface $serializer
-	) {
-		$this->logger = $logger;
+	public function __construct(SerializerInterface $serializer)
+	{
 		$this->serializer = $serializer;
 	}
 
@@ -44,19 +38,24 @@ class EventContext implements EventStrategyInterface
      */
     public function handle(Message $message)
     {
-		$this->logger->alert(
-			sprintf("Event %s received.", $message->getHeaders()->getEvent()),
-			$this->serializer->normalize($message, 'array')
-		);
-        foreach (app()->tagged(EventInterface::TAG_NAME) as $event) {
-            if ($event->support($message)) {
-                $event->handle($message->getBody());
-                return;
-            }
+		$strategies = [
+			config('mediator-event.events.team_was_created') => TeamWasCreated::class,
+			config('mediator-event.events.team_was_updated') => TeamWasUpdated::class,
+			config('mediator-event.events.player_was_transferred') => PlayerWasTransferred::class,
+			config('mediator-event.events.team_became_runner_up') => TeamBecameRunnerUp::class,
+			config('mediator-event.events.team_became_winner') => TeamBecameWinner::class,
+			config('mediator-event.events.match_was_created') => MatchWasCreated::class,
+			config('mediator-event.events.match_finished') => MatchFinished::class,
+			config('mediator-event.events.match_status_changed') => MatchStatusChanged::class,
+		];
+        Event::received($message, $message->getHeaders()->getEvent());
+
+        if ( !isset($strategies[$message->getHeaders()->getEvent()]) ) {
+            Event::rejected($message, $message->getHeaders()->getEvent(), 'lack of ownership');
+            return;
         }
-		$this->logger->alert(
-			sprintf("Event %s rejected (lack of ownership).", $message->getHeaders()->getEvent()),
-			$this->serializer->normalize($message, 'array')
-		);
+
+        $eventClass = $strategies[$message->getHeaders()->getEvent()];
+        app($eventClass)->handle($message->getBody());
     }
 }

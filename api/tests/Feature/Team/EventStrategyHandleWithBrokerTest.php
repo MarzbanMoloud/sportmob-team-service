@@ -73,7 +73,7 @@ class EventStrategyHandleWithBrokerTest extends TestCase
 		$result = $this->brokerService->addMessage(
 			config('mediator-event.events.team_was_created'),
 			$this->serializer->serialize($message, 'json')
-		)->produceMessage(config('broker.topics.event'));
+		)->produceMessage(config('broker.topics.event_team_was_created'));
 		$this->assertEquals(true, $result);
 
 		Artisan::call('broker:consume:mediator 10 10');

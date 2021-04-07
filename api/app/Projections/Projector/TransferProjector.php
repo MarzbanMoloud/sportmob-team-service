@@ -17,9 +17,9 @@ use App\Models\Repositories\TransferRepository;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\Services\Cache\TransferCacheService;
+use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use DateTimeImmutable;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -35,7 +35,6 @@ class TransferProjector
 	private TeamRepository $teamRepository;
 	private TeamCacheServiceInterface $teamCacheService;
 	private TransferService $transferService;
-	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
 	private TransferCacheServiceInterface $transferCacheService;
 	private string $eventName;
@@ -47,7 +46,6 @@ class TransferProjector
 	 * @param TeamCacheServiceInterface $teamCacheService
 	 * @param TransferService $transferService
 	 * @param TransferCacheServiceInterface $transferCacheService
-	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
@@ -56,14 +54,12 @@ class TransferProjector
 		TeamCacheServiceInterface $teamCacheService,
 		TransferService $transferService,
 		TransferCacheServiceInterface $transferCacheService,
-		LoggerInterface $logger,
 		SerializerInterface $serializer
 	) {
 		$this->transferRepository = $transferRepository;
 		$this->teamRepository = $teamRepository;
 		$this->teamCacheService = $teamCacheService;
 		$this->transferService = $transferService;
-		$this->logger = $logger;
 		$this->serializer = $serializer;
 		$this->transferCacheService = $transferCacheService;
 	}
@@ -75,10 +71,7 @@ class TransferProjector
 	public function applyPlayerWasTransferred(MessageBody $body)
 	{
 		$this->eventName = config('mediator-event.events.player_was_transferred');
-		$this->logger->alert(
-			sprintf("%s handler in progress.", $this->eventName),
-			$this->serializer->normalize($body, 'array')
-		);
+		Event::processing($body, $this->eventName);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		$this->checkIdentifierValidation($body);
@@ -92,13 +85,7 @@ class TransferProjector
 		try {
 			$transferModel->prePersist();
 		} catch (ReadModelValidatorException $e) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'fromTeamId and toTeamId could not be null at same time.'
-				), $this->serializer->normalize($body, 'array')
-			);
+			Event::failed($body, $this->eventName, 'fromTeamId and toTeamId could not be null at same time.');
 		}
 		$this->persistTransfer($transferModel);
 		event(new PlayerWasTransferredProjectorEvent($transferModel));
@@ -110,10 +97,7 @@ class TransferProjector
 			$this->transferService->listByTeam($identifier['to'], $transferModel->getSeason());
 		} catch (\Exception $exception) {
 		}
-		$this->logger->alert(
-			sprintf("%s handler completed successfully.", $this->eventName),
-			$this->serializer->normalize($transferModel, 'array')
-		);
+		Event::succeeded($transferModel, $this->eventName);
 	}
 
 	/**
@@ -128,17 +112,9 @@ class TransferProjector
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($body->getIdentifiers()[$fieldName])) {
-				$this->logger->alert(
-					sprintf(
-						"%s handler failed because of %s",
-						$this->eventName,
-						sprintf("%s field is empty.", $prettyFieldName)
-					), $this->serializer->normalize($body, 'array')
-				);
-				throw new ProjectionException(
-					sprintf("%s field is empty.", $prettyFieldName),
-					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
-				);
+				$message = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($body, $this->eventName, $message);
+				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 	}
@@ -156,31 +132,15 @@ class TransferProjector
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($metadata[$fieldName])) {
-				$this->logger->alert(
-					sprintf(
-						"%s handler failed because of %s",
-						$this->eventName,
-						sprintf("%s field is empty.", $prettyFieldName)
-					), $this->serializer->normalize($body, 'array')
-				);
-				throw new ProjectionException(
-					sprintf("%s field is empty.", $prettyFieldName),
-					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
-				);
+				$message = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($body, $this->eventName, $message);
+				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 		if (is_null($metadata['active'])) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Active field is empty.'
-				), $this->serializer->normalize($body, 'array')
-			);
-			throw new ProjectionException(
-				'Active field is empty.',
-				ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
-			);
+			$message = 'Active field is empty.';
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 	}
 
@@ -197,15 +157,9 @@ class TransferProjector
 				try {
 					$teamsName[$field] = $this->findTeam($identifier[$field])->getName()->getOriginal();
 				} catch (\Throwable $exception) {
-					$this->logger->alert(
-						sprintf(
-							"%s handler failed because of %s",
-							$this->eventName,
-							sprintf('Could not find team by given Id :: %s', $identifier[$field])
-						), $identifier
-					);
-					throw new ProjectionException(sprintf('Could not find team by given Id :: %s',
-						$identifier[$field]), ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR, $exception);
+					$message = sprintf('Could not find team by given Id :: %s', $identifier[$field]);
+					Event::failed($identifier, $this->eventName, $message);
+					throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR, $exception);
 				}
 			}
 		}
@@ -261,14 +215,9 @@ class TransferProjector
 		try {
 			$this->transferRepository->persist($transferModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to persist transfer.'
-				), $this->serializer->normalize($transferModel, 'array')
-			);
-			throw new ProjectionException('Failed to persist transfer.', $exception->getCode(), $exception);
+			$message = 'Failed to persist transfer.';
+			Event::failed($transferModel, $this->eventName, $message);
+			throw new ProjectionException($message, $exception->getCode(), $exception);
 		}
 	}
 }

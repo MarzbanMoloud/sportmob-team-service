@@ -75,7 +75,7 @@ class TeamUpdatedListener
 		$this->broker->addMessage(
 			config('mediator-event.events.team_was_updated'),
 			$this->serializer->serialize($message, 'json')
-		)->produceMessage(config('broker.topics.event'));
+		)->produceMessage(config('broker.topics.event_team_was_updated'));
 		/**
 		 * Remove Team cache.
 		 */

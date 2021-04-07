@@ -25,13 +25,6 @@
         <env name="AWS_REGION" value="eu-west-2"/>
         <env name="AWS_VERSION" value="latest"/>
         <!--Broker-->
-        <env name="BROKER_PRODUCER_CLIENT_ID" value="team_service"/>
-        <env name="BROKER_PRODUCER_SOCKET_BLOCKING_MAX_MS" value="100"/>
-        <env name="BROKER_PRODUCER_MESSAGE_TIMEOUT_MS" value="300000"/>
-        <env name="BROKER_PRODUCER_POLL_TIMEOUT" value="0"/>
-        <env name="BROKER_CONSUMER_GROUP_ID" value="teamGroup"/>
-        <env name="BROKER_CONSUMER_OFFSET_STORE_METHOD" value="broker"/>
-        <env name="BROKER_CONSUMER_AUTO_OFFSET_RESET" value="smallest"/>
         <env name="BROKER_HOST" value="broker:9092"/>
         <env name="BROKER_SERVICE_PLAYER_NAME" value="player"/>
         <env name="BROKER_SERVICE_TEAM_NAME" value="team"/>
@@ -39,10 +32,29 @@
         <env name="BROKER_SERVICE_TOURNAMENT_NAME" value="tournament"/>
         <env name="BROKER_SERVICE_COACH_NAME" value="coach"/>
         <env name="VISIBILITY_TIMEOUT_MESSAGE" value="20"/>
-        <env name="BROKER_TOPIC_EVENT" value="test_team_event_topic"/>
-        <env name="BROKER_TOPIC_QUESTION" value="test_team_question_topic"/>
-        <env name="BROKER_TOPIC_ANSWER" value="test_team_answer_topic"/>
+        <!--Topic-Event-->
+        <env name="BROKER_TOPIC_TEAM_WAS_CREATED" value="test_team_team_was_created_topic"/>
+        <env name="BROKER_TOPIC_TEAM_WAS_UPDATED" value="test_team_team_was_updated_topic"/>
+        <env name="BROKER_TOPIC_PLAYER_WAS_TRANSFERRED" value="test_team_player_was_transferred_topic"/>
+        <env name="BROKER_TOPIC_TEAM_BECAME_RUNNER_UP" value="test_team_team_became_runner_up_topic"/>
+        <env name="BROKER_TOPIC_TEAM_BECAME_WINNER" value="test_team_team_became_winner_topic"/>
+        <env name="BROKER_TOPIC_MATCH_WAS_CREATED" value="test_team_match_was_created_topic"/>
+        <env name="BROKER_TOPIC_MATCH_FINISHED" value="test_team_match_finished_topic"/>
+        <env name="BROKER_TOPIC_MATCH_STATUS_CHANGED" value="test_team_match_status_changed_topic"/>
+        <!--Topic-Question-->
+        <env name="BROKER_TOPIC_TOURNAMENT_QUESTION" value="test_team_question_tournament_topic"/>
+        <env name="BROKER_TOPIC_PLAYER_QUESTION" value="test_team_question_player_topic"/>
+        <env name="BROKER_TOPIC_TEAM_QUESTION" value="test_team_question_team_topic"/>
+        <env name="BROKER_TOPIC_COMPETITION_QUESTION" value="test_team_question_competition_topic"/>
+        <env name="BROKER_TOPIC_COACH_QUESTION" value="test_team_question_coach_topic"/>
+        <!--Topic-Answer-->
+        <env name="BROKER_TOPIC_TEAM_ANSWER" value="test_team_answer_team_topic"/>
+        <env name="BROKER_TOPIC_MATCH_ANSWER" value="test_team_answer_match_topic"/>
+        <env name="BROKER_TOPIC_COMPETITION_ANSWER" value="test_team_answer_competition_topic"/>
+        <env name="BROKER_TOPIC_PLAYER_ANSWER" value="test_team_player_answer_topic"/>
+        <!--Topic-Notification-->
         <env name="BROKER_TOPIC_NOTIFICATION" value="test_team_notification_topic"/>
+        <!--Queue-->
         <env name="BROKER_QUEUE_EVENT" value="test_team_event_queue"/>
         <env name="BROKER_QUEUE_QUESTION" value="test_team_question_queue"/>
         <env name="BROKER_QUEUE_ANSWER" value="test_team_answer_queue"/>

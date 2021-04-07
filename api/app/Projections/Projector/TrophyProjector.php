@@ -15,8 +15,8 @@ use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TrophyRepository;
 use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\Services\Cache\TrophyCacheService;
+use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\MessageBody;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -29,7 +29,6 @@ class TrophyProjector
 	private TrophyRepository $trophyRepository;
 	private TeamRepository $teamRepository;
 	private TrophyService $trophyService;
-	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
 	private TrophyCacheServiceInterface $trophyCacheService;
 	private string $eventName;
@@ -40,7 +39,6 @@ class TrophyProjector
 	 * @param TeamRepository $teamRepository
 	 * @param TrophyService $trophyService
 	 * @param TrophyCacheServiceInterface $trophyCacheService
-	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
 	public function __construct(
@@ -48,13 +46,11 @@ class TrophyProjector
 		TeamRepository $teamRepository,
 		TrophyService $trophyService,
 		TrophyCacheServiceInterface $trophyCacheService,
-		LoggerInterface $logger,
 		SerializerInterface $serializer
 	) {
 		$this->trophyRepository = $trophyRepository;
 		$this->teamRepository = $teamRepository;
 		$this->trophyService = $trophyService;
-		$this->logger = $logger;
 		$this->serializer = $serializer;
 		$this->trophyCacheService = $trophyCacheService;
 	}
@@ -66,10 +62,7 @@ class TrophyProjector
 	public function applyTeamBecameWinner(MessageBody $body): void
 	{
 		$this->eventName = config('mediator-event.events.team_became_winner');
-		$this->logger->alert(
-			sprintf("%s handler in progress.", $this->eventName),
-			$this->serializer->normalize($body, 'array')
-		);
+		Event::processing($body, $this->eventName);
 		$this->applyEventByPosition($body, Trophy::POSITION_WINNER);
 	}
 
@@ -80,10 +73,7 @@ class TrophyProjector
 	public function applyTeamBecameRunnerUp(MessageBody $body): void
 	{
 		$this->eventName = config('mediator-event.events.team_became_runner_up');
-		$this->logger->alert(
-			sprintf("%s handler in progress.", $this->eventName),
-			$this->serializer->normalize($body, 'array')
-		);
+		Event::processing($body, $this->eventName);
 		$this->applyEventByPosition($body, Trophy::POSITION_RUNNER_UP);
 	}
 
@@ -98,14 +88,9 @@ class TrophyProjector
 		$this->checkIdentifiersValidation($body);
 		/** @var Team $team */
 		if (!$team = $this->teamRepository->find(['id' => $identifiers['team']])) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					sprintf('Could not find team by given Id : %s', $identifiers['team'])
-				), $this->serializer->normalize($body, 'array')
-			);
-			throw new ProjectionException(sprintf('Could not find team by given Id : %s', $identifiers['team']));
+			$message = sprintf('Could not find team by given Id : %s', $identifiers['team']);
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message);
 		}
 		$trophyModel = $this->createTrophyModel($identifiers, $team, $position);
 		$trophyModel->prePersist();
@@ -119,10 +104,7 @@ class TrophyProjector
 			$this->trophyService->getTrophiesByCompetition($identifiers['competition']);
 		} catch (\Exception $e) {
 		}
-		$this->logger->alert(
-			sprintf("%s handler completed successfully.", $this->eventName),
-			$this->makeContextForLog($trophyModel)
-		);
+		Event::succeeded($trophyModel, $this->eventName);
 	}
 
 	/**
@@ -138,17 +120,9 @@ class TrophyProjector
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($body->getIdentifiers()[$fieldName])) {
-				$this->logger->alert(
-					sprintf(
-						"%s handler failed because of %s",
-						$this->eventName,
-						sprintf("%s field is empty.", $prettyFieldName)
-					), $this->serializer->normalize($body, 'array')
-				);
-				throw new ProjectionException(
-					sprintf("%s field is empty.", $prettyFieldName),
-					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
-				);
+				$message = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($body, $this->eventName, $message);
+				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 	}
@@ -178,14 +152,9 @@ class TrophyProjector
 		try {
 			$this->trophyRepository->persist($trophyModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to persist trophy.'
-				), $this->makeContextForLog($trophyModel)
-			);
-			throw new ProjectionException('Failed to persist trophy.', $exception->getCode(), $exception);
+			$message = 'Failed to persist trophy.';
+			Event::failed($this->makeContextForLog($trophyModel), $this->eventName, $message);
+			throw new ProjectionException($message, $exception->getCode(), $exception);
 		}
 	}
 

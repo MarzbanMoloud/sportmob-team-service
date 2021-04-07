@@ -7,13 +7,7 @@ namespace App\Providers;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Response\ResponseService;
 use App\Services\AWS\BrokerService;
-use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandEventInterface;
-use App\Services\BrokerCommandStrategy\MatchWasCreatedUpdatedInfo;
-use App\Services\BrokerCommandStrategy\PlayerWasTransferredUpdateInfo;
-use App\Services\BrokerCommandStrategy\TrophyUpdateInfo;
 use App\Services\BrokerInterface;
-use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
-use App\Services\BrokerQueryStrategy\TeamInformation;
 use App\Services\Cache\BrokerMessageCacheService;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
@@ -24,15 +18,6 @@ use App\Services\Cache\TeamCacheService;
 use App\Services\Cache\TeamsMatchCacheService;
 use App\Services\Cache\TransferCacheService;
 use App\Services\Cache\TrophyCacheService;
-use App\Services\EventStrategy\Interfaces\EventInterface;
-use App\Services\EventStrategy\MatchFinished;
-use App\Services\EventStrategy\MatchStatusChanged;
-use App\Services\EventStrategy\MatchWasCreated;
-use App\Services\EventStrategy\PlayerWasTransferred;
-use App\Services\EventStrategy\TeamBecameRunnerUp;
-use App\Services\EventStrategy\TeamBecameWinner;
-use App\Services\EventStrategy\TeamWasCreated;
-use App\Services\EventStrategy\TeamWasUpdated;
 use Illuminate\Support\ServiceProvider;
 use Sentry\SentrySdk;
 use SportMob\Translation\Client;
@@ -45,6 +30,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+
 
 /**
  * Class AppServiceProvider
@@ -78,30 +64,6 @@ class AppServiceProvider extends ServiceProvider
     	    BrokerInterface::class,
             BrokerService::class
         );
-
-    	/*------ Event Mediator Strategy ------*/
-        $this->app->tag([
-        	TeamWasCreated::class,
-			TeamWasUpdated::class,
-			PlayerWasTransferred::class,
-			TeamBecameRunnerUp::class,
-			TeamBecameWinner::class,
-			MatchWasCreated::class,
-			MatchFinished::class,
-			MatchStatusChanged::class,
-        ], [EventInterface::TAG_NAME]);
-
-        /*------ Broker Command Strategy ------*/
-        $this->app->tag([
-        	PlayerWasTransferredUpdateInfo::class,
-			TrophyUpdateInfo::class,
-			MatchWasCreatedUpdatedInfo::class
-        ], [BrokerCommandEventInterface::TAG_NAME]);
-
-        /*------ Broker Query Strategy ------*/
-        $this->app->tag([
-        	TeamInformation::class
-        ], [BrokerQueryEventInterface::TAG_NAME]);
 
         /*------ Services ------*/
 		$this->app->singleton(

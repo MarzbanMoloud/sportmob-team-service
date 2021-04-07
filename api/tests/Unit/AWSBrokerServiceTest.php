@@ -14,26 +14,37 @@ class AWSBrokerServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->createApplication();
-        $this->setupAWSBroker();
+        config(['broker.topics.eventAWSBrokerServiceTest' => env('APP_NAME', 'Lumen') . 'AWSBrokerServiceTest']);
+    }
+
+    protected function tearDown(): void
+    {
+        sleep(60); //Because of you must wait 60 seconds after deleting a queue before you can create another with the same name.
+
+        $this->removeBrokerByTopicName(config('broker.topics.eventAWSBrokerServiceTest'));
     }
 
     public function testProduceMessage()
     {
-        $FirstMessage  = [
+        config(['broker.topics.eventAWSBrokerServiceTest' => env('APP_NAME', 'Lumen') . 'AWSBrokerServiceTest']);
+        $this->setupAWSBroker();
+
+        $FirstMessage = [
             'FirstName' => 'John',
-            'Date'      => microtime()
+            'Date' => microtime()
         ];
         $SecondMessage = [
             'LastName' => 'Smith',
-            'Date'     => microtime()
+            'Date' => microtime()
         ];
-        $this->brokerService->addMessage( 'TestFromLocalMessage', json_encode( $FirstMessage ) )
-                            ->addMessage( 'TestFromLocalMessage', json_encode( $SecondMessage ) )
-                            ->produceMessage( config('broker.topics.event') );
-        $Messages = $this->brokerService->consumePureMessage( [ config('broker.queues.event') ], 1 );
-        $this->assertCount( 2, $Messages );
-        $this->assertEquals( $FirstMessage, json_decode( $Messages[ 0 ], true ) );
-        $this->assertEquals( $SecondMessage, json_decode( $Messages[ 1 ], true ) );
+        $this->brokerService
+            ->addMessage('TestFromLocalMessage', json_encode($FirstMessage))
+            ->addMessage('TestFromLocalMessage', json_encode($SecondMessage))
+            ->produceMessage(config('broker.topics.eventAWSBrokerServiceTest'));
+        $Messages = $this->brokerService->consumePureMessage([config('broker.queues.event')], 1);
+        $this->assertCount(2, $Messages);
+        $this->assertEquals($FirstMessage, json_decode($Messages[0], true));
+        $this->assertEquals($SecondMessage, json_decode($Messages[1], true));
     }
 
 }

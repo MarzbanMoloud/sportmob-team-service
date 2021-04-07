@@ -25,12 +25,12 @@ class Handler extends ExceptionHandler
      *
      * @var array
      */
-    protected $dontReport = [
-        AuthorizationException::class,
-        HttpException::class,
-        ModelNotFoundException::class,
-        ValidationException::class
-    ];
+	protected $dontReport = [
+		AuthorizationException::class,
+		HttpException::class,
+		ModelNotFoundException::class,
+		ValidationException::class
+	];
 
     /**
      * Report or log an exception.
@@ -79,7 +79,7 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof DynamoDBRepositoryException) {
             return response()->json([
-                'message' => 'unprocessable_request.',
+                'message' => 'Unprocessable request.',
                 'code' => config('common.error_codes.unprocessable_request')
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }

@@ -59,7 +59,7 @@ class QueryStrategyHandle extends TestCase
 		$this->brokerService->addMessage(
 			'GetTeamInformation',
 			$this->serializer->serialize($message, 'json')
-		)->produceMessage(config('broker.topics.question'));
+		)->produceMessage(config('broker.topics.question_team'));
 
 		Artisan::call('broker:consume:query 10 10');
 
@@ -101,7 +101,7 @@ class QueryStrategyHandle extends TestCase
 		$this->brokerService->addMessage(
 			'GetTeamInformation',
 			$this->serializer->serialize($message, 'json')
-		)->produceMessage(config('broker.topics.question'));
+		)->produceMessage(config('broker.topics.question_team'));
 
 		Artisan::call('broker:consume:query 10 10');
 

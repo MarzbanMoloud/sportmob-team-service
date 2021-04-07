@@ -11,11 +11,11 @@ use App\Listeners\Traits\PlayerWasTransferredNotificationTrait;
 use App\Models\Repositories\TransferRepository;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
+use App\Services\Logger\Event;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Carbon\Carbon;
 use DateTimeInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -34,7 +34,6 @@ class PlayerWasTransferredProjectorListener
 	private SerializerInterface $serializer;
 	private BrokerMessageCacheServiceInterface $brokerMessageCacheService;
 	private TransferRepository $transferRepository;
-	private LoggerInterface $logger;
 
 	/**
 	 * PlayerWasTransferredProjectorListener constructor.
@@ -42,20 +41,17 @@ class PlayerWasTransferredProjectorListener
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param TransferRepository $transferRepository
 	 * @param SerializerInterface $serializer
-	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		TransferRepository $transferRepository,
-		SerializerInterface $serializer,
-		LoggerInterface $logger
+		SerializerInterface $serializer
 	) {
 		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->transferRepository = $transferRepository;
-		$this->logger = $logger;
 	}
 
 	/**
@@ -84,17 +80,8 @@ class PlayerWasTransferredProjectorListener
 			$this->broker->flushMessages()->addMessage(
 				self::BROKER_EVENT_KEY,
 				$this->serializer->serialize($message, 'json')
-			)->produceMessage(config('broker.topics.question'));
-
-			$this->logger->alert(
-				sprintf(
-					"%s handler needs to ask %s from %s",
-					$eventName,
-					self::BROKER_EVENT_KEY,
-					config('broker.services.player_name')
-				),
-				$this->serializer->normalize($message, 'array')
-			);
+			)->produceMessage(config('broker.topics.question_player'));
+			Event::needToAsk($message, $eventName, self::BROKER_EVENT_KEY, config('broker.services.player_name'));
 			return;
 		}
 		$playerInfo = $this->brokerMessageCacheService->getPlayerInfo($event->transfer->getPlayerId());
@@ -104,14 +91,9 @@ class PlayerWasTransferredProjectorListener
 		try {
 			$this->transferRepository->persist($event->transfer);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$eventName,
-					'Failed to update transfer.'
-				), $this->serializer->normalize($event->transfer, 'array')
-			);
-			throw new ProjectionException('Failed to update transfer.', $exception->getCode());
+			$message = 'Failed to update transfer.';
+			Event::failed($event->transfer, $eventName, $message);
+			throw new ProjectionException($message, $exception->getCode());
 		}
 		if (strpos($event->transfer->getSeason(), date('Y')) != false) {
 			$this->sendNotification($event->transfer, self::BROKER_NOTIFICATION_KEY);

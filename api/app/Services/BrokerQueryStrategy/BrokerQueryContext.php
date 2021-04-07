@@ -4,10 +4,9 @@
 namespace App\Services\BrokerQueryStrategy;
 
 
-use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryEventInterface;
 use App\Services\BrokerQueryStrategy\Interfaces\BrokerQueryStrategyInterface;
+use App\Services\Logger\Question;
 use App\ValueObjects\Broker\CommandQuery\Message;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -17,19 +16,14 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class BrokerQueryContext implements BrokerQueryStrategyInterface
 {
-	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
 
 	/**
 	 * BrokerQueryContext constructor.
-	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 */
-	public function __construct(
-		LoggerInterface $logger,
-		SerializerInterface $serializer
-	) {
-		$this->logger = $logger;
+	public function __construct(SerializerInterface $serializer)
+	{
 		$this->serializer = $serializer;
 	}
 
@@ -39,20 +33,17 @@ class BrokerQueryContext implements BrokerQueryStrategyInterface
      */
     public function handle(Message $message)
     {
-		$this->logger->alert(
-			sprintf("Question %s by %s received.", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
-			$this->serializer->normalize($message, 'array')
-		);
+		$strategies = [
+			config('broker.services.team_name') => TeamInformation::class,
+		];
+        Question::received($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource());
 
-        foreach (app()->tagged(BrokerQueryEventInterface::TAG_NAME) as $event) {
-            if ($event->support($message)) {
-                $event->handle($message);
-                return;
-            }
+        if ( !isset($strategies[$message->getBody()['entity']]) ) {
+            Question::rejected($message, $message->getHeaders()->getKey(), $message->getHeaders()->getSource(), 'lack of ownership');
+            return;
         }
-		$this->logger->alert(
-			sprintf("Question %s by %s rejected (lack of ownership).", $message->getHeaders()->getKey(), $message->getHeaders()->getSource()),
-			$this->serializer->normalize($message, 'array')
-		);
+
+        $eventClass = $strategies[$message->getBody()['entity']];
+        app($eventClass)->handle($message);
     }
 }

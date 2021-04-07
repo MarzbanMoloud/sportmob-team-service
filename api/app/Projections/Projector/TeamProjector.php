@@ -24,9 +24,9 @@ use App\Services\Cache\Interfaces\TeamsMatchCacheServiceInterface;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\Services\Cache\TeamsMatchCacheService;
+use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use App\ValueObjects\ReadModel\TeamName;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Sentry\State\HubInterface;
 
@@ -38,7 +38,6 @@ use Sentry\State\HubInterface;
 class TeamProjector
 {
 	private TeamRepository $teamRepository;
-	private LoggerInterface $logger;
 	private SerializerInterface $serializer;
 	private TeamsMatchRepository $teamsMatchRepository;
 	private TeamsMatchCacheServiceInterface $teamsMatchCacheService;
@@ -64,7 +63,6 @@ class TeamProjector
 	 * @param TrophyRepository $trophyRepository
 	 * @param TrophyCacheServiceInterface $trophyCacheService
 	 * @param TrophyService $trophyService
-	 * @param LoggerInterface $logger
 	 * @param SerializerInterface $serializer
 	 * @param HubInterface $sentryHub
 	 */
@@ -79,12 +77,10 @@ class TeamProjector
 		TrophyRepository $trophyRepository,
 		TrophyCacheServiceInterface $trophyCacheService,
 		TrophyService $trophyService,
-		LoggerInterface $logger,
 		SerializerInterface $serializer,
 		HubInterface $sentryHub
 	) {
 		$this->teamRepository = $teamRepository;
-		$this->logger = $logger;
 		$this->serializer = $serializer;
 		$this->teamsMatchRepository = $teamsMatchRepository;
 		$this->sentryHub = $sentryHub;
@@ -105,31 +101,20 @@ class TeamProjector
 	public function applyTeamWasCreated(MessageBody $body): void
 	{
 		$this->eventName = config('mediator-event.events.team_was_created');
-		$this->logger->alert(
-			sprintf("%s handler in progress.", $this->eventName),
-			$this->serializer->normalize($body, 'array')
-		);
+		Event::processing($body, $this->eventName);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		if (empty($identifier['team'])) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Team field is empty.'
-				), $this->serializer->normalize($body, 'array')
-			);
-			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$message = 'Team field is empty.';
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		$this->checkMetadataValidation($body);
 		$this->checkItemExist($identifier['team']);
 		$teamModel = $this->createTeamModel($identifier['team'], $metadata);
 		$this->persistTeam($teamModel);
 		event(new TeamWasCreatedProjectorEvent($teamModel));
-		$this->logger->alert(
-			sprintf("%s handler completed successfully.", $this->eventName),
-			$this->serializer->normalize($teamModel, 'array')
-		);
+		Event::succeeded($teamModel, $this->eventName);
 	}
 
 	/**
@@ -139,41 +124,25 @@ class TeamProjector
 	public function applyTeamWasUpdated(MessageBody $body): void
 	{
 		$this->eventName = config('mediator-event.events.team_was_updated');
-		$this->logger->alert(
-			sprintf("%s handler in progress.", $this->eventName),
-			$this->serializer->normalize($body, 'array')
-		);
+		Event::processing($body, $this->eventName);
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
 		if (empty($identifier['team'])) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Team field is empty.'
-				), $this->serializer->normalize($body, 'array')
-			);
-			throw new ProjectionException('Team field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$message = 'Team field is empty.';
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		if (empty($metadata['fullName'])) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'FullName field is empty.'
-				), $this->serializer->normalize($body, 'array')
-			);
-			throw new ProjectionException('FullName field is empty.', ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$message = 'FullName field is empty.';
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		$teamModel = $this->checkItemNotExist($identifier['team'], $this->serializer->normalize($body, 'array'));
 		$teamModel = $this->updateTeamModel($teamModel, $metadata);
 		$this->persistTeam($teamModel);
 		event(new TeamWasUpdatedProjectorEvent($teamModel));
 		$this->updateOtherEntities($identifier['team'], $metadata);
-		$this->logger->alert(
-			sprintf("%s handler completed successfully.", $this->eventName),
-			$this->serializer->normalize($teamModel, 'array')
-		);
+		Event::succeeded($teamModel, $this->eventName);
 	}
 
 	/**
@@ -191,31 +160,15 @@ class TeamProjector
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($metadata[$fieldName])) {
-				$this->logger->alert(
-					sprintf(
-						"%s handler failed because of %s",
-						$this->eventName,
-						sprintf("%s field is empty.", $prettyFieldName)
-					), $this->serializer->normalize($body, 'array')
-				);
-				throw new ProjectionException(
-					sprintf("%s field is empty.", $prettyFieldName),
-					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
-				);
+				$message = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($body, $this->eventName, $message);
+				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 		if (is_null($metadata['active'])) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Active field is empty.'
-				), $this->serializer->normalize($body, 'array')
-			);
-			throw new ProjectionException(
-				sprintf("Active field is empty."),
-				ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR
-			);
+			$message = 'Active field is empty.';
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 	}
 
@@ -227,17 +180,9 @@ class TeamProjector
 	{
 		$teamItem = $this->teamRepository->find(['id' => $teamId]);
 		if ($teamItem) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					sprintf("Team already exist by following id: %s", $teamId)
-				), $this->serializer->normalize($teamItem, 'array')
-			);
-			throw new ProjectionException(
-				sprintf("Team already exist by following id: %s", $teamId),
-				ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR
-			);
+			$message = sprintf("Team already exist by following id: %s", $teamId);
+			Event::failed($teamItem, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR);
 		}
 	}
 
@@ -251,17 +196,9 @@ class TeamProjector
 	{
 		$teamItem = $this->teamRepository->find(['id' => $teamId]);
 		if (!$teamItem) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					sprintf("Team already not exist by following id: %s", $teamId)
-				), $body
-			);
-			throw new ProjectionException(
-				sprintf("Team already not exist by following id: %s", $teamId),
-				ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR
-			);
+			$message = sprintf("Team does not exist by following id: %s", $teamId);
+			Event::failed($body, $this->eventName, $message);
+			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR);
 		}
 		return $teamItem;
 	}
@@ -332,13 +269,7 @@ class TeamProjector
 						$status));
 					$this->teamsMatchService->getTeamsMatchInfo($team);
 				} catch (\Exception $e) {
-					$this->logger->alert(
-						sprintf(
-							"%s handler failed because of %s",
-							$this->eventName,
-							'Failed create or forget cache for teamsMatch.'
-						), $this->serializer->normalize($item, 'array')
-					);
+					Event::failed($item, $this->eventName, 'Failed create or forget cache for teamsMatch.');
 				}
 			}
 			$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByOpponentId($team);
@@ -358,13 +289,7 @@ class TeamProjector
 						$status));
 					$this->teamsMatchService->getTeamsMatchInfo($team);
 				} catch (\Exception $e) {
-					$this->logger->alert(
-						sprintf(
-							"%s handler failed because of %s",
-							$this->eventName,
-							'Failed create or forget cache for teamsMatch.'
-						), $this->serializer->normalize($item, 'array')
-					);
+					Event::failed($item, $this->eventName, 'Failed create or forget cache for teamsMatch.');
 				}
 			}
 		}
@@ -385,13 +310,7 @@ class TeamProjector
 				$this->transferCacheService->forget('transfer_by_*');//per playerId and teamId
 				$this->transferService->listByTeam($team);
 			} catch (\Exception $e) {
-				$this->logger->alert(
-					sprintf(
-						"%s handler failed because of %s",
-						$this->eventName,
-						'Failed create or forget cache for transfer.'
-					), $this->serializer->normalize($transfer, 'array')
-				);
+				Event::failed($transfer, $this->eventName, 'Failed create or forget cache for transfer.');
 			}
 		}
 		/**	Trophies */
@@ -406,13 +325,7 @@ class TeamProjector
 				$this->trophyCacheService->forget('trophies_by_*');//per teamId and competitionId.
 				$this->trophyService->getTrophiesByTeam($team);
 			} catch (\Exception $e) {
-				$this->logger->alert(
-					sprintf(
-						"%s handler failed because of %s",
-						$this->eventName,
-						'Failed create cache or forget for trophy.'
-					), $this->serializer->normalize($trophy, 'array')
-				);
+				Event::failed($trophy, $this->eventName, 'Failed create cache or forget for trophy.');
 			}
 		}
 	}
@@ -426,14 +339,9 @@ class TeamProjector
 		try {
 			$this->teamRepository->persist($teamModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to persist team.'
-				), $this->serializer->normalize($teamModel, 'array')
-			);
-			throw new ProjectionException('Failed to persist team.', $exception->getCode(), $exception);
+			$message = 'Failed to persist team.';
+			Event::failed($teamModel, $this->eventName, $message);
+			throw new ProjectionException($message, $exception->getCode(), $exception);
 		}
 	}
 
@@ -445,13 +353,8 @@ class TeamProjector
 		try {
 			$this->teamsMatchRepository->persist($teamsMatchModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to update teamsMatch.'
-				), $this->serializer->normalize($teamsMatchModel, 'array')
-			);
+			$message = 'Failed to update teamsMatch.';
+			Event::failed($teamsMatchModel, $this->eventName, $message);
 			$this->sentryHub->captureException($exception);
 		}
 	}
@@ -464,13 +367,7 @@ class TeamProjector
 		try {
 			$this->transferRepository->persist($transferModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to update transfer.'
-				), $this->serializer->normalize($transferModel, 'array')
-			);
+			Event::failed($transferModel, $this->eventName, 'Failed to update transfer.');
 			$this->sentryHub->captureException($exception);
 		}
 	}
@@ -483,13 +380,7 @@ class TeamProjector
 		try {
 			$this->trophyRepository->persist($trophyModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$this->logger->alert(
-				sprintf(
-					"%s handler failed because of %s",
-					$this->eventName,
-					'Failed to update trophy.'
-				), $this->serializer->normalize($trophyModel, 'array')
-			);
+			Event::failed($trophyModel, $this->eventName, 'Failed to update trophy.');
 			$this->sentryHub->captureException($exception);
 		}
 	}

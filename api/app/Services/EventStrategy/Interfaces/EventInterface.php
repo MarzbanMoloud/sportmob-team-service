@@ -11,7 +11,6 @@ namespace App\Services\EventStrategy\Interfaces;
 
 
 use App\ValueObjects\Broker\Mediator\MessageBody;
-use App\ValueObjects\Broker\Mediator\Message;
 
 
 /**
@@ -20,17 +19,6 @@ use App\ValueObjects\Broker\Mediator\Message;
  */
 interface EventInterface
 {
-    /**
-     *
-     */
-    const TAG_NAME = 'eventService';
-
-    /**
-     * @param Message $message
-     * @return bool
-     */
-    public function support(Message $message): bool;
-
     /**
      * @param MessageBody $body
      */
