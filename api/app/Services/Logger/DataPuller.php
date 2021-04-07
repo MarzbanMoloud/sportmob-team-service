@@ -2,13 +2,14 @@
 
 namespace App\Services\Logger;
 
+use App\Services\Logger\Interfaces\DispatchInterface;
 use App\Services\Logger\Interfaces\SmLoggerInterface;
 
 /**
  * Class DataPuller
  * @package App\Services\Logger
  */
-class DataPuller implements SmLoggerInterface
+class DataPuller implements SmLoggerInterface, DispatchInterface
 {
     use SmLoggerTrait;
 
@@ -18,10 +19,25 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function received($context, string $messageName, ?string $param2)
+	public static function received($context, string $messageName, ?string $param2 = null)
     {
         self::logger()->alert(
             sprintf('Message "%s" received from the data puller.', $messageName),
+            is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
+        );
+    }
+
+    /**
+     * @param $context
+     * @param string $param1
+     * @param string $param2
+     * @param string|null $param3
+     * @return mixed|void
+     */
+    public static function rejected($context, string $eventName, ?string $reason = 'there is no strategy', ?string $param3 = null)
+    {
+        self::logger()->alert(
+            sprintf('Message "%" rejected (%s)', $eventName, $reason),
             is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
         );
     }
@@ -33,7 +49,7 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function handled($context, string $messageName, string $handlerClassName, ?string $param3)
+	public static function handled($context, string $messageName, string $handlerClassName, ?string $param3 = null)
     {
         self::logger()->alert(
             sprintf('Message "%s" will handle by "%s".', $messageName, $handlerClassName),
@@ -60,10 +76,10 @@ class DataPuller implements SmLoggerInterface
 	 * @param $context
 	 * @return mixed|void
 	 */
-	public static function failed($context, string $messageName, string $reason)
+	public static function failed($context, string $handler, string $reason)
     {
         self::logger()->alert(
-            sprintf('%s" handler failed because of "%s".', $messageName, $reason),
+            sprintf('"%s" handler failed because "%s".', $handler, $reason),
             is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
         );
     }
@@ -77,6 +93,19 @@ class DataPuller implements SmLoggerInterface
     {
         self::logger()->alert(
             sprintf('"%s" handler completed successfully.', $messageName),
+            is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
+        );
+    }
+
+    /**
+     * @param mixed $context
+     * @param string $eventName
+     * @return mixed|void
+     */
+    public static function dispatched($context, string $eventName)
+    {
+        self::logger()->alert(
+            sprintf('Event "%"  was dispatched', $eventName),
             is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
         );
     }

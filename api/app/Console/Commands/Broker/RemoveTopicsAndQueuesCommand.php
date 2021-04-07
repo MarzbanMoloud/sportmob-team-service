@@ -86,30 +86,36 @@ class RemoveTopicsAndQueuesCommand extends Command
 
     private function deleteQueues(): void
     {
-        $queues = $this->sqsClient->listQueues()->get('QueueUrls') ?: [];
-        foreach ($queues as $queueUrl) {
-            foreach (config('broker.queues') as $key => $queue) {
-                if ($queueUrl == $queue) {
-                    $this->sqsClient->purgeQueue(['QueueUrl' => $queue]);
-                    $this->sqsClient->deleteQueue(['QueueUrl' => $queue]);
+        $nextToken = [];
+        do {
+            $queues = $this->sqsClient->listQueues($nextToken);
+
+            foreach ($queues->get('QueueUrls') ?: [] as $queueUrl) {
+                if (in_array($queueUrl, config('broker.queues'))) {
+                    $this->sqsClient->purgeQueue(['QueueUrl' => $queueUrl]);
+                    $this->sqsClient->deleteQueue(['QueueUrl' => $queueUrl]);
                 }
             }
-        }
+            $nextToken = $queues->get('NextToken') ? ['NextToken' => $queues->get('NextToken')] : null;
+        } while ($nextToken);
     }
 
     private function deleteTopics(): void
     {
-        foreach (array_map(function ($topic) {
-            return $topic['TopicArn'];
-        },
-            $this->snsClient->listTopics()->get('Topics')) as $topicArn) {
-            foreach (config('broker.topics') as $key => $topic) {
-                if ($topicArn == $topic) {
+        $nextToken = null;
+        do {
+            $result = $this->snsClient->listTopics([
+                'NextToken' => $nextToken
+            ]);
+
+            foreach ($result->get('Topics') ?: [] as $topicArn) {
+                if (in_array($topicArn['TopicArn'], config('broker.topics'))) {
                     $this->snsClient->deleteTopic([
-                        'TopicArn' => $topicArn
+                        'TopicArn' => $topicArn['TopicArn']
                     ]);
                 }
             }
-        }
+            $nextToken = $result->get('NextToken');
+        } while ($nextToken);
     }
 }
