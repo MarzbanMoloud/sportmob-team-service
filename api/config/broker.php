@@ -21,7 +21,6 @@ return [
         'event_match_status_changed' => env( 'BROKER_TOPIC_MATCH_STATUS_CHANGED', 'match_status_changed_topic' ),
 		'question_player'     => env( 'BROKER_TOPIC_PLAYER_QUESTION', 'player_question_topic' ),
 		'question_competition'     => env( 'BROKER_TOPIC_COMPETITION_QUESTION', 'competition_question_topic' ),
-		'question_tournament'     => env( 'BROKER_TOPIC_TOURNAMENT_QUESTION', 'tournament_question_topic' ),
 		'question_team'     => env( 'BROKER_TOPIC_TEAM_QUESTION', 'team_question_topic' ),
 		'answer_team'       => env( 'BROKER_TOPIC_TEAM_ANSWER', 'team_answer_topic' ),
 		'answer_match'       => env( 'BROKER_TOPIC_MATCH_ANSWER', 'match_answer_topic' ),

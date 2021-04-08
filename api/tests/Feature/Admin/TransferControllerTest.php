@@ -45,7 +45,7 @@ class TransferControllerTest extends TestCase
 		$this->persistBatchDataForListByPlayer($fakePlayerId, $fakePlayerName);
 		/** Read from DB */
 		$this->transferCacheService->flush();
-		$response = $this->json('GET', sprintf('/admin/transfers/players/%s', $fakePlayerId));
+		$response = $this->json('GET', sprintf('/admin/players/%s/transfers', $fakePlayerId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $transferItem) {
 			$this->assertNotNull($transferItem['id']);
@@ -71,7 +71,7 @@ class TransferControllerTest extends TestCase
 		}
 		/** Read from Cache */
 		$this->transferRepository->drop();
-		$response = $this->json('GET', sprintf('/admin/transfers/players/%s', $fakePlayerId));
+		$response = $this->json('GET', sprintf('/admin/players/%s/transfers', $fakePlayerId));
 		$response = json_decode($response->response->getContent(), true);
 		foreach ($response['data'] as $transferItem) {
 			$this->assertNotNull($transferItem['id']);
@@ -99,7 +99,7 @@ class TransferControllerTest extends TestCase
 
 	public function testIndexWhenItemNotExist()
 	{
-		$response = $this->json('GET', sprintf('/admin/transfers/players/%s', $this->faker->uuid));
+		$response = $this->json('GET', sprintf('/admin/players/%s/transfers', $this->faker->uuid));
 		$response->assertResponseStatus(Response::HTTP_NOT_FOUND);
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
@@ -113,7 +113,7 @@ class TransferControllerTest extends TestCase
 		$this->persistBatchDataForListByPlayer($fakePlayerId, $fakePlayerName);
 		$transferItem = $this->transferRepository->findByPlayerId($fakePlayerId);
 		$transferId = base64_encode(sprintf('%s#%s', $transferItem[0]->getPlayerId(), $transferItem[0]->getStartDate()->format(DateTimeInterface::ATOM)));
-		$response = $this->put('/admin/transfers/players/' . $transferId, [
+		$response = $this->put('/admin/players/transfers/' . $transferId, [
 			'marketValue' => '12.02$',
 			'announcedDate' => 1612693084,
 			'contractDate' => 1612693093,
@@ -138,7 +138,7 @@ class TransferControllerTest extends TestCase
 		$transferId = base64_encode(sprintf('%s#%s', $transferItem[0]->getPlayerId(), $transferItem[0]->getStartDate()->format(DateTimeInterface::ATOM)));
 		$validMarketValues = ['12.33$', '1233', '12.33'];
 		foreach ($validMarketValues as $value) {
-			$response = $this->put('/admin/transfers/players/' . $transferId, [
+			$response = $this->put('/admin/players/transfers/' . $transferId, [
 				'marketValue' => $value,
 				'announcedDate' => 1612693084,
 				'contractDate' => 1612693093,
@@ -147,7 +147,7 @@ class TransferControllerTest extends TestCase
 		}
 		$invalidMarketValues = ['12.33#', '12.33&', '12.33@', '12/33'];
 		foreach ($invalidMarketValues as $value) {
-			$response = $this->put('/admin/transfers/players/' . $transferId, [
+			$response = $this->put('/admin/players/transfers/' . $transferId, [
 				'marketValue' => $value,
 				'announcedDate' => 1612693084,
 				'contractDate' => 1612693093,
@@ -162,7 +162,7 @@ class TransferControllerTest extends TestCase
 	public function testUpdateWhenItemNotExist()
 	{
 		$transferId = base64_encode(sprintf('%s#%s', $this->faker->uuid, (new \DateTimeImmutable())->format(DateTimeInterface::ATOM)));
-		$response = $this->put('/admin/transfers/players/' . $transferId, [
+		$response = $this->put('/admin/players/transfers/' . $transferId, [
 			'marketValue' => '12.00$',
 			'announcedDate' => 1612693084,
 			'contractDate' => 1612693084,

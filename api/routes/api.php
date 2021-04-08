@@ -16,10 +16,9 @@ $router->group(['middleware' => 'logging'], function ($router) {
 			$router->get('/{team}', ['as' => 'admin-teams-show', 'uses' => 'TeamController@show']);
 			$router->put('/{team}', ['as' => 'admin-teams-update', 'uses' => 'TeamController@update']);
 		});
-		$router->group(['prefix' => '/transfers/players'], function ($router) {
-			$router->get('/{player}', ['as' => 'admin-transfers-players-index', 'uses' => 'TransferController@index']);
-			$router->put('/{transfer}',
-				['as' => 'admin-transfers-players-update', 'uses' => 'TransferController@update']);
+		$router->group(['prefix' => '/players'], function ($router) {
+			$router->get('/{player}/transfers', ['as' => 'admin-transfers-players-index', 'uses' => 'TransferController@index']);
+			$router->put('/transfers/{transfer}', ['as' => 'admin-transfers-players-update', 'uses' => 'TransferController@update']);
 		});
 	});
 

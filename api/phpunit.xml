@@ -42,7 +42,6 @@
         <env name="BROKER_TOPIC_MATCH_FINISHED" value="test_team_match_finished_topic"/>
         <env name="BROKER_TOPIC_MATCH_STATUS_CHANGED" value="test_team_match_status_changed_topic"/>
         <!--Topic-Question-->
-        <env name="BROKER_TOPIC_TOURNAMENT_QUESTION" value="test_team_question_tournament_topic"/>
         <env name="BROKER_TOPIC_PLAYER_QUESTION" value="test_team_question_player_topic"/>
         <env name="BROKER_TOPIC_TEAM_QUESTION" value="test_team_question_team_topic"/>
         <env name="BROKER_TOPIC_COMPETITION_QUESTION" value="test_team_question_competition_topic"/>

@@ -86,7 +86,7 @@ interface TeamControllerInterface
 	 *                          ),
 	 *                          @OA\Property(
 	 *                              property="active",
-	 *                              type="bool",
+	 *                              type="boolean",
 	 *                              example=false
 	 *                          ),
 	 *                          @OA\Property(
@@ -164,32 +164,8 @@ interface TeamControllerInterface
 	 *     ),
 	 *     @OA\Response(
 	 *          response=204,
-	 *          description="When the update is successful",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema()
-	 *         )
+	 *          description="When the update is successful"
 	 *     ),
-	 *     @OA\Response(
-	 *          response=404,
-	 *          description="When Resource not found",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema(
-	 *                  type="object",
-	 *                  @OA\Property(
-	 *                      property="message",
-	 *                      type="string",
-	 *                      example="Resource not found."
-	 *                  ),
-	 *                  @OA\Property(
-	 *                      property="code",
-	 *                      type="string",
-	 *                      example="TM-404"
-	 *                  ),
-	 *             )
-	 *         )
-	 *     )
 	 * )
 	 * @param string $team
 	 * @param Request $request

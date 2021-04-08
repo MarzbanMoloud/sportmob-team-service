@@ -15,7 +15,7 @@ interface TransferControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/admin/transfers/players/{player}",
+	 *     path="/admin/players/{player}/transfers",
 	 *     tags={"Admin"},
 	 *     @OA\Parameter(
 	 *         name="player",
@@ -99,7 +99,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Put(
-	 *     path="/admin/transfers/players/{transfer}",
+	 *     path="/admin/players/transfers/{transfer}",
 	 *     tags={"Admin"},
 	 *     @OA\Parameter(
 	 *          name="transfer",
@@ -134,11 +134,7 @@ interface TransferControllerInterface
 	 *     ),
 	 *     @OA\Response(
 	 *          response=204,
-	 *          description="When the update is successful",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema()
-	 *         )
+	 *          description="When the update is successful"
 	 *     ),
 	 *     @OA\Response(
 	 *          response=404,

@@ -403,12 +403,8 @@ interface TransferControllerInterface
 	 * 			)
 	 * 		),
 	 *     @OA\Response(
-	 *          response=202,
-	 *          description="When the update is successful",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema()
-	 *         )
+	 *          response=204,
+	 *          description="When the update is successful"
 	 *     ),
 	 *     @OA\Response(
 	 *          response=422,
