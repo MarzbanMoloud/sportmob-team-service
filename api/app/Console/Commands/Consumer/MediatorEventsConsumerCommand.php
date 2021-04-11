@@ -47,7 +47,7 @@ class MediatorEventsConsumerCommand extends Command
     {
         $this->checkValidation();
         $this->broker->addBroker(config('broker.host'))
-            ->consumeMessage([config('broker.ask.provider.topic')],
+            ->consumeMessage([config('broker.queues.event')],
                 (int) $this->argument('timeout'),
                 app(BrokerMediatorEvent::class),
                 (int) $this->argument('limit'));

@@ -44,7 +44,7 @@ class CommandEventsConsumerCommand extends Command
     {
         $this->checkValidation();
         $this->broker->addBroker(config('broker.host'))
-            ->consumeMessage([config('broker.ask.service.response.topic')],
+            ->consumeMessage([config('broker.queues.answer')],
                 (int) $this->argument('timeout'),
                 app(BrokerCommandEvent::class),
                 (int) $this->argument('limit'));
