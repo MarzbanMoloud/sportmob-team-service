@@ -98,24 +98,36 @@ trait AmazonBrokerTrait
     {
         $ExistTopics = [];
         $ExistQueues = [];
-        foreach (array_map(function ($topic) {
-            return $topic['TopicArn'];
-        },
-            $this->snsClient->listTopics()->get('Topics')) as $topicArn) {
-            foreach (config('broker.topics') as $key => $topic) {
-                if (strstr($topicArn, $topic)) {
-                    $ExistTopics[$key] = $topicArn;
+        $nextToken = null;
+        do {
+            $result = $this->snsClient->listTopics([
+                'NextToken' => $nextToken
+            ]);
+
+            foreach ($result->get('Topics') ?: [] as $topicArn) {
+                foreach (config('broker.topics') as $key => $topic) {
+                    if (strstr($topicArn['TopicArn'], $topic)) {
+                        $ExistTopics[$key] = $topicArn['TopicArn'];
+                    }
                 }
             }
-        }
-        $queues = $this->sqsClient->listQueues()->get('QueueUrls') ?: [];
-        foreach ($queues as $queueUrl) {
-            foreach (config('broker.queues') as $key => $queue) {
-                if (strstr($queueUrl, $queue)) {
-                    $ExistQueues[$key] = $queueUrl;
+            $nextToken = $result->get('NextToken');
+        } while ($nextToken);
+
+        $nextToken = [];
+        do {
+            $queues = $this->sqsClient->listQueues($nextToken);
+
+            foreach ($queues->get('QueueUrls') ?: [] as $queueUrl) {
+                foreach (config('broker.queues') as $key => $queue) {
+                    if (strstr($queueUrl, $queue)) {
+                        $ExistQueues[$key] = $queueUrl;
+                    }
                 }
             }
-        }
+            $nextToken = $queues->get('NextToken') ? ['NextToken' => $queues->get('NextToken')] : null;
+        } while ($nextToken);
+
         foreach ($ExistTopics as $key => $topic) {
             config([sprintf("broker.topics.%s", $key) => $topic]);
         }
