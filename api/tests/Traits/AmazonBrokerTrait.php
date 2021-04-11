@@ -62,7 +62,7 @@ trait AmazonBrokerTrait
             }
         }
 
-        if ($queues = array_diff_key (config('broker.queues'), $ExistQueues)) {
+        if ($queues = array_diff_key(config('broker.queues'), $ExistQueues)) {
             foreach ($queues as $key => $queue) {
                 $Queue = $this->sqsClient->createQueue([
                     'QueueName' => sprintf("%s.fifo", $queue),
@@ -148,11 +148,23 @@ trait AmazonBrokerTrait
 
     /**
      * @param string $topicName
+     * @param string $queueName
      */
-    private function removeBrokerByTopicName(string $topicName)
+    private function removeBrokerByTopicNameByQueueName(string $topicName, string $queueName)
     {
         $this->removeSubscriptionByTopicName($topicName);
         $this->removeTopicByTopicName($topicName);
+        $this->removeQueueByQueueName($queueName);
+    }
+
+    /**
+     * @param string $queueName
+     */
+    public function removeQueueByQueueName(string $queueName)
+    {
+        $this->sqsClient->deleteQueue([
+            'QueueUrl' => $queueName
+        ]);
     }
 
     /**
