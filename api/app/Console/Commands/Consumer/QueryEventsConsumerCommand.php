@@ -46,7 +46,8 @@ class QueryEventsConsumerCommand extends Command
     public function handle()
     {
         $this->checkValidation();
-        $this->broker->consumeMessage([config('broker.queues.question')],
+        $this->broker->addBroker(config('broker.host'))
+            ->consumeMessage([config('broker.queues.question')],
                 (int) $this->argument('timeout'),
                 app(BrokerQueryEvent::class),
                 (int) $this->argument('limit'));
