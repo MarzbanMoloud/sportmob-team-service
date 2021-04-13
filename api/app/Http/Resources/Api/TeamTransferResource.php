@@ -58,17 +58,17 @@ class TeamTransferResource extends JsonResource
 				'id' => base64_encode(sprintf('%s#%s', $transfer->getPlayerId(), $transfer->getStartDate()->format(DateTimeInterface::ATOM))),
 				'player' => [
 					'id' => $transfer->getPlayerId(),
-					'name' => $this->client->getByLang($transfer->getPlayerName(), $this->lang),
-					'position' => $this->client->getByLang($transfer->getPlayerPosition(), $this->lang)
+					'name' => ($transfer->getPlayerName()) ? $this->client->getByLang($transfer->getPlayerName(), $this->lang) : null,
+					'position' => ($transfer->getPlayerPosition()) ? $this->client->getByLang($transfer->getPlayerPosition(), $this->lang) : null
 				],
 				'team' => [
 					'to' => [
 						'id' => $transfer->getToTeamId(),
-						'name' => $this->client->getByLang($transfer->getToTeamName(), $this->lang)
+						'name' => ($transfer->getToTeamName()) ? $this->client->getByLang($transfer->getToTeamName(), $this->lang) : null
 					],
 					'from' => [
 						'id' => $transfer->getFromTeamId(),
-						'name' => $this->client->getByLang($transfer->getFromTeamName(), $this->lang)
+						'name' => ($transfer->getFromTeamName()) ? $this->client->getByLang($transfer->getFromTeamName(), $this->lang) : null
 					]
 				],
 				'marketValue' => $transfer->getMarketValue(),

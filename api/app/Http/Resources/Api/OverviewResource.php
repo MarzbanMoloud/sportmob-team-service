@@ -45,9 +45,9 @@ class OverviewResource extends JsonResource
 				'team' => [
 					'id' => $this->resource['team']['id'],
 					'name' => [
-						'original' => $this->client->getByLang($this->resource['team']['name']['original'], $this->lang),
-						'short' => $this->client->getByLang($this->resource['team']['name']['short'], $this->lang),
-						'official' => $this->client->getByLang($this->resource['team']['name']['official'], $this->lang),
+						'original' => ($this->resource['team']['name']['original']) ? $this->client->getByLang($this->resource['team']['name']['original'], $this->lang) : null,
+						'short' => ($this->resource['team']['name']['short']) ? $this->client->getByLang($this->resource['team']['name']['short'], $this->lang) : null,
+						'official' => ($this->resource['team']['name']['official']) ? $this->client->getByLang($this->resource['team']['name']['official'], $this->lang) : null,
 					]
 				],
 				TeamsMatch::STATUS_UPCOMING => $this->makeUpcomingData(),
@@ -69,21 +69,21 @@ class OverviewResource extends JsonResource
 			return [
 				'competition' => [
 					'id' => $upcoming->getCompetitionId(),
-					'name' => $this->client->getByLang($upcoming->getCompetitionName(), $this->lang)
+					'name' => ($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
 				],
 				'team' => [
 					'home' => [
 						'id' => $upcoming->getTeamId(),
 						'name' => [
-							'original' => $this->client->getByLang($upcoming->getTeamName()->getOriginal(), $this->lang),
-							'short' => $this->client->getByLang($upcoming->getTeamName()->getShort(), $this->lang),
+							'original' => ($upcoming->getTeamName()->getOriginal()) ? $this->client->getByLang($upcoming->getTeamName()->getOriginal(), $this->lang) : null,
+							'short' => ($upcoming->getTeamName()->getShort()) ? $this->client->getByLang($upcoming->getTeamName()->getShort(), $this->lang) : null,
 						]
 					],
 					'away' => [
 						'id' => $upcoming->getOpponentId(),
 						'name' => [
-							'original' => $this->client->getByLang($upcoming->getOpponentName()->getOriginal(), $this->lang),
-							'short' => $this->client->getByLang($upcoming->getOpponentName()->getShort(), $this->lang)
+							'original' => ($upcoming->getOpponentName()->getOriginal()) ? $this->client->getByLang($upcoming->getOpponentName()->getOriginal(), $this->lang) : null,
+							'short' => ($upcoming->getOpponentName()->getShort()) ? $this->client->getByLang($upcoming->getOpponentName()->getShort(), $this->lang) : null
 						]
 					]
 				],
@@ -106,8 +106,8 @@ class OverviewResource extends JsonResource
 					'team' => [
 						'id' => $teamsMatch->getOpponentId(),
 						'name' => [
-							'original' => $this->client->getByLang($teamsMatch->getOpponentName()->getOriginal(), $this->lang),
-							'short' => $this->client->getByLang($teamsMatch->getOpponentName()->getShort(), $this->lang),
+							'original' => ($teamsMatch->getOpponentName()->getOriginal()) ? $this->client->getByLang($teamsMatch->getOpponentName()->getOriginal(), $this->lang) : null,
+							'short' => ($teamsMatch->getOpponentName()->getShort()) ? $this->client->getByLang($teamsMatch->getOpponentName()->getShort(), $this->lang) : null,
 						]
 					],
 					'date' => TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
