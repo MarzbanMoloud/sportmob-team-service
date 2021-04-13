@@ -80,12 +80,7 @@
         <env name="EVENT_MATCH_FINISHED" value="MatchFinished"/>
         <env name="EVENT_MATCH_STATUS_CHANGED" value="MatchStatusChanged"/>
         <!-- Monolog-->
-        <env name="MONOLOG_INDEX" value="sportmob_log"/>
-        <env name="ELASTIC_HOST" value="62.75.148.72"/>
-        <env name="ELASTIC_PORT" value="29200"/>
-        <env name="ELASTIC_TRANSPORT" value="http"/>
-        <env name="ELASTIC_USERNAME" value="a.tavakoli@tgbsco.com"/>
-        <env name="ELASTIC_PASSWORD" value="Admin1@3"/>
+        <env name="MONOLOG_INDEX" value="sportmob_log_test"/>
         <!-- Sentry-->
         <env name="SENTRY_DSN" value="http://07a0bb4f72904898a2112abe06feffbd@sentry.sportmob.com/2"/>
     </php>
