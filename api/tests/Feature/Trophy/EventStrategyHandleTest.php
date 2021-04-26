@@ -132,7 +132,7 @@ class EventStrategyHandleTest extends TestCase
 		$runner = ($trophies[0]->getPosition() == Trophy::POSITION_RUNNER_UP) ? $trophies[0]: $trophies[1];
 
 		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['team'], $winner->getTeamId());
-		$this->assertEquals($fakeTeamModelWinner->getName()->getOfficial(), $winner->getTeamName());
+		$this->assertEquals($fakeTeamModelWinner->getName()->getOriginal(), $winner->getTeamName());
 		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['tournament'], $winner->getTournamentId());
 		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['competition'], $winner->getCompetitionId());
 		$this->assertNull($winner->getCompetitionName());
@@ -141,7 +141,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($winner->getSortKey());
 
 		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['team'], $runner->getTeamId());
-		$this->assertEquals($fakeTeamModelRunner->getName()->getOfficial(), $runner->getTeamName());
+		$this->assertEquals($fakeTeamModelRunner->getName()->getOriginal(), $runner->getTeamName());
 		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['tournament'], $runner->getTournamentId());
 		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['competition'], $runner->getCompetitionId());
 		$this->assertNull($runner->getCompetitionName());
@@ -328,7 +328,7 @@ class EventStrategyHandleTest extends TestCase
 		$runner = ($trophies[0]->getPosition() == Trophy::POSITION_RUNNER_UP) ? $trophies[0]: $trophies[1];
 
 		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['team'], $winner->getTeamId());
-		$this->assertEquals($fakeTeamModelWinner->getName()->getOfficial(), $winner->getTeamName());
+		$this->assertEquals($fakeTeamModelWinner->getName()->getOriginal(), $winner->getTeamName());
 		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['tournament'], $winner->getTournamentId());
 		$this->assertEquals($winnerMessage->getBody()->getIdentifiers()['competition'], $winner->getCompetitionId());
 		$this->assertNull($winner->getCompetitionName());
@@ -337,7 +337,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNotNull($winner->getSortKey());
 
 		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['team'], $runner->getTeamId());
-		$this->assertEquals($fakeTeamModelRunner->getName()->getOfficial(), $runner->getTeamName());
+		$this->assertEquals($fakeTeamModelRunner->getName()->getOriginal(), $runner->getTeamName());
 		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['tournament'], $runner->getTournamentId());
 		$this->assertEquals($runnerUpMessage->getBody()->getIdentifiers()['competition'], $runner->getCompetitionId());
 		$this->assertNull($runner->getCompetitionName());
@@ -544,7 +544,7 @@ class EventStrategyHandleTest extends TestCase
 		$trophies = $this->trophyRepository->findAll();
 		foreach ($trophies as $trophy) {
 			$this->assertEquals($message->getBody()->getIdentifiers()['team'], $trophy->getTeamId());
-			$this->assertEquals($fakeTeamModel->getName()->getOfficial(), $trophy->getTeamName());
+			$this->assertEquals($fakeTeamModel->getName()->getOriginal(), $trophy->getTeamName());
 			$this->assertEquals($message->getBody()->getIdentifiers()['tournament'], $trophy->getTournamentId());
 			$this->assertEquals($message->getBody()->getIdentifiers()['competition'], $trophy->getCompetitionId());
 			$this->assertNull($trophy->getCompetitionName());

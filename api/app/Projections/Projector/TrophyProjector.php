@@ -139,7 +139,7 @@ class TrophyProjector
 			->setCompetitionId($identifiers['competition'])
 			->setTournamentId($identifiers['tournament'])
 			->setTeamId($identifiers['team'])
-			->setTeamName($team->getName()->getOfficial())
+			->setTeamName($team->getName()->getOriginal())
 			->setPosition($position);
 	}
 
