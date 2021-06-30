@@ -110,7 +110,6 @@ class TeamProjector
 			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		$this->checkMetadataValidation($body);
-		$this->checkItemExist($identifier['team']);
 		$teamModel = $this->createTeamModel($identifier['team'], $metadata);
 		$this->persistTeam($teamModel);
 		event(new TeamWasCreatedProjectorEvent($teamModel));

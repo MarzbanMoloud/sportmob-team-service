@@ -141,46 +141,6 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals($message->getBody()->getMetadata()['gender'], $response->getGender());
 	}
 
-	public function testTeamWasCreatedHandleWhenTeamExist()
-	{
-		$this->expectException(ProjectionException::class);
-		$fakeTeamModel = $this->createTeamModel();
-		$this->teamRepository->persist($fakeTeamModel);
-		$message = sprintf('
-		{
-			"headers":{
-                "event": "%s",
-                "priority": "1",
-                "date": "%s"
-            },
-			"body":{
-				"identifiers": {
-					"team":"%s"
-				 },
-				"metadata": {
-					"fullName": "Barcelona",
-					"shortName": "Barcelona_short",
-					"officialName": "Barcelona_official",
-					"type": "club",
-					"country": "England",
-					"countryId": "10458356-653d-11eb-ae93-0242ac130002",
-					"city": "Manchester",
-					"active": true,
-					"founded": "1234",
-					"gender": "male"
-				}
-			}
-		}',
-			config('mediator-event.events.team_was_created'),
-			Carbon::now()->format('c'),
-			$fakeTeamModel->getId());
-		/**
-		 * @var Message $message
-		 */
-		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasCreated::class)->handle($message->getBody());
-	}
-
 	public function testTeamWasCreatedHandleWhenIdentifierIsNull()
 	{
 		$this->expectException(ProjectionException::class);
