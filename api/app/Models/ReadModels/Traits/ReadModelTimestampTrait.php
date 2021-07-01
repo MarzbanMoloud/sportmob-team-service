@@ -15,24 +15,22 @@ namespace App\Models\ReadModels\Traits;
  */
 trait ReadModelTimestampTrait
 {
-
-    private \DateTimeImmutable $createdAt;
-
+    private \DateTime $createdAt;
     private ?\DateTime $updatedAt = null;
 
     /**
-     * @return \DateTimeImmutable
+     * @return \DateTime
      */
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
 
     /**
-     * @param \DateTimeImmutable $createdAt
+     * @param \DateTime $createdAt
      * @return ReadModelTimestampTrait
      */
-    public function setCreatedAt(\DateTimeImmutable $createdAt): ReadModelTimestampTrait
+    public function setCreatedAt(\DateTime $createdAt): ReadModelTimestampTrait
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -55,5 +53,4 @@ trait ReadModelTimestampTrait
         $this->updatedAt = $updatedAt;
         return $this;
     }
-
 }
