@@ -37,7 +37,7 @@ class DataPuller implements SmLoggerInterface, DispatchInterface
     public static function rejected($context, string $eventName, ?string $reason = 'there is no strategy', ?string $param3 = null)
     {
         self::logger()->alert(
-            sprintf('Message "%" rejected (%s)', $eventName, $reason),
+            sprintf('Message "%s" rejected (%s)', $eventName, $reason),
             is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
         );
     }
@@ -105,7 +105,7 @@ class DataPuller implements SmLoggerInterface, DispatchInterface
     public static function dispatched($context, string $eventName)
     {
         self::logger()->alert(
-            sprintf('Event "%"  was dispatched', $eventName),
+            sprintf('Event "%s"  was dispatched', $eventName),
             is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
         );
     }

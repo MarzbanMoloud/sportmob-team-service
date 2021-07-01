@@ -21,7 +21,7 @@ class MediatorEventsConsumerCommand extends Command
     /**
      * @var string
      */
-    protected $signature = 'broker:consume:mediator {timeout=10} {limit=10}';
+    protected $signature = 'broker:consume:mediator {timeout=20} {limit=10}';
 
     /**
      * @var string

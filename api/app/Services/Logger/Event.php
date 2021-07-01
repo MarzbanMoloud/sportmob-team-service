@@ -37,7 +37,7 @@ class Event implements SmLoggerInterface, NeedToAskInterface
 	public static function rejected($context, string $eventName, string $reason, ?string $param3 = null)
     {
         self::logger()->alert(
-            sprintf('Event "%" rejected (%s)', $eventName, $reason),
+            sprintf('Event "%s" rejected (%s)', $eventName, $reason),
             is_object($context) ? self::serializer()->normalize($context, 'array') : $context,
         );
     }

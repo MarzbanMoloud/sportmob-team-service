@@ -9,49 +9,46 @@
 namespace App\Models\ReadModels\Traits;
 
 
-use DateTimeImmutable;
-
-
 /**
  * Class ReadModelTimestampTrait
  * @package App\Models\ReadModels\Traits
  */
 trait ReadModelTimestampTrait
 {
-    private DateTimeImmutable $createdAt;
-	private ?DateTimeImmutable $updatedAt = null;
+    private \DateTime $createdAt;
+    private ?\DateTime $updatedAt = null;
 
     /**
-     * @return \DateTimeImmutable
+     * @return \DateTime
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
 
-	/**
-	 * @param DateTimeImmutable $createdAt
-	 * @return $this
-	 */
-	public function setCreatedAt(DateTimeImmutable $createdAt)
+    /**
+     * @param \DateTime $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-	/**
-	 * @return DateTimeImmutable|null
-	 */
-	public function getUpdatedAt(): ?DateTimeImmutable
+    /**
+     * @return \DateTime|null
+     */
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-	/**
-	 * @param DateTimeImmutable|null $updatedAt
-	 * @return $this
-	 */
-	public function setUpdatedAt(?DateTimeImmutable $updatedAt)
+    /**
+     * @param \DateTime|null $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt(?\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         return $this;

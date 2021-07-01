@@ -21,7 +21,7 @@ class QueryEventsConsumerCommand extends Command
     /**
      * @var string
      */
-    protected $signature = 'broker:consume:query {timeout=10} {limit=10}';
+    protected $signature = 'broker:consume:query {timeout=20} {limit=10}';
 
     /**
      * @var string
