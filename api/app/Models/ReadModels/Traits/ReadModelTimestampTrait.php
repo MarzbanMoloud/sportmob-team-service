@@ -28,9 +28,9 @@ trait ReadModelTimestampTrait
 
     /**
      * @param \DateTime $createdAt
-     * @return ReadModelTimestampTrait
+     * @return $this
      */
-    public function setCreatedAt(\DateTime $createdAt): ReadModelTimestampTrait
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -46,9 +46,9 @@ trait ReadModelTimestampTrait
 
     /**
      * @param \DateTime|null $updatedAt
-     * @return ReadModelTimestampTrait
+     * @return $this
      */
-    public function setUpdatedAt(?\DateTime $updatedAt): ReadModelTimestampTrait
+    public function setUpdatedAt(?\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         return $this;
