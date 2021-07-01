@@ -19,6 +19,7 @@ use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\Services\Cache\TransferCacheService;
 use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\MessageBody;
+use DateTime;
 use DateTimeImmutable;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -194,7 +195,8 @@ class TransferProjector
 			->setStartDate(new DateTimeImmutable($metadata['startDate']))
 			->setEndDate($metadata['endDate' ] ? new DateTimeImmutable($metadata['endDate']) : null)
 			->setActive($metadata['active'])
-			->setType($metadata['type']);
+			->setType($metadata['type'])
+			->setCreatedAt(new DateTime());
 
 		$teamsName = $this->getTeamsName($identifier);
 		if (! empty($teamsName['from'])) {

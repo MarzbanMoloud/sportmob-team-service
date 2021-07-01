@@ -15,6 +15,8 @@ use DateTimeImmutable;
  */
 class Trophy implements DynamoDBRepositoryModelInterface
 {
+	use ReadModelTimestampTrait;
+
 	const POSITION_WINNER = 'winner';
 	const POSITION_RUNNER_UP = 'runnerUp';
 

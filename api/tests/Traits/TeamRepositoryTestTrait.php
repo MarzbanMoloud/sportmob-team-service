@@ -7,6 +7,7 @@ namespace Tests\Traits;
 use App\ValueObjects\ReadModel\TeamName;
 use App\Models\ReadModels\Team;
 use App\Models\Repositories\TeamRepository;
+use DateTime;
 
 
 /**
@@ -45,6 +46,7 @@ trait TeamRepositoryTestTrait
 					->setOriginal($this->faker->name)
 					->setOfficial($this->faker->name)
 					->setShort($this->faker->name)
-			);
+			)
+			->setCreatedAt(new DateTime());
 	}
 }

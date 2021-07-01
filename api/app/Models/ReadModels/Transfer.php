@@ -16,6 +16,8 @@ use DateTimeImmutable;
  */
 class Transfer implements DynamoDBRepositoryModelInterface
 {
+	use ReadModelTimestampTrait;
+
 	private string $playerId;
 	private ?string $playerName = null;
 	private ?string $playerPosition = null;

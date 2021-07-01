@@ -17,6 +17,7 @@ use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\Services\Cache\TrophyCacheService;
 use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\MessageBody;
+use DateTime;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -140,7 +141,8 @@ class TrophyProjector
 			->setTournamentId($identifiers['tournament'])
 			->setTeamId($identifiers['team'])
 			->setTeamName($team->getName()->getOriginal())
-			->setPosition($position);
+			->setPosition($position)
+			->setCreatedAt(new DateTime());
 	}
 
 	/**

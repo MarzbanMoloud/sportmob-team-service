@@ -6,6 +6,7 @@ namespace Tests\Traits;
 
 use App\Models\ReadModels\Trophy;
 use App\Models\Repositories\TrophyRepository;
+use DateTime;
 
 
 /**
@@ -35,7 +36,8 @@ trait TrophyRepositoryTestTrait
 			->setCompetitionId($this->faker->uuid)
 			->setCompetitionName($this->faker->name)
 			->setTournamentId($this->faker->uuid)
-			->setTournamentSeason('2020/2021');
+			->setTournamentSeason('2020/2021')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		return $trophyModel;
 	}
@@ -60,7 +62,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2020/2021');
+			->setTournamentSeason('2020/2021')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp */
@@ -71,7 +74,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2020/2021');
+			->setTournamentSeason('2020/2021')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/**
@@ -86,7 +90,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2019/2020');
+			->setTournamentSeason('2019/2020')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp */
@@ -97,7 +102,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2019/2020');
+			->setTournamentSeason('2019/2020')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/**
@@ -112,7 +118,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2018/2019');
+			->setTournamentSeason('2018/2019')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp is Manchester City */
@@ -123,7 +130,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2018/2019');
+			->setTournamentSeason('2018/2019')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/**
@@ -138,7 +146,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2017/2018');
+			->setTournamentSeason('2017/2018')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp is Manchester City */
@@ -149,7 +158,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2017/2018');
+			->setTournamentSeason('2017/2018')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 
@@ -168,7 +178,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2020/2021');
+			->setTournamentSeason('2020/2021')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp */
@@ -179,7 +190,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2020/2021');
+			->setTournamentSeason('2020/2021')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/**
@@ -194,7 +206,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2019/2020');
+			->setTournamentSeason('2019/2020')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp */
@@ -205,7 +218,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2019/2020');
+			->setTournamentSeason('2019/2020')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/**
@@ -220,7 +234,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2018/2019');
+			->setTournamentSeason('2018/2019')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp is Manchester City */
@@ -231,7 +246,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2018/2019');
+			->setTournamentSeason('2018/2019')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/**
@@ -246,7 +262,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($fakeTeamName)
 			->setPosition(Trophy::POSITION_RUNNER_UP)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2017/2018');
+			->setTournamentSeason('2017/2018')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 		/** RunnerUp is Manchester City */
@@ -257,7 +274,8 @@ trait TrophyRepositoryTestTrait
 			->setTeamName($this->faker->name)
 			->setPosition(Trophy::POSITION_WINNER)
 			->setTournamentId($fakeTournamentId)
-			->setTournamentSeason('2017/2018');
+			->setTournamentSeason('2017/2018')
+			->setCreatedAt(new DateTime());
 		$trophyModel->prePersist();
 		$this->trophyRepository->persist($trophyModel);
 

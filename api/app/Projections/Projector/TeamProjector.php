@@ -27,6 +27,7 @@ use App\Services\Cache\TeamsMatchCacheService;
 use App\Services\Logger\Event;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use App\ValueObjects\ReadModel\TeamName;
+use DateTime;
 use Symfony\Component\Serializer\SerializerInterface;
 use Sentry\State\HubInterface;
 
@@ -222,7 +223,8 @@ class TeamProjector
 					->setOriginal($metadata['fullName'])
 					->setOfficial($metadata['officialName'])
 					->setShort($metadata['shortName'])
-			);
+			)
+			->setCreatedAt(new DateTime());
 	}
 
 	/**

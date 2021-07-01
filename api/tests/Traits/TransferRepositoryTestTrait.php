@@ -6,6 +6,7 @@ namespace Tests\Traits;
 
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TransferRepository;
+use DateTime;
 use DateTimeImmutable;
 
 
@@ -42,7 +43,8 @@ trait TransferRepositoryTestTrait
 			->setAnnouncedDate(new DateTimeImmutable())
 			->setContractDate(new DateTimeImmutable())
 			->setType('transferred')
-			->setActive(1);
+			->setActive(1)
+			->setCreatedAt(new DateTime());
 	}
 
 	private function persistBatchDataForListByTeam(string $fakeTeamId, string $fakeTeamName): void

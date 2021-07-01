@@ -255,7 +255,8 @@ class MatchProjector
 			->setIsHome(($home) ? true : false)
 			->setStatus(TeamsMatch::STATUS_UPCOMING)
 			->setCoverage(($metadata['coverage']) ? $metadata['coverage'] : TeamsMatch::COVERAGE_LOW)
-			->setSortKey(TeamsMatch::generateSortKey($this->generateDateTime($metadata['date'], $metadata['time']), TeamsMatch::STATUS_UPCOMING));
+			->setSortKey(TeamsMatch::generateSortKey($this->generateDateTime($metadata['date'], $metadata['time']), TeamsMatch::STATUS_UPCOMING))
+			->setCreatedAt(new DateTime());
 	}
 
 	/**

@@ -79,7 +79,8 @@ trait TeamsMatchRepositoryTestTrait
 						'home' => 1,
 						'away' => 1
 					]
-			]);
+			])
+			->setCreatedAt(new DateTime());
 		$this->teamsMatchRepository->persist($fakeTeamsMatchModel);
 		return $fakeTeamsMatchModel;
 

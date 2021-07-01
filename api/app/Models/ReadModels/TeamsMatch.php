@@ -4,6 +4,7 @@
 namespace App\Models\ReadModels;
 
 
+use App\Models\ReadModels\Traits\ReadModelTimestampTrait;
 use App\ValueObjects\ReadModel\TeamName;
 use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface;
 use DateTime;
@@ -15,6 +16,8 @@ use DateTime;
  */
 class TeamsMatch implements DynamoDBRepositoryModelInterface
 {
+	use ReadModelTimestampTrait;
+
 	const EVALUATION_DRAW = 'draw';
 	const EVALUATION_LOSS = 'loss';
 	const EVALUATION_WIN = 'win';
