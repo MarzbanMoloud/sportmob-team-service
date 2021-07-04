@@ -47,6 +47,7 @@ class QueryStrategyHandle extends TestCase
 		$message = (new Message())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey('GetTeamInformation')
 					->setId($fakeTeamModel->getId())
 					->setDestination(config('broker.services.team_name'))
@@ -89,6 +90,7 @@ class QueryStrategyHandle extends TestCase
 		$message = (new Message())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey('GetTeamInformation')
 					->setId($fakeTeamId)
 					->setDestination(config('broker.services.team_name'))

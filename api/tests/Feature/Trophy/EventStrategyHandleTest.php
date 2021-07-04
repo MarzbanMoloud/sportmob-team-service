@@ -64,7 +64,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -85,7 +86,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -121,8 +123,8 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(TeamBecameWinner::class)->handle($winnerMessage->getBody());
-		app(TeamBecameRunnerUp::class)->handle($runnerUpMessage->getBody());
+		app(TeamBecameWinner::class)->handle($winnerMessage);
+		app(TeamBecameRunnerUp::class)->handle($runnerUpMessage);
 		/**
 		 * Read from DB
 		 * @var Trophy $trophy
@@ -178,6 +180,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessageWinner = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload_winner['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -193,6 +196,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessageRunner = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload_runner['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -260,7 +264,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -281,7 +286,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -317,8 +323,8 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(TeamBecameWinner::class)->handle($winnerMessage->getBody());
-		app(TeamBecameRunnerUp::class)->handle($runnerUpMessage->getBody());
+		app(TeamBecameWinner::class)->handle($winnerMessage);
+		app(TeamBecameRunnerUp::class)->handle($runnerUpMessage);
 		/**
 		 * Read from DB
 		 * @var Trophy $trophy
@@ -374,6 +380,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessageWinner = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload_winner['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -389,6 +396,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessageRunner = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload_runner['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -443,7 +451,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -463,7 +472,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(TeamBecameWinner::class)->handle($message->getBody());
+		app(TeamBecameWinner::class)->handle($message);
 	}
 
 	public function testTeamBecameWinnerHandleWhenTeamNotExist()
@@ -474,7 +483,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -497,7 +507,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(TeamBecameWinner::class)->handle($message->getBody());
+		app(TeamBecameWinner::class)->handle($message);
 	}
 
 	public function testTeamBecameWinnerHandleWhenCompetitionInfoIsEmpty()
@@ -507,7 +517,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -536,7 +547,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(TeamBecameWinner::class)->handle($message->getBody());
+		app(TeamBecameWinner::class)->handle($message);
 		/**
 		 * Read from DB
 		 * @var Trophy $trophy
@@ -577,6 +588,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(TrophyProjectorListener::BROKER_EVENT_KEY)
 					->setId($message->getBody()->getIdentifiers()['tournament'])
 					->setDestination(config('broker.services.team_name'))

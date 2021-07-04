@@ -13,6 +13,7 @@ use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Logger\Event;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
+use App\ValueObjects\Broker\Mediator\Message as MediatorMessage;
 use Carbon\Carbon;
 use Sentry\State\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -60,20 +61,21 @@ class MatchWasCreatedProjectorListener
 	 */
 	public function handle(MatchWasCreatedProjectorEvent $event)
 	{
+		$identifier = $event->mediatorMessage->getBody()->getIdentifiers();
 		$this->eventName = config('mediator-event.events.match_was_created');
-		if (!$this->brokerMessageCacheService->hasCompetitionName($event->identifier['competition'])) {
+		if (!$this->brokerMessageCacheService->hasCompetitionName($identifier['competition'])) {
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
+						->setEventId($event->mediatorMessage->getHeaders()->getId())
 						->setKey(self::BROKER_EVENT_KEY)
-						->setId(sprintf('%s#%s#%s', $event->identifier['match'], $event->identifier['home'],
-							$event->identifier['away']))
+						->setId(sprintf('%s#%s#%s', $identifier['match'], $identifier['home'], $identifier['away']))
 						->setDestination(config('broker.services.competition_name'))
 						->setSource(config('broker.services.team_name'))
 						->setDate(Carbon::now()->format('c'))
 				)->setBody([
 					'entity' => config('broker.services.competition_name'),
-					'id' => $event->identifier['competition']
+					'id' => $identifier['competition']
 				]);
 			$this->broker->flushMessages()->addMessage(
 				self::BROKER_EVENT_KEY,
@@ -82,17 +84,18 @@ class MatchWasCreatedProjectorListener
 			Event::needToAsk($message, $this->eventName, self::BROKER_EVENT_KEY, config('broker.services.competition_name'));
 			return;
 		}
-		$competitionName = $this->brokerMessageCacheService->getCompetitionName($event->identifier['competition']);
-		$this->updateTeamsMatch($event->identifier['match'], $event->identifier['home'], $competitionName);
-		$this->updateTeamsMatch($event->identifier['match'], $event->identifier['away'], $competitionName);
+		$competitionName = $this->brokerMessageCacheService->getCompetitionName($identifier['competition']);
+		$this->updateTeamsMatch($identifier['match'], $identifier['home'], $competitionName, $event->mediatorMessage);
+		$this->updateTeamsMatch($identifier['match'], $identifier['away'], $competitionName, $event->mediatorMessage);
 	}
 
 	/**
 	 * @param string $matchId
 	 * @param string $teamId
 	 * @param string $competitionName
+	 * @param MediatorMessage $mediatorMessage
 	 */
-	private function updateTeamsMatch(string $matchId, string $teamId, string $competitionName): void
+	private function updateTeamsMatch(string $matchId, string $teamId, string $competitionName, MediatorMessage $mediatorMessage): void
 	{
 		$teamsMatchItem = $this->teamsMatchRepository->find([
 			'matchId' => $matchId,
@@ -106,7 +109,7 @@ class MatchWasCreatedProjectorListener
 		try {
 			$this->teamsMatchRepository->persist($teamsMatchItem);
 		} catch (DynamoDBRepositoryException $exception) {
-			Event::failed($teamsMatchItem, $this->eventName, 'Failed to update teamsMatch.');
+			Event::failed($mediatorMessage, $this->eventName, 'Failed to update teamsMatch.');
 			$this->sentryHub->captureException($exception);
 		}
 	}

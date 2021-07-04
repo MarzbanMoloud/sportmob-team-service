@@ -7,7 +7,7 @@ namespace App\Services\EventStrategy;
 use App\Projections\Projector\TeamProjector;
 use App\Services\EventStrategy\Interfaces\EventInterface;
 use App\Services\Logger\Event;
-use App\ValueObjects\Broker\Mediator\MessageBody;
+use App\ValueObjects\Broker\Mediator\Message;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
@@ -34,12 +34,12 @@ class TeamWasUpdated implements EventInterface
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws \App\Exceptions\Projection\ProjectionException
 	 */
-	public function handle(MessageBody $body): void
+	public function handle(Message $message): void
 	{
-		Event::handled($body, config('mediator-event.events.team_was_updated'), __CLASS__);
-		$this->teamProjector->applyTeamWasUpdated($body);
+		Event::handled($message, config('mediator-event.events.team_was_updated'), __CLASS__);
+		$this->teamProjector->applyTeamWasUpdated($message);
 	}
 }

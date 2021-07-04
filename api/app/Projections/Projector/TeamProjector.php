@@ -25,7 +25,7 @@ use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\Services\Cache\TeamsMatchCacheService;
 use App\Services\Logger\Event;
-use App\ValueObjects\Broker\Mediator\MessageBody;
+use App\ValueObjects\Broker\Mediator\Message;
 use App\ValueObjects\ReadModel\TeamName;
 use DateTime;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -96,62 +96,64 @@ class TeamProjector
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	public function applyTeamWasCreated(MessageBody $body): void
+	public function applyTeamWasCreated(Message $message): void
 	{
-		$this->eventName = config('mediator-event.events.team_was_created');
-		Event::processing($body, $this->eventName);
+		$body = $message->getBody();
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
+		$this->eventName = config('mediator-event.events.team_was_created');
+		Event::processing($message, $this->eventName);
 		if (empty($identifier['team'])) {
-			$message = 'Team field is empty.';
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$validationMessage = 'Team field is empty.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		$this->checkMetadataValidation($body);
+		$this->checkMetadataValidation($message);
 		$teamModel = $this->createTeamModel($identifier['team'], $metadata);
-		$this->persistTeam($teamModel);
+		$this->persistTeam($teamModel, $message);
 		event(new TeamWasCreatedProjectorEvent($teamModel));
-		Event::succeeded($teamModel, $this->eventName);
+		Event::succeeded($message, $this->eventName);
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	public function applyTeamWasUpdated(MessageBody $body): void
+	public function applyTeamWasUpdated(Message $message): void
 	{
-		$this->eventName = config('mediator-event.events.team_was_updated');
-		Event::processing($body, $this->eventName);
+		$body = $message->getBody();
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
+		$this->eventName = config('mediator-event.events.team_was_updated');
+		Event::processing($message, $this->eventName);
 		if (empty($identifier['team'])) {
-			$message = 'Team field is empty.';
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$validationMessage = 'Team field is empty.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 		if (empty($metadata['fullName'])) {
-			$message = 'FullName field is empty.';
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$validationMessage = 'FullName field is empty.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
-		$teamModel = $this->checkItemNotExist($identifier['team'], $this->serializer->normalize($body, 'array'));
+		$teamModel = $this->checkItemNotExist($identifier['team'], $message);
 		$teamModel = $this->updateTeamModel($teamModel, $metadata);
-		$this->persistTeam($teamModel);
+		$this->persistTeam($teamModel, $message);
 		event(new TeamWasUpdatedProjectorEvent($teamModel));
-		$this->updateOtherEntities($identifier['team'], $metadata);
-		Event::succeeded($teamModel, $this->eventName);
+		$this->updateOtherEntities($identifier['team'], $message);
+		Event::succeeded($message, $this->eventName);
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function checkMetadataValidation(MessageBody $body): void
+	private function checkMetadataValidation(Message $message): void
 	{
-		$metadata = $body->getMetadata();
+		$metadata = $message->getBody()->getMetadata();
 		$requiredFields = [
 			'fullName' => 'Full Name',
 			'type' => 'Type',
@@ -160,15 +162,15 @@ class TeamProjector
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($metadata[$fieldName])) {
-				$message = sprintf("%s field is empty.", $prettyFieldName);
-				Event::failed($body, $this->eventName, $message);
-				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($message, $this->eventName, $validationMessage);
+				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 		if (is_null($metadata['active'])) {
-			$message = 'Active field is empty.';
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$validationMessage = 'Active field is empty.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 	}
 
@@ -188,17 +190,17 @@ class TeamProjector
 
 	/**
 	 * @param string $teamId
-	 * @param array $body
+	 * @param Message $message
 	 * @return \App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface
 	 * @throws ProjectionException
 	 */
-	private function checkItemNotExist(string $teamId, array $body)
+	private function checkItemNotExist(string $teamId, Message $message)
 	{
 		$teamItem = $this->teamRepository->find(['id' => $teamId]);
 		if (!$teamItem) {
-			$message = sprintf("Team does not exist by following id: %s", $teamId);
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR);
+			$validationMessage = sprintf("Team does not exist by following id: %s", $teamId);
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_CONFLICT_ERROR);
 		}
 		return $teamItem;
 	}
@@ -246,11 +248,11 @@ class TeamProjector
 
 	/**
 	 * @param string $team
-	 * @param array $metadata
-	 * @throws ProjectionException
+	 * @param Message $message
 	 */
-	private function updateOtherEntities(string $team, array $metadata)
+	private function updateOtherEntities(string $team, Message $message)
 	{
+		$metadata = $message->getBody()->getMetadata();
 		/**	TeamsMatch */
 		foreach ([TeamsMatch::STATUS_UPCOMING, TeamsMatch::STATUS_FINISHED, TeamsMatch::STATUS_UNKNOWN] as $status) {
 			$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByTeamId($team, $status);
@@ -263,14 +265,14 @@ class TeamProjector
 							->setOfficial($metadata['officialName'])
 							->setShort($metadata['shortName'])
 					);
-					$this->persistTeamsMatch($item);
+					$this->persistTeamsMatch($item, $message);
 				}
 				try {
 					$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchByTeamIdKey($team,
 						$status));
 					$this->teamsMatchService->getTeamsMatchInfo($team);
 				} catch (\Exception $e) {
-					Event::failed($item, $this->eventName, 'Failed create or forget cache for teamsMatch.');
+					Event::failed($message, $this->eventName, 'Failed create or forget cache for teamsMatch.');
 				}
 			}
 			$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByOpponentId($team);
@@ -283,14 +285,14 @@ class TeamProjector
 							->setOfficial($metadata['officialName'])
 							->setShort($metadata['shortName'])
 					);
-					$this->persistTeamsMatch($item);
+					$this->persistTeamsMatch($item, $message);
 				}
 				try {
 					$this->teamsMatchCacheService->forget(TeamsMatchCacheService::getTeamsMatchByTeamIdKey($team,
 						$status));
 					$this->teamsMatchService->getTeamsMatchInfo($team);
 				} catch (\Exception $e) {
-					Event::failed($item, $this->eventName, 'Failed create or forget cache for teamsMatch.');
+					Event::failed($message, $this->eventName, 'Failed create or forget cache for teamsMatch.');
 				}
 			}
 		}
@@ -305,13 +307,13 @@ class TeamProjector
 				if ($transfer->getFromTeamId() == $team) {
 					$transfer->setFromTeamName($metadata['fullName']);
 				}
-				$this->persistTransfer($transfer);
+				$this->persistTransfer($transfer, $message);
 			}
 			try {
 				$this->transferCacheService->forget('transfer_by_*');//per playerId and teamId
 				$this->transferService->listByTeam($team);
 			} catch (\Exception $e) {
-				Event::failed($transfer, $this->eventName, 'Failed create or forget cache for transfer.');
+				Event::failed($message, $this->eventName, 'Failed create or forget cache for transfer.');
 			}
 		}
 		/**	Trophies */
@@ -320,36 +322,38 @@ class TeamProjector
 			foreach ($trophies as $trophy) {
 				/**	@var Trophy $trophy */
 				$trophy->setTeamName($metadata['officialName']);
-				$this->persistTrophy($trophy);
+				$this->persistTrophy($trophy, $message);
 			}
 			try {
 				$this->trophyCacheService->forget('trophies_by_*');//per teamId and competitionId.
 				$this->trophyService->getTrophiesByTeam($team);
 			} catch (\Exception $e) {
-				Event::failed($trophy, $this->eventName, 'Failed create cache or forget for trophy.');
+				Event::failed($message, $this->eventName, 'Failed create cache or forget for trophy.');
 			}
 		}
 	}
 
 	/**
 	 * @param Team $teamModel
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function persistTeam(Team $teamModel): void
+	private function persistTeam(Team $teamModel, Message $message): void
 	{
 		try {
 			$this->teamRepository->persist($teamModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$message = 'Failed to persist team.';
-			Event::failed($teamModel, $this->eventName, $message);
-			throw new ProjectionException($message, $exception->getCode(), $exception);
+			$validationMessage = 'Failed to persist team.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, $exception->getCode(), $exception);
 		}
 	}
 
 	/**
 	 * @param TeamsMatch $teamsMatchModel
+	 * @param Message $message
 	 */
-	private function persistTeamsMatch(TeamsMatch $teamsMatchModel)
+	private function persistTeamsMatch(TeamsMatch $teamsMatchModel, Message $message)
 	{
 		try {
 			$this->teamsMatchRepository->persist($teamsMatchModel);
@@ -362,8 +366,9 @@ class TeamProjector
 
 	/**
 	 * @param Transfer $transferModel
+	 * @param Message $message
 	 */
-	private function persistTransfer(Transfer $transferModel)
+	private function persistTransfer(Transfer $transferModel, Message $message)
 	{
 		try {
 			$this->transferRepository->persist($transferModel);
@@ -375,8 +380,9 @@ class TeamProjector
 
 	/**
 	 * @param Trophy $trophyModel
+	 * @param Message $message
 	 */
-	private function persistTrophy(Trophy $trophyModel)
+	private function persistTrophy(Trophy $trophyModel, Message $message)
 	{
 		try {
 			$this->trophyRepository->persist($trophyModel);

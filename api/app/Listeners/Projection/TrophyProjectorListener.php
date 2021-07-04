@@ -66,6 +66,7 @@ class TrophyProjectorListener
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
+						->setEventId($event->mediatorMessage->getHeaders()->getId())
 						->setKey(self::BROKER_EVENT_KEY)
 						->setId(sprintf('%s#%s#%s', $event->trophy->getCompetitionId(),
 							$event->trophy->getTournamentId(), $event->trophy->getTeamId()))
@@ -90,12 +91,9 @@ class TrophyProjectorListener
 		try {
 			$this->trophyRepository->persist($event->trophy);
 		} catch (DynamoDBRepositoryException $exception) {
-			$message = 'Failed to update trophy.';
-			$trophyArray = $this->serializer->normalize($event->trophy, 'array');
-			$temp['_teamName'] = $trophyArray['teamName'];
-			unset($trophyArray['teamName']);
-			Event::failed($trophyArray, $event->eventName, $message);
-			throw new ProjectionException($message, $exception->getCode(), $exception);
+			$validationMessage = 'Failed to update trophy.';
+			Event::failed($event->mediatorMessage, $event->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, $exception->getCode(), $exception);
 		}
 
 		if (($event->trophy->getPosition() == Trophy::POSITION_WINNER) && (strpos($event->trophy->getTournamentSeason(), date('Y')) != false)){

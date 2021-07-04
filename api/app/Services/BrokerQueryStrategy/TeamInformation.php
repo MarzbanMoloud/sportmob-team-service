@@ -59,6 +59,7 @@ class TeamInformation implements BrokerQueryEventInterface
 		$message = (new Message())
 			->setHeaders(
 				(new Headers())
+					->setEventId($commandQuery->getHeaders()->getEventId())
 					->setKey($commandQuery->getHeaders()->getKey())
 					->setId($commandQuery->getHeaders()->getId())
 					->setDestination($commandQuery->getHeaders()->getSource())

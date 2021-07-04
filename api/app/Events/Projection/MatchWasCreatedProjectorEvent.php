@@ -5,6 +5,7 @@ namespace App\Events\Projection;
 
 
 use App\Events\Event;
+use App\ValueObjects\Broker\Mediator\Message;
 
 
 /**
@@ -13,14 +14,14 @@ use App\Events\Event;
  */
 class MatchWasCreatedProjectorEvent extends Event
 {
-	public array $identifier;
+	public Message $mediatorMessage;
 
 	/**
 	 * MatchWasCreatedProjectorEvent constructor.
-	 * @param array $identifier
+	 * @param Message $mediatorMessage
 	 */
-	public function __construct(array $identifier)
+	public function __construct(Message $mediatorMessage)
 	{
-		$this->identifier = $identifier;
+		$this->mediatorMessage = $mediatorMessage;
 	}
 }

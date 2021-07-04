@@ -77,7 +77,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -103,7 +104,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchWasCreated::class)->handle($message->getBody());
+		app(MatchWasCreated::class)->handle($message);
 		/**
 		 * Read from DB.
 		 */
@@ -151,6 +152,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -207,7 +209,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -233,7 +236,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchWasCreated::class)->handle($message->getBody());
+		app(MatchWasCreated::class)->handle($message);
 		/**
 		 * Read from DB.
 		 */
@@ -281,6 +284,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -329,7 +333,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -355,7 +360,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchWasCreated::class)->handle($message->getBody());
+		app(MatchWasCreated::class)->handle($message);
 		/**
 		 * Read from DB.
 		 */
@@ -402,6 +407,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(MatchWasCreatedProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -432,7 +438,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -450,7 +457,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchWasCreated::class)->handle($message->getBody());
+		app(MatchWasCreated::class)->handle($message);
 	}
 
 	public function testMatchWasCreatedHandleWhenMetadataIsNull()
@@ -461,7 +468,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -487,7 +495,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchWasCreated::class)->handle($message->getBody());
+		app(MatchWasCreated::class)->handle($message);
 	}
 
 	public function testMatchWasCreatedHandleWhenTeamItemNotExist()
@@ -502,7 +510,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -528,7 +537,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchWasCreated::class)->handle($message->getBody());
+		app(MatchWasCreated::class)->handle($message);
 	}
 
 	public function testMatchFinishedHandle()
@@ -564,7 +573,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -605,7 +615,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchFinished::class)->handle($message->getBody());
+		app(MatchFinished::class)->handle($message);
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
 		foreach ($teamsMatch as $item) {
@@ -661,7 +671,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -696,7 +707,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchFinished::class)->handle($message->getBody());
+		app(MatchFinished::class)->handle($message);
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
 		foreach ($teamsMatch as $item) {
@@ -715,7 +726,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -731,7 +743,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchFinished::class)->handle($message->getBody());
+		app(MatchFinished::class)->handle($message);
 	}
 
 	public function testMatchFinishedHandleWithNullMetadata()
@@ -742,7 +754,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -762,7 +775,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchFinished::class)->handle($message->getBody());
+		app(MatchFinished::class)->handle($message);
 	}
 
 	public function testMatchFinishedHandleWhenMatchItemNotExist()
@@ -773,7 +786,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -809,7 +823,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchFinished::class)->handle($message->getBody());
+		app(MatchFinished::class)->handle($message);
 	}
 
 	public function testMatchStatusChangedHandle()
@@ -845,7 +859,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -863,7 +878,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchStatusChanged::class)->handle($message->getBody());
+		app(MatchStatusChanged::class)->handle($message);
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
 		foreach ($teamsMatch as $item) {
@@ -905,7 +920,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -923,7 +939,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchStatusChanged::class)->handle($message->getBody());
+		app(MatchStatusChanged::class)->handle($message);
 		$teamsMatch = $this->teamsMatchRepository->findTeamsMatchByMatchId($fakeMatchIdForUpcoming);
 		$this->assertCount(2, $teamsMatch);
 		foreach ($teamsMatch as $item) {
@@ -940,7 +956,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -955,7 +972,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchStatusChanged::class)->handle($message->getBody());
+		app(MatchStatusChanged::class)->handle($message);
 	}
 
 	public function testMatchStatusChangedHandleWhenMetaDataIsNull()
@@ -966,7 +983,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -984,7 +1002,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(MatchStatusChanged::class)->handle($message->getBody());
+		app(MatchStatusChanged::class)->handle($message);
 	}
 
 	protected function tearDown(): void

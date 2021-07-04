@@ -65,6 +65,7 @@ class PlayerWasTransferredProjectorListener
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
+						->setEventId($event->mediatorMessage->getHeaders()->getId())
 						->setKey(self::BROKER_EVENT_KEY)
 						->setId(
 							sprintf('%s#%s', $event->transfer->getPlayerId(),
@@ -91,9 +92,9 @@ class PlayerWasTransferredProjectorListener
 		try {
 			$this->transferRepository->persist($event->transfer);
 		} catch (DynamoDBRepositoryException $exception) {
-			$message = 'Failed to update transfer.';
-			Event::failed($event->transfer, $eventName, $message);
-			throw new ProjectionException($message, $exception->getCode());
+			$validationMessage = 'Failed to update transfer.';
+			Event::failed($event->mediatorMessage, $eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, $exception->getCode());
 		}
 		if (strpos($event->transfer->getSeason(), date('Y')) != false) {
 			$this->sendNotification($event->transfer, self::BROKER_NOTIFICATION_KEY);

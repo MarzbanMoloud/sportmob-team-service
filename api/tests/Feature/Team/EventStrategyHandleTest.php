@@ -106,7 +106,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasCreated::class)->handle($message->getBody());
+		app(TeamWasCreated::class)->handle($message);
 		/**
 		 * @var Team $response
 		 * Read from DB.
@@ -164,7 +164,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasCreated::class)->handle($message->getBody());
+		app(TeamWasCreated::class)->handle($message);
 	}
 
 	public function testTeamWasCreatedHandleWhenMetadataIsWrong()
@@ -195,7 +195,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasCreated::class)->handle($message->getBody());
+		app(TeamWasCreated::class)->handle($message);
 	}
 
 	public function testTeamWasUpdatedHandle()
@@ -265,7 +265,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasUpdated::class)->handle($message->getBody());
+		app(TeamWasUpdated::class)->handle($message);
 		/**
 		 * @var Team $response
 		 * Read from DB.
@@ -386,7 +386,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasUpdated::class)->handle($message->getBody());
+		app(TeamWasUpdated::class)->handle($message);
 	}
 
 	public function testTeamWasUpdatedHandleWhenIdentifierIsWrong()
@@ -413,7 +413,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasUpdated::class)->handle($message->getBody());
+		app(TeamWasUpdated::class)->handle($message);
 	}
 
 	public function testTeamWasUpdatedHandleWhenMetaDataIsWrong()
@@ -447,7 +447,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Message $message
 		 */
 		$message = $this->serializer->deserialize($message, Message::class, 'json');
-		app(TeamWasUpdated::class)->handle($message->getBody());
+		app(TeamWasUpdated::class)->handle($message);
 	}
 
 	protected function tearDown(): void

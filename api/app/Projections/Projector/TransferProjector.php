@@ -18,7 +18,7 @@ use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\Services\Cache\TransferCacheService;
 use App\Services\Logger\Event;
-use App\ValueObjects\Broker\Mediator\MessageBody;
+use App\ValueObjects\Broker\Mediator\Message;
 use DateTime;
 use DateTimeImmutable;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -66,30 +66,31 @@ class TransferProjector
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	public function applyPlayerWasTransferred(MessageBody $body)
+	public function applyPlayerWasTransferred(Message $message)
 	{
-		$this->eventName = config('mediator-event.events.player_was_transferred');
-		Event::processing($body, $this->eventName);
+		$body = $message->getBody();
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
-		$this->checkIdentifierValidation($body);
-		$this->checkMetadataValidation($body);
+		$this->eventName = config('mediator-event.events.player_was_transferred');
+		Event::processing($message, $this->eventName);
+		$this->checkIdentifierValidation($message);
+		$this->checkMetadataValidation($message);
 		if ($metadata['active'] == true) {
 			if ($latestTransfers = $this->transferRepository->findActiveTransfer($identifier['player'])) {
-				$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $metadata);
+				$this->inactiveLastActiveTransferByPlayerId($latestTransfers[0], $message);
 			}
 		}
 		$transferModel = $this->createTransferModel($identifier, $metadata);
 		try {
 			$transferModel->prePersist();
 		} catch (ReadModelValidatorException $e) {
-			Event::failed($body, $this->eventName, 'fromTeamId and toTeamId could not be null at same time.');
+			Event::failed($message, $this->eventName, 'fromTeamId and toTeamId could not be null at same time.');
 		}
-		$this->persistTransfer($transferModel);
-		event(new PlayerWasTransferredProjectorEvent($transferModel));
+		$this->persistTransfer($transferModel, $message);
+		event(new PlayerWasTransferredProjectorEvent($transferModel, $message));
 		/** Create cache by call service */
 		try {
 			$this->transferCacheService->forget('transfer_by_team*');
@@ -98,50 +99,50 @@ class TransferProjector
 			$this->transferService->listByTeam($identifier['to'], $transferModel->getSeason());
 		} catch (\Exception $exception) {
 		}
-		Event::succeeded($transferModel, $this->eventName);
+		Event::succeeded($message, $this->eventName);
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function checkIdentifierValidation(MessageBody $body): void
+	private function checkIdentifierValidation(Message $message): void
 	{
 		$requiredFields = [
 			'player' => 'Player',
 			'to' => 'To',
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
-			if (empty($body->getIdentifiers()[$fieldName])) {
-				$message = sprintf("%s field is empty.", $prettyFieldName);
-				Event::failed($body, $this->eventName, $message);
-				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
+				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($message, $this->eventName, $validationMessage);
+				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function checkMetadataValidation(MessageBody $body): void
+	private function checkMetadataValidation(Message $message): void
 	{
-		$metadata = $body->getMetadata();
+		$metadata = $message->getBody()->getMetadata();
 		$requiredFields = [
 			'startDate' => 'Start Date',
 			'type' => 'Type',
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
 			if (empty($metadata[$fieldName])) {
-				$message = sprintf("%s field is empty.", $prettyFieldName);
-				Event::failed($body, $this->eventName, $message);
-				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($message, $this->eventName, $validationMessage);
+				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 		if (is_null($metadata['active'])) {
-			$message = 'Active field is empty.';
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			$validationMessage = 'Active field is empty.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
 	}
 
@@ -169,15 +170,15 @@ class TransferProjector
 
 	/**
 	 * @param Transfer $latestTransfer
-	 * @param array $metadata
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function inactiveLastActiveTransferByPlayerId(Transfer $latestTransfer, array $metadata): void
+	private function inactiveLastActiveTransferByPlayerId(Transfer $latestTransfer, Message $message): void
 	{
 		$latestTransfer->setActive( false )
 			->setEndDate( $latestTransfer->getEndDate() ?:
-				new DateTimeImmutable( $metadata[ 'startDate' ] ) );
-		$this->persistTransfer($latestTransfer);
+				new DateTimeImmutable($message->getBody()->getMetadata()['startDate']));
+		$this->persistTransfer($latestTransfer, $message);
 	}
 
 	/**
@@ -210,16 +211,17 @@ class TransferProjector
 
 	/**
 	 * @param Transfer $transferModel
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function persistTransfer(Transfer $transferModel): void
+	private function persistTransfer(Transfer $transferModel, Message $message): void
 	{
 		try {
 			$this->transferRepository->persist($transferModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$message = 'Failed to persist transfer.';
-			Event::failed($transferModel, $this->eventName, $message);
-			throw new ProjectionException($message, $exception->getCode(), $exception);
+			$validationMessage = 'Failed to persist transfer.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, $exception->getCode(), $exception);
 		}
 	}
 }

@@ -16,7 +16,7 @@ use App\Models\Repositories\TrophyRepository;
 use App\Services\Cache\Interfaces\TrophyCacheServiceInterface;
 use App\Services\Cache\TrophyCacheService;
 use App\Services\Logger\Event;
-use App\ValueObjects\Broker\Mediator\MessageBody;
+use App\ValueObjects\Broker\Mediator\Message;
 use DateTime;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -57,46 +57,47 @@ class TrophyProjector
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	public function applyTeamBecameWinner(MessageBody $body): void
+	public function applyTeamBecameWinner(Message $message): void
 	{
 		$this->eventName = config('mediator-event.events.team_became_winner');
-		Event::processing($body, $this->eventName);
-		$this->applyEventByPosition($body, Trophy::POSITION_WINNER);
+		Event::processing($message, $this->eventName);
+		$this->applyEventByPosition($message, Trophy::POSITION_WINNER);
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	public function applyTeamBecameRunnerUp(MessageBody $body): void
+	public function applyTeamBecameRunnerUp(Message $message): void
 	{
 		$this->eventName = config('mediator-event.events.team_became_runner_up');
-		Event::processing($body, $this->eventName);
-		$this->applyEventByPosition($body, Trophy::POSITION_RUNNER_UP);
+		Event::processing($message, $this->eventName);
+		$this->applyEventByPosition($message, Trophy::POSITION_RUNNER_UP);
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @param string $position
 	 * @throws ProjectionException
 	 */
-	private function applyEventByPosition(MessageBody $body, string $position)
+	private function applyEventByPosition(Message $message, string $position)
 	{
+		$body = $message->getBody();
 		$identifiers = $body->getIdentifiers();
-		$this->checkIdentifiersValidation($body);
+		$this->checkIdentifiersValidation($message);
 		/** @var Team $team */
 		if (!$team = $this->teamRepository->find(['id' => $identifiers['team']])) {
-			$message = sprintf('Could not find team by given Id : %s', $identifiers['team']);
-			Event::failed($body, $this->eventName, $message);
-			throw new ProjectionException($message);
+			$validationMessage = sprintf('Could not find team by given Id : %s', $identifiers['team']);
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage);
 		}
 		$trophyModel = $this->createTrophyModel($identifiers, $team, $position);
 		$trophyModel->prePersist();
-		$this->persistTrophy($trophyModel);
-		event(new TrophyProjectorEvent($trophyModel, $this->eventName));
+		$this->persistTrophy($trophyModel, $message);
+		event(new TrophyProjectorEvent($trophyModel, $this->eventName, $message));
 		/** Create cache by call service */
 		try {
 			$this->trophyCacheService->forget(TrophyCacheService::getTrophyByCompetitionKey($identifiers['competition']));
@@ -105,14 +106,14 @@ class TrophyProjector
 			$this->trophyService->getTrophiesByCompetition($identifiers['competition']);
 		} catch (\Exception $e) {
 		}
-		Event::succeeded($trophyModel, $this->eventName);
+		Event::succeeded($message, $this->eventName);
 	}
 
 	/**
-	 * @param MessageBody $body
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function checkIdentifiersValidation(MessageBody $body): void
+	private function checkIdentifiersValidation(Message $message): void
 	{
 		$requiredFields = [
 			'competition' => 'Competition',
@@ -120,10 +121,10 @@ class TrophyProjector
 			'team' => 'Team'
 		];
 		foreach ($requiredFields as $fieldName => $prettyFieldName) {
-			if (empty($body->getIdentifiers()[$fieldName])) {
-				$message = sprintf("%s field is empty.", $prettyFieldName);
-				Event::failed($body, $this->eventName, $message);
-				throw new ProjectionException($message, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
+				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				Event::failed($message, $this->eventName, $validationMessage);
+				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 	}
@@ -147,28 +148,17 @@ class TrophyProjector
 
 	/**
 	 * @param Trophy $trophyModel
+	 * @param Message $message
 	 * @throws ProjectionException
 	 */
-	private function persistTrophy(Trophy $trophyModel): void
+	private function persistTrophy(Trophy $trophyModel, Message $message): void
 	{
 		try {
 			$this->trophyRepository->persist($trophyModel);
 		} catch (DynamoDBRepositoryException $exception) {
-			$message = 'Failed to persist trophy.';
-			Event::failed($this->makeContextForLog($trophyModel), $this->eventName, $message);
-			throw new ProjectionException($message, $exception->getCode(), $exception);
+			$validationMessage = 'Failed to persist trophy.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			throw new ProjectionException($validationMessage, $exception->getCode(), $exception);
 		}
-	}
-
-	/**
-	 * @param Trophy $trophy
-	 * @return array
-	 */
-	private function makeContextForLog(Trophy $trophy): array
-	{
-		$trophyArray = $this->serializer->normalize($trophy, 'array');
-		$temp['_teamName'] = $trophyArray['teamName'];
-		unset($trophyArray['teamName']);
-		return $trophyArray;
 	}
 }

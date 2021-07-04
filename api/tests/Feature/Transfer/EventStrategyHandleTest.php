@@ -64,7 +64,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -99,7 +100,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 		/**
 		 * Read from DB
 		 * @var Transfer $transfer
@@ -145,6 +146,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -223,7 +225,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -258,7 +261,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 		/**
 		 * Read from DB
 		 * @var Transfer $transfer
@@ -317,7 +320,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -352,7 +356,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 		/**
 		 * Read from DB
 		 * @var Transfer $transfer
@@ -398,6 +402,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -445,7 +450,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -480,7 +486,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 		/**
 		 * Read from DB
 		 * @var Transfer $transfer
@@ -532,6 +538,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
@@ -594,7 +601,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -614,7 +622,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 	}
 
 	public function testPlayerWasTransferredHandleWithNullMetaData()
@@ -625,7 +633,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -653,7 +662,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 	}
 
 	public function testPlayerWasTransferredHandleWhenTeamItemsNotExist()
@@ -664,7 +673,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -692,7 +702,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 	}
 
 	public function testPlayerWasTransferredHandleWithEmptyPlayerInfo()
@@ -702,7 +712,8 @@ class EventStrategyHandleTest extends TestCase
 			"headers":{
                 "event": "%s",
                 "priority": "1",
-                "date": "%s"
+                "date": "%s",
+                "id": "1"
             },
 			"body":{
 				"identifiers": {
@@ -737,7 +748,7 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Handle event.
 		 */
-		app(PlayerWasTransferred::class)->handle($message->getBody());
+		app(PlayerWasTransferred::class)->handle($message);
 		/**
 		 * Read from DB
 		 * @var Transfer $transfer
@@ -783,6 +794,7 @@ class EventStrategyHandleTest extends TestCase
 		$answerMessage = (new CommandQueryMessage())
 			->setHeaders(
 				(new Headers())
+					->setEventId('1')
 					->setKey(PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY)
 					->setId($payload['headers']['id'])
 					->setDestination(config('broker.services.team_name'))
