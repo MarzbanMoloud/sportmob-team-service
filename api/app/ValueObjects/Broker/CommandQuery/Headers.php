@@ -33,6 +33,11 @@ class Headers
     /**
      * @var string
      */
+    private string $eventId;
+
+    /**
+     * @var string
+     */
     private string $date;
 
     /**
@@ -86,6 +91,24 @@ class Headers
     public function setKey(string $key): Headers
     {
         $this->key = $key;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEventId(): string
+    {
+        return $this->eventId;
+    }
+
+    /**
+     * @param string $eventId
+     * @return Headers
+     */
+    public function setEventId(string $eventId): Headers
+    {
+        $this->eventId = $eventId;
         return $this;
     }
 
