@@ -56,6 +56,6 @@ class EventContext implements EventStrategyInterface
         }
 
         $eventClass = $strategies[$message->getHeaders()->getEvent()];
-        app($eventClass)->handle($message->getBody());
+        app($eventClass)->handle($message);
     }
 }

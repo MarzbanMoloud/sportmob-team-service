@@ -10,7 +10,7 @@
 namespace App\Services\EventStrategy\Interfaces;
 
 
-use App\ValueObjects\Broker\Mediator\MessageBody;
+use App\ValueObjects\Broker\Mediator\Message;
 
 
 /**
@@ -20,7 +20,7 @@ use App\ValueObjects\Broker\Mediator\MessageBody;
 interface EventInterface
 {
     /**
-     * @param MessageBody $body
+     * @param Message $message
      */
-    public function handle(MessageBody $body): void;
+    public function handle(Message $message): void;
 }

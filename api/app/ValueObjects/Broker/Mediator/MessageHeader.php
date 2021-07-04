@@ -22,17 +22,21 @@ class MessageHeader
 
     private \DateTimeImmutable $date;
 
+    private ?string $id;
+
     /**
      * MessageHeader constructor.
-     * @param $event
-     * @param $priority
-     * @param $date
+     * @param string $event
+     * @param string $priority
+     * @param \DateTimeImmutable $date
+     * @param string $id
      */
-    public function __construct(string $event, string $priority, \DateTimeImmutable $date)
+    public function __construct(string $event, string $priority, \DateTimeImmutable $date, ?string $id = null)
     {
         $this->event = $event;
         $this->priority = $priority;
         $this->date = $date;
+        $this->id = $id;
     }
 
     /**
@@ -57,5 +61,13 @@ class MessageHeader
     public function getDate(): \DateTimeImmutable
     {
         return $this->date;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getId(): ?string
+    {
+        return $this->id;
     }
 }
