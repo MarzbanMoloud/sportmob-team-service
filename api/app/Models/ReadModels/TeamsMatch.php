@@ -40,6 +40,12 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	private string $status;
 	private array $result = [];
 
+
+	public function __construct()
+	{
+		$this->setUpdatedAt(new \DateTime());
+	}
+
 	/**
 	 * @return string
 	 */

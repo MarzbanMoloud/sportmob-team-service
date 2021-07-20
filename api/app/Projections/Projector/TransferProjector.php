@@ -76,6 +76,7 @@ class TransferProjector
 		$metadata = $body->getMetadata();
 		$this->eventName = config('mediator-event.events.player_was_transferred');
 		Event::processing($message, $this->eventName);
+		//TODO:: rename.
 		$this->checkIdentifierValidation($message);
 		$this->checkMetadataValidation($message);
 		if ($metadata['active'] == true) {
@@ -91,14 +92,7 @@ class TransferProjector
 		}
 		$this->persistTransfer($transferModel, $message);
 		event(new PlayerWasTransferredProjectorEvent($transferModel, $message));
-		/** Create cache by call service */
-		try {
-			$this->transferCacheService->forget('transfer_by_team*');
-			$this->transferCacheService->forget(TransferCacheService::getTransferByPlayerKey($identifier['player']));
-			$this->transferService->listByPlayer($identifier['player']);
-			$this->transferService->listByTeam($identifier['to'], $transferModel->getSeason());
-		} catch (\Exception $exception) {
-		}
+		//TODO:: create cache.
 		Event::succeeded($message, $this->eventName);
 	}
 
@@ -108,13 +102,10 @@ class TransferProjector
 	 */
 	private function checkIdentifierValidation(Message $message): void
 	{
-		$requiredFields = [
-			'player' => 'Player',
-			'to' => 'To',
-		];
-		foreach ($requiredFields as $fieldName => $prettyFieldName) {
+		$requiredFields = ['player', 'to', 'transferId'];
+		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
-				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
 				Event::failed($message, $this->eventName, $validationMessage);
 				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
@@ -128,13 +119,10 @@ class TransferProjector
 	private function checkMetadataValidation(Message $message): void
 	{
 		$metadata = $message->getBody()->getMetadata();
-		$requiredFields = [
-			'startDate' => 'Start Date',
-			'type' => 'Type',
-		];
-		foreach ($requiredFields as $fieldName => $prettyFieldName) {
+		$requiredFields = ['type'];
+		foreach ($requiredFields as $fieldName) {
 			if (empty($metadata[$fieldName])) {
-				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
 				Event::failed($message, $this->eventName, $validationMessage);
 				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
@@ -175,9 +163,9 @@ class TransferProjector
 	 */
 	private function inactiveLastActiveTransferByPlayerId(Transfer $latestTransfer, Message $message): void
 	{
-		$latestTransfer->setActive( false )
-			->setEndDate( $latestTransfer->getEndDate() ?:
-				new DateTimeImmutable($message->getBody()->getMetadata()['startDate']));
+		$latestTransfer
+			->setActive(false)
+			->setEndDate($latestTransfer->getEndDate() ?: new DateTimeImmutable($message->getBody()->getMetadata()['startDate']));
 		$this->persistTransfer($latestTransfer, $message);
 	}
 
@@ -190,11 +178,12 @@ class TransferProjector
 	private function createTransferModel(array $identifier, array $metadata): Transfer
 	{
 		$transferModel = (new Transfer())
+			->setId($identifier['transferId'])
 			->setPlayerId($identifier['player'])
 			->setFromTeamId($identifier['from'])
 			->setToTeamId($identifier['to'])
-			->setStartDate(new DateTimeImmutable($metadata['startDate']))
-			->setEndDate($metadata['endDate' ] ? new DateTimeImmutable($metadata['endDate']) : null)
+			->setStartDate($metadata['startDate'] ? new DateTimeImmutable($metadata['startDate']) : Transfer::getDateTimeImmutable())
+			->setEndDate($metadata['endDate'] ? new DateTimeImmutable($metadata['endDate']) : null)
 			->setActive($metadata['active'])
 			->setType($metadata['type'])
 			->setCreatedAt(new DateTime());

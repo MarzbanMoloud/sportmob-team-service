@@ -31,6 +31,14 @@ class Team implements DynamoDBRepositoryModelInterface
 	private string $type;
 
 	/**
+	 * Team constructor.
+	 */
+	public function __construct()
+	{
+		$this->setUpdatedAt(new \DateTime());
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getId(): string

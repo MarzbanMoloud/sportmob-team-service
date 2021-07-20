@@ -71,32 +71,32 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	{
 		Answer::handled($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, $commandQuery->getHeaders()->getSource(), __CLASS__);
 		Answer::processing($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
+
 		if (empty($commandQuery->getBody())) {
 			Answer::failed($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, 'Data not found.');
 			return;
 		}
-		[$playerId, $startDate] = explode('#', $commandQuery->getHeaders()->getId());
+
 		/** @var Transfer $transfer */
-		$transfer = $this->transferRepository->find(['playerId' => $playerId, 'startDate' => $startDate]);
-		$transfer->setPlayerName($commandQuery->getBody()['fullName'] ?? $commandQuery->getBody()['shortName'])
+		$transfer = $this->transferRepository->find(['id' => $commandQuery->getHeaders()->getId()]);
+
+		$transfer
+			->setPlayerName($commandQuery->getBody()['fullName'] ?? $commandQuery->getBody()['shortName'])
 			->setPlayerPosition($commandQuery->getBody()['position']);
+
 		try {
 			$this->transferRepository->persist($transfer);
 		} catch (DynamoDBRepositoryException $exception) {
 			Answer::failed($transfer, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, 'Failed to persist transfer.');
 			$this->sentryHub->captureException($exception);
 		}
-		try {
-			$this->transferCacheService->forget('transfer_by_*');//per playerId and teamId
-			$this->transferService->listByPlayer($playerId);
-		} catch (\Exception $e) {
-		}
-		/**
-		 * Put playerInfo in cache.
-		 */
+		//TODO:: create cache.
+
+		/** Put playerInfo in cache.*/
 		$data = $commandQuery->getBody();
 		unset($data['entity']);
 		$this->brokerMessageCacheService->putPlayerInfo($data);
+
 		/**
 		 * Notification message.
 		 * @var Transfer $activeTransfer
@@ -104,6 +104,7 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		if (strpos($transfer->getSeason(), date('Y')) != false) {
 			$this->sendNotification($transfer, PlayerWasTransferredProjectorListener::BROKER_NOTIFICATION_KEY);
 		}
+
 		Answer::succeeded($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
 	}
 }

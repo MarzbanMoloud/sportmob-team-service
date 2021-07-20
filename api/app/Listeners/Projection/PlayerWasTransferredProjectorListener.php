@@ -67,10 +67,7 @@ class PlayerWasTransferredProjectorListener
 					(new Headers())
 						->setEventId($event->mediatorMessage->getHeaders()->getId())
 						->setKey(self::BROKER_EVENT_KEY)
-						->setId(
-							sprintf('%s#%s', $event->transfer->getPlayerId(),
-								$event->transfer->getStartDate()->format(DateTimeInterface::ATOM))
-						)
+						->setId($event->transfer->getId())
 						->setDestination(config('broker.services.player_name'))
 						->setSource(config('broker.services.team_name'))
 						->setDate(Carbon::now()->format('c'))

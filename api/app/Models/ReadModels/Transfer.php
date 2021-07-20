@@ -18,6 +18,10 @@ class Transfer implements DynamoDBRepositoryModelInterface
 {
 	use ReadModelTimestampTrait;
 
+	const ATTR_TO_TEAM_ID = 'toTeamId';
+	const ATTR_FROM_TEAM_ID = 'fromTeamId';
+
+	private string $id;
 	private string $playerId;
 	private ?string $playerName = null;
 	private ?string $playerPosition = null;
@@ -31,10 +35,33 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	private ?DateTimeImmutable $announcedDate = null;
 	private ?DateTimeImmutable $contractDate = null;
 	private string $type;
-	private bool $active = true;
+	private int $active = 1;
 	private ?int $like = 0;
 	private ?int $dislike = 0;
-	private string $season;
+	private string $season = '0';
+
+	public function __construct()
+	{
+		$this->setUpdatedAt(new \DateTime());
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getId(): string
+	{
+		return $this->id;
+	}
+
+	/**
+	 * @param string $id
+	 * @return Transfer
+	 */
+	public function setId(string $id): Transfer
+	{
+		$this->id = $id;
+		return $this;
+	}
 
 	/**
 	 * @return string
@@ -163,6 +190,45 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
+	 * @return string|null
+	 */
+	public function getMarketValue(): ?string
+	{
+		return $this->marketValue;
+	}
+
+	/**
+	 * @param string|null $marketValue
+	 * @return Transfer
+	 */
+	public function setMarketValue(?string $marketValue): Transfer
+	{
+		$this->marketValue = $marketValue;
+		return $this;
+	}
+
+	/**
+	 * @return DateTimeImmutable|null
+	 */
+	public function getStartDate(): ?DateTimeImmutable
+	{
+		return $this->startDate;
+	}
+
+	/**
+	 * @param DateTimeImmutable|null $startDate
+	 * @return Transfer
+	 */
+	public function setStartDate(?DateTimeImmutable $startDate): Transfer
+	{
+		if (!$startDate){
+			$startDate = self::getDateTimeImmutable();
+		}
+		$this->startDate = $startDate;
+		return $this;
+	}
+
+	/**
 	 * @return DateTimeImmutable|null
 	 */
 	public function getEndDate(): ?DateTimeImmutable
@@ -172,7 +238,7 @@ class Transfer implements DynamoDBRepositoryModelInterface
 
 	/**
 	 * @param DateTimeImmutable|null $endDate
-	 * @return $this
+	 * @return Transfer
 	 */
 	public function setEndDate(?DateTimeImmutable $endDate): Transfer
 	{
@@ -235,33 +301,33 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
-	 * @return bool
+	 * @return int
 	 */
-	public function isActive(): bool
+	public function getActive(): int
 	{
 		return $this->active;
 	}
 
 	/**
-	 * @param bool $active
+	 * @param int $active
 	 * @return Transfer
 	 */
-	public function setActive(bool $active): Transfer
+	public function setActive(int $active): Transfer
 	{
 		$this->active = $active;
 		return $this;
 	}
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
-	public function getLike(): int
+	public function getLike(): ?int
 	{
 		return $this->like;
 	}
 
 	/**
-	 * @param int $like
+	 * @param int|null $like
 	 * @return Transfer
 	 */
 	public function setLike(?int $like): Transfer
@@ -271,15 +337,15 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
-	public function getDislike(): int
+	public function getDislike(): ?int
 	{
 		return $this->dislike;
 	}
 
 	/**
-	 * @param int $dislike
+	 * @param int|null $dislike
 	 * @return Transfer
 	 */
 	public function setDislike(?int $dislike): Transfer
@@ -307,48 +373,15 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
-	 * @return DateTimeImmutable
-	 */
-	public function getStartDate(): DateTimeImmutable
-	{
-		return $this->startDate;
-	}
-
-	/**
-	 * @param DateTimeImmutable $startDate
-	 * @return Transfer
-	 */
-	public function setStartDate(DateTimeImmutable $startDate): Transfer
-	{
-		$this->startDate = $startDate;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getMarketValue(): ?string
-	{
-		return $this->marketValue;
-	}
-
-	/**
-	 * @param string|null $marketValue
-	 * @return Transfer
-	 */
-	public function setMarketValue(?string $marketValue): Transfer
-	{
-		$this->marketValue = $marketValue;
-		return $this;
-	}
-
-	/**
 	 * @throws ReadModelValidatorException
 	 */
 	public function prePersist()
 	{
 		if (!$this->fromTeamId && !$this->toTeamId) {
 			throw new ReadModelValidatorException( 'fromTeamId and toTeamId could not be null at same time.' );
+		}
+		if ($this->startDate->getTimestamp() == self::getDateTimeImmutable()->getTimestamp()) {
+			return;
 		}
 		$year         = (int)$this->startDate->format( 'Y' );
 		$month        = (int)$this->startDate->format( 'm' );
@@ -367,5 +400,13 @@ class Transfer implements DynamoDBRepositoryModelInterface
 					$year + 1
 				];
 		$this->season = sprintf( "%d-%d", ...$vars );
+	}
+
+	/**
+	 * @return DateTimeImmutable
+	 */
+	public static function getDateTimeImmutable(): DateTimeImmutable
+	{
+		return (new DateTimeImmutable())->setDate(0, 0, 0)->setTime(0, 0, 0);
 	}
 }

@@ -30,6 +30,14 @@ class Trophy implements DynamoDBRepositoryModelInterface
 	private ?string $tournamentSeason = '0';
 
 	/**
+	 * Trophy constructor.
+	 */
+	public function __construct()
+	{
+		$this->setUpdatedAt(new \DateTime());
+	}
+
+	/**
 	 * @param string $teamId
 	 * @return $this
 	 */

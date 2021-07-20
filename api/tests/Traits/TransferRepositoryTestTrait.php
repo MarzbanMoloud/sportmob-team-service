@@ -25,26 +25,34 @@ trait TransferRepositoryTestTrait
 	}
 
 	/**
-	 * @return Transfer
+	 * @param string|null $playerId
+	 * @param DateTimeImmutable|null $startDate
+	 * @param bool $active
+	 * @throws \App\Exceptions\ReadModelValidatorException
 	 */
-	private function createTransferModel(): Transfer
+	private function createTransferModel(?string $playerId = null, ?DateTimeImmutable $startDate = null, bool $active = false
+		, string $toTeam = "1", string $fromTeam = "2")
 	{
-		return (new Transfer())
-			->setPlayerId($this->faker->uuid)
+		$transferModel = (new Transfer())
+			->setId($this->faker->uuid)
+			->setPlayerId($playerId ?? $this->faker->uuid)
 			->setPlayerName($this->faker->name)
 			->setPlayerPosition('defender')
-			->setFromTeamId($this->faker->uuid)
-			->setFromTeamName('Team B')
-			->setToTeamId($this->faker->uuid)
+			->setFromTeamId($fromTeam)
+			->setToTeamId($toTeam)
+			->setFromTeamName('Team A')
 			->setToTeamName('Team B')
 			->setMarketValue(200)
-			->setStartDate(new DateTimeImmutable('2020-02-02'))
+			->setStartDate($startDate)
 			->setEndDate(new DateTimeImmutable())
 			->setAnnouncedDate(new DateTimeImmutable())
 			->setContractDate(new DateTimeImmutable())
 			->setType('transferred')
-			->setActive(1)
+			->setActive($active)
 			->setCreatedAt(new DateTime());
+
+		$transferModel->prePersist();
+		$this->transferRepository->persist($transferModel);
 	}
 
 	private function persistBatchDataForListByTeam(string $fakeTeamId, string $fakeTeamName): void
