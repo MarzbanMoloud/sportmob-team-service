@@ -4,9 +4,8 @@
 namespace App\Listeners\Projection;
 
 
-use App\Events\Projection\PlayerWasTransferredProjectorEvent;
+use App\Events\Projection\MembershipWasUpdatedProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
-use App\Exceptions\Projection\ProjectionException;
 use App\Listeners\Traits\PlayerWasTransferredNotificationTrait;
 use App\Models\Repositories\TransferRepository;
 use App\Services\BrokerInterface;
@@ -15,25 +14,26 @@ use App\Services\Logger\Event;
 use App\ValueObjects\Broker\CommandQuery\Headers;
 use App\ValueObjects\Broker\CommandQuery\Message;
 use Carbon\Carbon;
-use DateTimeInterface;
+use Sentry\State\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
- * Class PlayerWasTransferredProjectorListener
+ * Class MembershipWasUpdatedProjectorListener
  * @package App\Listeners\Projection
  */
-class PlayerWasTransferredProjectorListener
+class MembershipWasUpdatedProjectorListener
 {
 	use PlayerWasTransferredNotificationTrait;
 
-	const BROKER_EVENT_KEY = 'PlayerWasTransferredUpdateInfo';
-	const BROKER_NOTIFICATION_KEY = 'transfer-player';
+	const BROKER_EVENT_KEY = 'MembershipWasUpdated-UpdateInfo';
+	const BROKER_NOTIFICATION_KEY = 'membership-person';
 
 	private BrokerInterface $broker;
 	private SerializerInterface $serializer;
 	private BrokerMessageCacheServiceInterface $brokerMessageCacheService;
 	private TransferRepository $transferRepository;
+	private HubInterface $sentryHub;
 
 	/**
 	 * PlayerWasTransferredProjectorListener constructor.
@@ -41,27 +41,31 @@ class PlayerWasTransferredProjectorListener
 	 * @param BrokerMessageCacheServiceInterface $brokerMessageCacheService
 	 * @param TransferRepository $transferRepository
 	 * @param SerializerInterface $serializer
+	 * @param HubInterface $sentryHub
 	 */
 	public function __construct(
 		BrokerInterface $broker,
 		BrokerMessageCacheServiceInterface $brokerMessageCacheService,
 		TransferRepository $transferRepository,
-		SerializerInterface $serializer
+		SerializerInterface $serializer,
+		HubInterface $sentryHub
 	) {
 		$this->serializer = $serializer;
 		$this->broker = $broker;
 		$this->brokerMessageCacheService = $brokerMessageCacheService;
 		$this->transferRepository = $transferRepository;
+		$this->sentryHub = $sentryHub;
 	}
 
 	/**
-	 * @param PlayerWasTransferredProjectorEvent $event
-	 * @throws ProjectionException
+	 * @param MembershipWasUpdatedProjectorEvent $event
 	 */
-	public function handle(PlayerWasTransferredProjectorEvent $event)
+	public function handle(MembershipWasUpdatedProjectorEvent $event)
 	{
-		$eventName = config('mediator-event.events.player_was_transferred');
-		if (! $this->brokerMessageCacheService->hasPlayerInfo($event->transfer->getPlayerId())) {
+		$eventName = config('mediator-event.events.membership_was_updated');
+
+		if (! $this->brokerMessageCacheService->hasPlayerInfo($event->transfer->getPersonId())) {
+
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
@@ -73,28 +77,32 @@ class PlayerWasTransferredProjectorListener
 						->setDate(Carbon::now()->format('c'))
 				)->setBody([
 					'entity' => config('broker.services.player_name'),
-					'id' => $event->transfer->getPlayerId()
+					'id' => $event->transfer->getPersonId()
 				]);
+
 			$this->broker->flushMessages()->addMessage(
 				self::BROKER_EVENT_KEY,
 				$this->serializer->serialize($message, 'json')
 			)->produceMessage(config('broker.topics.question_player'));
+
 			Event::needToAsk($message, $eventName, self::BROKER_EVENT_KEY, config('broker.services.player_name'));
+
 			return;
 		}
-		$playerInfo = $this->brokerMessageCacheService->getPlayerInfo($event->transfer->getPlayerId());
-		$event->transfer
-			->setPlayerName($playerInfo['fullName'] ?? $playerInfo['shortName'])
-			->setPlayerPosition($playerInfo['position']);
+
+		$playerInfo = $this->brokerMessageCacheService->getPlayerInfo($event->transfer->getPersonId());
+		$event->transfer->setPersonName($playerInfo['fullName'] ?? $playerInfo['shortName']);
+
 		try {
 			$this->transferRepository->persist($event->transfer);
 		} catch (DynamoDBRepositoryException $exception) {
-			$validationMessage = 'Failed to update transfer.';
-			Event::failed($event->mediatorMessage, $eventName, $validationMessage);
-			throw new ProjectionException($validationMessage, $exception->getCode());
+			Event::failed($event->mediatorMessage, $eventName, 'Failed to update transfer.');
+			$this->sentryHub->captureException($exception);
 		}
-		if (strpos($event->transfer->getSeason(), date('Y')) != false) {
+
+		//TODO:: notification
+		/*if (strpos($event->transfer->getSeason(), date('Y')) != false) {
 			$this->sendNotification($event->transfer, self::BROKER_NOTIFICATION_KEY);
-		}
+		}*/
 	}
 }

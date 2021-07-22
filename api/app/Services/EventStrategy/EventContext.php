@@ -41,7 +41,7 @@ class EventContext implements EventStrategyInterface
 		$strategies = [
 			config('mediator-event.events.team_was_created') => TeamWasCreated::class,
 			config('mediator-event.events.team_was_updated') => TeamWasUpdated::class,
-			config('mediator-event.events.player_was_transferred') => PlayerWasTransferred::class,
+			config('mediator-event.events.membership_was_updated') => MembershipWasUpdated::class,
 			config('mediator-event.events.team_became_runner_up') => TeamBecameRunnerUp::class,
 			config('mediator-event.events.team_became_winner') => TeamBecameWinner::class,
 			config('mediator-event.events.match_was_created') => MatchWasCreated::class,

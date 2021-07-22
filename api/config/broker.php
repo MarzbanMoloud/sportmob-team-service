@@ -13,7 +13,7 @@ return [
     'topics'      => [
         'event_team_was_created' => env( 'BROKER_TOPIC_TEAM_WAS_CREATED', 'team_was_created_topic' ),
         'event_team_was_updated' => env( 'BROKER_TOPIC_TEAM_WAS_UPDATED', 'team_was_updated_topic' ),
-        'event_player_was_transferred' => env( 'BROKER_TOPIC_PLAYER_WAS_TRANSFERRED', 'player_was_transferred_topic' ),
+        'event_membership_was_updated' => env( 'BROKER_TOPIC_MEMBERSHIP_WAS_UPDATED', 'membership_was_updated_topic' ),
         'event_team_became_runner_up' => env( 'BROKER_TOPIC_TEAM_BECAME_RUNNER_UP', 'team_became_runner_up_topic' ),
         'event_team_became_winner' => env( 'BROKER_TOPIC_TEAM_BECAME_WINNER', 'team_became_winner_topic' ),
         'event_match_was_created' => env( 'BROKER_TOPIC_MATCH_WAS_CREATED', 'match_was_created_topic' ),

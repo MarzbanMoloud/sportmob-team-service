@@ -10,16 +10,16 @@ use App\ValueObjects\Broker\Mediator\Message;
 
 
 /**
- * Class PlayerWasTransferredProjectorEvent
+ * Class MembershipWasUpdatedProjectorEvent
  * @package App\Events\Projection
  */
-class PlayerWasTransferredProjectorEvent extends Event
+class MembershipWasUpdatedProjectorEvent extends Event
 {
 	public Transfer $transfer;
 	public Message $mediatorMessage;
 
 	/**
-	 * PlayerWasTransferredProjectorEvent constructor.
+	 * MembershipWasUpdatedProjectorEvent constructor.
 	 * @param Transfer $transfer
 	 * @param Message $mediatorMessage
 	 */

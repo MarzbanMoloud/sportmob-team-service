@@ -6,7 +6,7 @@ namespace App\Services\BrokerCommandStrategy;
 
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Http\Services\Transfer\TransferService;
-use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
+use App\Listeners\Projection\MembershipWasUpdatedProjectorListener;
 use App\Listeners\Traits\PlayerWasTransferredNotificationTrait;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TransferRepository;
@@ -21,10 +21,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
- * Class PlayerWasTransferredUpdateInfo
+ * Class MembershipWasUpdatedUpdateInfo
  * @package App\Services\BrokerCommandStrategy
  */
-class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
+class MembershipWasUpdatedUpdateInfo implements BrokerCommandEventInterface
 {
 	use PlayerWasTransferredNotificationTrait;
 
@@ -69,25 +69,23 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 	 */
 	public function handle(Message $commandQuery): void
 	{
-		Answer::handled($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, $commandQuery->getHeaders()->getSource(), __CLASS__);
-		Answer::processing($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
+		Answer::handled($commandQuery, MembershipWasUpdatedProjectorListener::BROKER_EVENT_KEY, $commandQuery->getHeaders()->getSource(), __CLASS__);
+		Answer::processing($commandQuery, MembershipWasUpdatedProjectorListener::BROKER_EVENT_KEY);
 
 		if (empty($commandQuery->getBody())) {
-			Answer::failed($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, 'Data not found.');
+			Answer::failed($commandQuery, MembershipWasUpdatedProjectorListener::BROKER_EVENT_KEY, 'Data not found.');
 			return;
 		}
 
 		/** @var Transfer $transfer */
 		$transfer = $this->transferRepository->find(['id' => $commandQuery->getHeaders()->getId()]);
 
-		$transfer
-			->setPlayerName($commandQuery->getBody()['fullName'] ?? $commandQuery->getBody()['shortName'])
-			->setPlayerPosition($commandQuery->getBody()['position']);
+		$transfer->setPersonName($commandQuery->getBody()['fullName'] ?? $commandQuery->getBody()['shortName']);
 
 		try {
 			$this->transferRepository->persist($transfer);
 		} catch (DynamoDBRepositoryException $exception) {
-			Answer::failed($transfer, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, 'Failed to persist transfer.');
+			Answer::failed($transfer, MembershipWasUpdatedProjectorListener::BROKER_EVENT_KEY, 'Failed to persist transfer.');
 			$this->sentryHub->captureException($exception);
 		}
 		//TODO:: create cache.
@@ -101,10 +99,11 @@ class PlayerWasTransferredUpdateInfo implements BrokerCommandEventInterface
 		 * Notification message.
 		 * @var Transfer $activeTransfer
 		 */
-		if (strpos($transfer->getSeason(), date('Y')) != false) {
-			$this->sendNotification($transfer, PlayerWasTransferredProjectorListener::BROKER_NOTIFICATION_KEY);
-		}
+		//TODO:: notification
+	/*	if (strpos($transfer->getSeason(), date('Y')) != false) {
+			$this->sendNotification($transfer, MembershipWasUpdatedProjectorListener::BROKER_NOTIFICATION_KEY);
+		}*/
 
-		Answer::succeeded($commandQuery, PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY);
+		Answer::succeeded($commandQuery, MembershipWasUpdatedProjectorListener::BROKER_EVENT_KEY);
 	}
 }

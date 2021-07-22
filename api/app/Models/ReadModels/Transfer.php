@@ -18,6 +18,7 @@ class Transfer implements DynamoDBRepositoryModelInterface
 {
 	use ReadModelTimestampTrait;
 
+	const DEFAULT_VALUE = '0';
 	const ATTR_TEAM_ID = 'teamId';
 	const ATTR_ON_LOAN_FROM_ID = 'onLoanFromId';
 
@@ -27,11 +28,11 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	private string $personType;
 	private string $teamId;
 	private ?string $teamName = null;
-	private string $onLoanFromId = '0';
+	private string $onLoanFromId = self::DEFAULT_VALUE;
 	private ?string $onLoanFromName = null;
 	private DateTimeImmutable $dateFrom;
 	private ?DateTimeImmutable $dateTo = null;
-	private string $season = '0';
+	private string $season = self::DEFAULT_VALUE;
 	private ?int $like = 0;
 	private ?int $dislike = 0;
 	private ?string $marketValue = null;
@@ -339,14 +340,14 @@ class Transfer implements DynamoDBRepositoryModelInterface
 		if ($this->dateFrom->getTimestamp() == self::getDateTimeImmutable()->getTimestamp()) {
 			return;
 		}
-		$year         = (int)$this->dateFrom->format( 'Y' );
-		$month        = (int)$this->dateFrom->format( 'm' );
-		$vars         =
-			in_array( $month,
+		$year = (int)$this->dateFrom->format('Y');
+		$month = (int)$this->dateFrom->format('m');
+		$vars =
+			in_array($month,
 				[
 					1,
 					2
-				] ) ?
+				]) ?
 				[
 					$year - 1,
 					$year
@@ -355,7 +356,7 @@ class Transfer implements DynamoDBRepositoryModelInterface
 					$year,
 					$year + 1
 				];
-		$this->season = sprintf( "%d-%d", ...$vars );
+		$this->season = sprintf("%d-%d", ...$vars);
 	}
 
 	/**

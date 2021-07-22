@@ -6,13 +6,13 @@ namespace App\Providers;
 
 use App\Events\Admin\TeamUpdatedEvent;
 use App\Events\Projection\MatchWasCreatedProjectorEvent;
-use App\Events\Projection\PlayerWasTransferredProjectorEvent;
+use App\Events\Projection\MembershipWasUpdatedProjectorEvent;
 use App\Events\Projection\TeamWasCreatedProjectorEvent;
 use App\Events\Projection\TeamWasUpdatedProjectorEvent;
 use App\Events\Projection\TrophyProjectorEvent;
 use App\Listeners\Admin\TeamUpdatedListener;
 use App\Listeners\Projection\MatchWasCreatedProjectorListener;
-use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
+use App\Listeners\Projection\MembershipWasUpdatedProjectorListener;
 use App\Listeners\Projection\TeamCacheListener;
 use App\Listeners\Projection\TrophyProjectorListener;
 use App\Events\Consumer\{BrokerCommandEvent, BrokerMediatorEvent, BrokerQueryEvent};
@@ -42,8 +42,8 @@ class EventServiceProvider extends ServiceProvider
 			TeamCacheListener::class
 		],
 
-		PlayerWasTransferredProjectorEvent::class => [
-			PlayerWasTransferredProjectorListener::class
+		MembershipWasUpdatedProjectorEvent::class => [
+			MembershipWasUpdatedProjectorListener::class
 		],
 
 		TrophyProjectorEvent::class => [

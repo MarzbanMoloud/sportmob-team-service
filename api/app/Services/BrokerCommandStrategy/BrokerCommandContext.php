@@ -5,7 +5,7 @@ namespace App\Services\BrokerCommandStrategy;
 
 
 use App\Listeners\Projection\MatchWasCreatedProjectorListener;
-use App\Listeners\Projection\PlayerWasTransferredProjectorListener;
+use App\Listeners\Projection\MembershipWasUpdatedProjectorListener;
 use App\Listeners\Projection\TrophyProjectorListener;
 use App\Services\BrokerCommandStrategy\Interfaces\BrokerCommandStrategyInterface;
 use App\Services\Logger\Answer;
@@ -37,7 +37,7 @@ class BrokerCommandContext implements BrokerCommandStrategyInterface
     public function handle(Message $message): void
     {
 		$strategies = [
-			PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY => PlayerWasTransferredUpdateInfo::class,
+			MembershipWasUpdatedProjectorListener::BROKER_EVENT_KEY => MembershipWasUpdatedUpdateInfo::class,
 			TrophyProjectorListener::BROKER_EVENT_KEY => TrophyUpdateInfo::class,
 			MatchWasCreatedProjectorListener::BROKER_EVENT_KEY => MatchWasCreatedUpdatedInfo::class,
 		];
