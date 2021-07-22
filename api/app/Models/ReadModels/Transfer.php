@@ -18,28 +18,29 @@ class Transfer implements DynamoDBRepositoryModelInterface
 {
 	use ReadModelTimestampTrait;
 
-	const ATTR_TO_TEAM_ID = 'toTeamId';
-	const ATTR_FROM_TEAM_ID = 'fromTeamId';
+	const ATTR_TEAM_ID = 'teamId';
+	const ATTR_ON_LOAN_FROM_ID = 'onLoanFromId';
 
 	private string $id;
-	private string $playerId;
-	private ?string $playerName = null;
-	private ?string $playerPosition = null;
-	private ?string $fromTeamId = null;
-	private ?string $fromTeamName = null;
-	private string $toTeamId;
-	private string $toTeamName;
-	private ?string $marketValue = null;
-	private DateTimeImmutable $startDate;
-	private ?DateTimeImmutable $endDate = null;
-	private ?DateTimeImmutable $announcedDate = null;
-	private ?DateTimeImmutable $contractDate = null;
-	private string $type;
-	private int $active = 1;
+	private string $personId;
+	private ?string $personName = null;
+	private string $personType;
+	private string $teamId;
+	private ?string $teamName = null;
+	private string $onLoanFromId = '0';
+	private ?string $onLoanFromName = null;
+	private DateTimeImmutable $dateFrom;
+	private ?DateTimeImmutable $dateTo = null;
+	private string $season = '0';
 	private ?int $like = 0;
 	private ?int $dislike = 0;
-	private string $season = '0';
+	private ?string $marketValue = null;
+	private ?DateTimeImmutable $announcedDate = null;
+	private ?DateTimeImmutable $contractDate = null;
 
+	/**
+	 * Transfer constructor.
+	 */
 	public function __construct()
 	{
 		$this->setUpdatedAt(new \DateTime());
@@ -66,255 +67,180 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	/**
 	 * @return string
 	 */
-	public function getPlayerId(): string
+	public function getPersonId(): string
 	{
-		return $this->playerId;
+		return $this->personId;
 	}
 
 	/**
-	 * @param string $playerId
+	 * @param string $personId
 	 * @return Transfer
 	 */
-	public function setPlayerId(string $playerId): Transfer
+	public function setPersonId(string $personId): Transfer
 	{
-		$this->playerId = $playerId;
+		$this->personId = $personId;
 		return $this;
 	}
 
 	/**
 	 * @return string|null
 	 */
-	public function getPlayerName(): ?string
+	public function getPersonName(): ?string
 	{
-		return $this->playerName;
+		return $this->personName;
 	}
 
 	/**
-	 * @param string|null $playerName
+	 * @param string|null $personName
 	 * @return Transfer
 	 */
-	public function setPlayerName(?string $playerName): Transfer
+	public function setPersonName(?string $personName): Transfer
 	{
-		$this->playerName = $playerName;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getPlayerPosition(): ?string
-	{
-		return $this->playerPosition;
-	}
-
-	/**
-	 * @param string|null $playerPosition
-	 * @return Transfer
-	 */
-	public function setPlayerPosition(?string $playerPosition): Transfer
-	{
-		$this->playerPosition = $playerPosition;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getFromTeamId(): ?string
-	{
-		return $this->fromTeamId;
-	}
-
-	/**
-	 * @param string|null $fromTeamId
-	 * @return Transfer
-	 */
-	public function setFromTeamId(?string $fromTeamId): Transfer
-	{
-		$this->fromTeamId = $fromTeamId;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getFromTeamName(): ?string
-	{
-		return $this->fromTeamName;
-	}
-
-	/**
-	 * @param string|null $fromTeamName
-	 * @return Transfer
-	 */
-	public function setFromTeamName(?string $fromTeamName): Transfer
-	{
-		$this->fromTeamName = $fromTeamName;
+		$this->personName = $personName;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getToTeamId(): string
+	public function getPersonType(): string
 	{
-		return $this->toTeamId;
+		return $this->personType;
 	}
 
 	/**
-	 * @param string $toTeamId
+	 * @param string $personType
 	 * @return Transfer
 	 */
-	public function setToTeamId(string $toTeamId): Transfer
+	public function setPersonType(string $personType): Transfer
 	{
-		$this->toTeamId = $toTeamId;
+		$this->personType = $personType;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getToTeamName(): string
+	public function getTeamId(): string
 	{
-		return $this->toTeamName;
+		return $this->teamId;
 	}
 
 	/**
-	 * @param string $toTeamName
+	 * @param string $teamId
 	 * @return Transfer
 	 */
-	public function setToTeamName(string $toTeamName): Transfer
+	public function setTeamId(string $teamId): Transfer
 	{
-		$this->toTeamName = $toTeamName;
+		$this->teamId = $teamId;
 		return $this;
 	}
 
 	/**
 	 * @return string|null
 	 */
-	public function getMarketValue(): ?string
+	public function getTeamName(): ?string
 	{
-		return $this->marketValue;
+		return $this->teamName;
 	}
 
 	/**
-	 * @param string|null $marketValue
+	 * @param string|null $teamName
 	 * @return Transfer
 	 */
-	public function setMarketValue(?string $marketValue): Transfer
+	public function setTeamName(?string $teamName): Transfer
 	{
-		$this->marketValue = $marketValue;
-		return $this;
-	}
-
-	/**
-	 * @return DateTimeImmutable|null
-	 */
-	public function getStartDate(): ?DateTimeImmutable
-	{
-		return $this->startDate;
-	}
-
-	/**
-	 * @param DateTimeImmutable|null $startDate
-	 * @return Transfer
-	 */
-	public function setStartDate(?DateTimeImmutable $startDate): Transfer
-	{
-		if (!$startDate){
-			$startDate = self::getDateTimeImmutable();
-		}
-		$this->startDate = $startDate;
-		return $this;
-	}
-
-	/**
-	 * @return DateTimeImmutable|null
-	 */
-	public function getEndDate(): ?DateTimeImmutable
-	{
-		return $this->endDate;
-	}
-
-	/**
-	 * @param DateTimeImmutable|null $endDate
-	 * @return Transfer
-	 */
-	public function setEndDate(?DateTimeImmutable $endDate): Transfer
-	{
-		$this->endDate = $endDate;
-		return $this;
-	}
-
-	/**
-	 * @return DateTimeImmutable|null
-	 */
-	public function getAnnouncedDate(): ?DateTimeImmutable
-	{
-		return $this->announcedDate;
-	}
-
-	/**
-	 * @param DateTimeImmutable|null $announcedDate
-	 * @return Transfer
-	 */
-	public function setAnnouncedDate(?DateTimeImmutable $announcedDate): Transfer
-	{
-		$this->announcedDate = $announcedDate;
-		return $this;
-	}
-
-	/**
-	 * @return DateTimeImmutable|null
-	 */
-	public function getContractDate(): ?DateTimeImmutable
-	{
-		return $this->contractDate;
-	}
-
-	/**
-	 * @param DateTimeImmutable|null $contractDate
-	 * @return Transfer
-	 */
-	public function setContractDate(?DateTimeImmutable $contractDate): Transfer
-	{
-		$this->contractDate = $contractDate;
+		$this->teamName = $teamName;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getType(): string
+	public function getOnLoanFromId(): string
 	{
-		return $this->type;
+		return $this->onLoanFromId;
 	}
 
 	/**
-	 * @param string $type
+	 * @param string $onLoanFromId
 	 * @return Transfer
 	 */
-	public function setType(string $type): Transfer
+	public function setOnLoanFromId(string $onLoanFromId): Transfer
 	{
-		$this->type = $type;
+		$this->onLoanFromId = $onLoanFromId;
 		return $this;
 	}
 
 	/**
-	 * @return int
+	 * @return string|null
 	 */
-	public function getActive(): int
+	public function getOnLoanFromName(): ?string
 	{
-		return $this->active;
+		return $this->onLoanFromName;
 	}
 
 	/**
-	 * @param int $active
+	 * @param string|null $onLoanFromName
 	 * @return Transfer
 	 */
-	public function setActive(int $active): Transfer
+	public function setOnLoanFromName(?string $onLoanFromName): Transfer
 	{
-		$this->active = $active;
+		$this->onLoanFromName = $onLoanFromName;
+		return $this;
+	}
+
+	/**
+	 * @return DateTimeImmutable
+	 */
+	public function getDateFrom(): DateTimeImmutable
+	{
+		return $this->dateFrom;
+	}
+
+	/**
+	 * @param DateTimeImmutable $dateFrom
+	 * @return Transfer
+	 */
+	public function setDateFrom(DateTimeImmutable $dateFrom): Transfer
+	{
+		$this->dateFrom = $dateFrom;
+		return $this;
+	}
+
+	/**
+	 * @return DateTimeImmutable|null
+	 */
+	public function getDateTo(): ?DateTimeImmutable
+	{
+		return $this->dateTo;
+	}
+
+	/**
+	 * @param DateTimeImmutable|null $dateTo
+	 * @return Transfer
+	 */
+	public function setDateTo(?DateTimeImmutable $dateTo): Transfer
+	{
+		$this->dateTo = $dateTo;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSeason(): string
+	{
+		return $this->season;
+	}
+
+	/**
+	 * @param string $season
+	 * @return Transfer
+	 */
+	public function setSeason(string $season): Transfer
+	{
+		$this->season = $season;
 		return $this;
 	}
 
@@ -355,36 +281,66 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getSeason(): string
+	public function getMarketValue(): ?string
 	{
-		return $this->season;
+		return $this->marketValue;
 	}
 
 	/**
-	 * @param string $season
+	 * @param string|null $marketValue
 	 * @return Transfer
 	 */
-	public function setSeason(string $season): Transfer
+	public function setMarketValue(?string $marketValue): Transfer
 	{
-		$this->season = $season;
+		$this->marketValue = $marketValue;
 		return $this;
 	}
 
 	/**
-	 * @throws ReadModelValidatorException
+	 * @return DateTimeImmutable|null
 	 */
-	public function prePersist()
+	public function getAnnouncedDate(): ?DateTimeImmutable
 	{
-		if (!$this->fromTeamId && !$this->toTeamId) {
-			throw new ReadModelValidatorException( 'fromTeamId and toTeamId could not be null at same time.' );
-		}
-		if ($this->startDate->getTimestamp() == self::getDateTimeImmutable()->getTimestamp()) {
+		return $this->announcedDate;
+	}
+
+	/**
+	 * @param DateTimeImmutable|null $announcedDate
+	 * @return Transfer
+	 */
+	public function setAnnouncedDate(?DateTimeImmutable $announcedDate): Transfer
+	{
+		$this->announcedDate = $announcedDate;
+		return $this;
+	}
+
+	/**
+	 * @return DateTimeImmutable|null
+	 */
+	public function getContractDate(): ?DateTimeImmutable
+	{
+		return $this->contractDate;
+	}
+
+	/**
+	 * @param DateTimeImmutable|null $contractDate
+	 * @return Transfer
+	 */
+	public function setContractDate(?DateTimeImmutable $contractDate): Transfer
+	{
+		$this->contractDate = $contractDate;
+		return $this;
+	}
+
+	public function prePersist(): void
+	{
+		if ($this->dateFrom->getTimestamp() == self::getDateTimeImmutable()->getTimestamp()) {
 			return;
 		}
-		$year         = (int)$this->startDate->format( 'Y' );
-		$month        = (int)$this->startDate->format( 'm' );
+		$year         = (int)$this->dateFrom->format( 'Y' );
+		$month        = (int)$this->dateFrom->format( 'm' );
 		$vars         =
 			in_array( $month,
 				[

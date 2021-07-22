@@ -25,30 +25,27 @@ trait TransferRepositoryTestTrait
 	}
 
 	/**
-	 * @param string|null $playerId
-	 * @param DateTimeImmutable|null $startDate
-	 * @param bool $active
-	 * @throws \App\Exceptions\ReadModelValidatorException
+	 * @param string|null $personId
+	 * @param DateTimeImmutable|null $dateFrom
+	 * @param string|null $teamId
+	 * @param string|null $onLoanFromId
 	 */
-	private function createTransferModel(?string $playerId = null, ?DateTimeImmutable $startDate = null, bool $active = false
-		, string $toTeam = "1", string $fromTeam = "2")
+	private function createTransferModel(?string $personId = null, ?DateTimeImmutable $dateFrom = null, ?string $teamId = null,?string $onLoanFromId = null)
 	{
 		$transferModel = (new Transfer())
 			->setId($this->faker->uuid)
-			->setPlayerId($playerId ?? $this->faker->uuid)
-			->setPlayerName($this->faker->name)
-			->setPlayerPosition('defender')
-			->setFromTeamId($fromTeam)
-			->setToTeamId($toTeam)
-			->setFromTeamName('Team A')
-			->setToTeamName('Team B')
+			->setPersonId($personId ?? $this->faker->uuid)
+			->setPersonName($this->faker->name)
+			->setPersonType('player')
+			->setTeamId($teamId ?? $this->faker->uuid)
+			->setTeamName($this->faker->city)
+			->setOnLoanFromId($onLoanFromId ?? $this->faker->uuid)
+			->setOnLoanFromName($onLoanFromId ? $this->faker->city : null)
+			->setDateFrom($dateFrom ?? Transfer::getDateTimeImmutable())
+			->setDateTo(new DateTimeImmutable())
 			->setMarketValue(200)
-			->setStartDate($startDate)
-			->setEndDate(new DateTimeImmutable())
 			->setAnnouncedDate(new DateTimeImmutable())
 			->setContractDate(new DateTimeImmutable())
-			->setType('transferred')
-			->setActive($active)
 			->setCreatedAt(new DateTime());
 
 		$transferModel->prePersist();
@@ -57,11 +54,11 @@ trait TransferRepositoryTestTrait
 
 	private function persistBatchDataForListByTeam(string $fakeTeamId, string $fakeTeamName): void
 	{
-		$fakePlayerPositions = ['defender', 'forward', 'goalkeeper', 'midfielder'];
+		$fakePersonPositions = ['defender', 'forward', 'goalkeeper', 'midfielder'];
 		for ($i = 1; $i < 10; $i++) {
 			$fakeTransferModel = $this->createTransferModel()
 				->setStartDate(new DateTimeImmutable(sprintf( "2020-%d-01", rand( 1, 12 ))))
-				->setPlayerPosition($fakePlayerPositions[$this->faker->numberBetween(0, 3)]);
+				->setPersonPosition($fakePersonPositions[$this->faker->numberBetween(0, 3)]);
 			$fakeTransferModel->prePersist();
 			$this->transferRepository->persist($fakeTransferModel);
 		}
@@ -70,13 +67,13 @@ trait TransferRepositoryTestTrait
 			if (in_array($i, [1,2,3,4])) {
 				$fakeTransferModel
 					->setStartDate(new DateTimeImmutable(sprintf( "2020-%d-01", $this->faker->numberBetween(1, 2))))
-					->setPlayerPosition($fakePlayerPositions[$this->faker->numberBetween(0, 3)])
+					->setPersonPosition($fakePersonPositions[$this->faker->numberBetween(0, 3)])
 					->setFromTeamId($fakeTeamId)
 					->setFromTeamName($fakeTeamName);
 			} else {
 				$fakeTransferModel
 					->setStartDate(new DateTimeImmutable(sprintf( "2020-%d-01", $this->faker->numberBetween(3, 12))))
-					->setPlayerPosition($fakePlayerPositions[$this->faker->numberBetween(0, 3)])
+					->setPersonPosition($fakePersonPositions[$this->faker->numberBetween(0, 3)])
 					->setToTeamId($fakeTeamId)
 					->setToTeamName($fakeTeamName);
 			}
@@ -85,13 +82,13 @@ trait TransferRepositoryTestTrait
 		}
 	}
 
-	private function persistBatchDataForListByPlayer(string $fakePlayerId, string $fakePlayerName): void
+	private function persistBatchDataForListByPerson(string $fakePersonId, string $fakePersonName): void
 	{
 		for ($i = 0; $i < 5; $i++) {
 			$fakeTransferModel = $this->createTransferModel();
-			$fakeTransferModel->setPlayerName($fakePlayerName)
+			$fakeTransferModel->setPersonName($fakePersonName)
 				->setStartDate(new DateTimeImmutable( sprintf( "2019-%d-01", rand( 1, 12 ) )))
-				->setPlayerId($fakePlayerId);
+				->setPersonId($fakePersonId);
 			$fakeTransferModel->prePersist();
 			$this->transferRepository->persist($fakeTransferModel);
 		}

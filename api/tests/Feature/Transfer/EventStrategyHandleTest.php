@@ -71,7 +71,8 @@ class EventStrategyHandleTest extends TestCase
 				"identifiers": {
 					"player": "%s",
 					"from": "%s",
-					"to": "%s"
+					"to": "%s",
+					"transfer": "%s"
 				 },
 				"metadata": {
 					"startDate": "2021-02-10",
@@ -85,6 +86,7 @@ class EventStrategyHandleTest extends TestCase
 		Carbon::now()->format('c'),
 		$this->faker->uuid,
 		$this->faker->uuid,
+		$this->faker->uuid,
 		$this->faker->uuid);
 		/**
 		 * @var Message $message
@@ -93,10 +95,14 @@ class EventStrategyHandleTest extends TestCase
 		/**
 		 * Persist team items for 'to' and 'from' fields.
 		 */
-		$fakeTeamToModel = $this->createTeamModel()->setId($message->getBody()->getIdentifiers()['to']);
+		$fakeTeamToModel = $this->createTeamModel()
+			->setId($message->getBody()->getIdentifiers()['to']);
 		$this->teamRepository->persist($fakeTeamToModel);
-		$fakeTeamFromModel = $this->createTeamModel()->setId($message->getBody()->getIdentifiers()['from']);
+
+		$fakeTeamFromModel = $this->createTeamModel()
+			->setId($message->getBody()->getIdentifiers()['from']);
 		$this->teamRepository->persist($fakeTeamFromModel);
+
 		/**
 		 * Handle event.
 		 */
@@ -106,6 +112,7 @@ class EventStrategyHandleTest extends TestCase
 		 * @var Transfer $transfer
 		 */
 		$transfer = $this->transferRepository->findByPlayerId($message->getBody()->getIdentifiers()['player']);
+
 		$this->assertNotEmpty($transfer);
 		$transfer = $transfer[0];
 		$this->assertEquals($message->getBody()->getIdentifiers()['player'], $transfer->getPlayerId());
@@ -121,10 +128,11 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertNull($transfer->getAnnouncedDate());
 		$this->assertNull($transfer->getContractDate());
 		$this->assertEquals($message->getBody()->getMetadata()['type'], $transfer->getType());
-		$this->assertTrue($transfer->isActive());
+		$this->assertTrue($transfer->getActive());
 		$this->assertEquals(0, $transfer->getLike());
 		$this->assertEquals(0, $transfer->getDislike());
 		$this->assertNotNull($transfer->getSeason());
+
 		/**
 		 * Consume question message for get player info from player_service.
 		 */
@@ -135,9 +143,7 @@ class EventStrategyHandleTest extends TestCase
 		$this->assertEquals(config('broker.services.team_name'), $payload['headers']['source']);
 		$this->assertEquals(config('broker.services.player_name'), $payload['headers']['destination']);
 		$this->assertEquals(PlayerWasTransferredProjectorListener::BROKER_EVENT_KEY, $payload['headers']['key']);
-		$this->assertEquals(
-			sprintf('%s#%s', $message->getBody()->getIdentifiers()['player'], $transfer->getStartDate()->format(DateTimeInterface::ATOM))
-			, $payload['headers']['id']);
+		$this->assertEquals($message->getBody()->getIdentifiers()['transfer'], $payload['headers']['id']);
 		$this->assertEquals(config('broker.services.player_name'), $payload['body']['entity']);
 		$this->assertEquals($message->getBody()->getIdentifiers()['player'], $payload['body']['id']);
 		/**

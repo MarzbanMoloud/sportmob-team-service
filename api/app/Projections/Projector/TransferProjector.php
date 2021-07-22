@@ -76,7 +76,6 @@ class TransferProjector
 		$metadata = $body->getMetadata();
 		$this->eventName = config('mediator-event.events.player_was_transferred');
 		Event::processing($message, $this->eventName);
-		//TODO:: rename.
 		$this->checkIdentifierValidation($message);
 		$this->checkMetadataValidation($message);
 		if ($metadata['active'] == true) {
@@ -102,7 +101,7 @@ class TransferProjector
 	 */
 	private function checkIdentifierValidation(Message $message): void
 	{
-		$requiredFields = ['player', 'to', 'transferId'];
+		$requiredFields = ['player', 'to', 'transfer'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
@@ -178,7 +177,7 @@ class TransferProjector
 	private function createTransferModel(array $identifier, array $metadata): Transfer
 	{
 		$transferModel = (new Transfer())
-			->setId($identifier['transferId'])
+			->setId($identifier['transfer'])
 			->setPlayerId($identifier['player'])
 			->setFromTeamId($identifier['from'])
 			->setToTeamId($identifier['to'])
