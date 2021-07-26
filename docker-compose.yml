@@ -42,6 +42,20 @@ services:
         networks:
             es-service-network:
 
+    #Local AWS cloud service
+    localstack:
+        container_name: es_service_localstack
+        image: localstack/localstack
+        ports:
+            - "4566:4566"
+        environment:
+            - SERVICES=sns , sqs
+            - DATA_DIR=/tmp/localstack/data
+            - DEFAULT_REGION=us-west-2
+            - HOSTNAME_EXTERNAL=localstack
+        networks:
+            es-service-network:
+
 networks:
     es-service-network:
 
