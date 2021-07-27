@@ -24,12 +24,12 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	}
 
 	/**
-	 * @param string $playerId
+	 * @param string $id
 	 * @return string
 	 */
-	public static function getTransferByPlayerKey(string $playerId): string
+	public static function getTransferByPersonKey(string $id): string
 	{
-		return sprintf(self::TRANSFER_BY_PLAYER_KEY, $playerId);
+		return sprintf(self::TRANSFER_BY_PERSON_KEY, $id);
 	}
 
 	/**
@@ -74,13 +74,13 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	}
 
 	/**
-	 * @param string $playerId
+	 * @param string $id
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransferByPlayer(string $playerId, $function)
+	public function rememberForeverTransferByPerson(string $id, $function)
 	{
-		return $this->rememberForever(self::getTransferByPlayerKey($playerId), $function);
+		return $this->rememberForever(self::getTransferByPersonKey($id), $function);
 	}
 
 	/**

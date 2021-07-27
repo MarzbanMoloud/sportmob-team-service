@@ -100,7 +100,7 @@ class TransferServiceTest extends TestCase
 		$fakePlayerId = $this->faker->uuid;
 		$fakePlayerName = $this->faker->name;
 		$this->persistBatchDataForListByPlayer($fakePlayerId, $fakePlayerName);
-		$response = $this->transferService->listByPlayer($fakePlayerId);
+		$response = $this->transferService->listByPerson($fakePlayerId);
 		foreach ($response as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
@@ -109,7 +109,7 @@ class TransferServiceTest extends TestCase
 	public function testListByPlayerWhenItemNotExist()
 	{
 		$this->expectException(NotFoundHttpException::class);
-		$this->transferService->listByPlayer($this->faker->uuid);
+		$this->transferService->listByPerson($this->faker->uuid);
 	}
 
 	protected function tearDown(): void

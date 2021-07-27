@@ -41,7 +41,7 @@ class TransferController extends Controller implements TransferControllerInterfa
 	public function index(string $player)
 	{
 		return $this->responseService->createSuccessResponseObject(
-			new PlayerTransferResource($this->transferService->listByPlayer($player))
+			new PlayerTransferResource($this->transferService->listByPerson($player))
 		);
 	}
 

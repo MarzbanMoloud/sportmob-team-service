@@ -23,21 +23,24 @@ $router->group(['middleware' => 'logging'], function ($router) {
 	});
 
 	$router->group(['prefix' => '/{lang}', 'namespace' => 'Api', 'middleware' => 'set.lang'], function ($router) {
+
 		$router->group(['prefix' => '/transfers'], function ($router) {
-			$router->get('/team/{team}[/{season}]',
-				['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);
-			$router->get('/player/{player}',
-				['as' => 'teams.transfers.player.list', 'uses' => 'TransferController@listByPlayer']);
-			$router->put('/{action}/{transfer}',
-				['as' => 'teams.transfers.action', 'uses' => 'TransferController@userActionTransfer']);
+
+			$router->get('/team/{team}[/{season}]', ['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);
+			$router->get('/person/{person}', ['as' => 'teams.transfers.person.list', 'uses' => 'TransferController@listByPerson']);
+			$router->put('/{action}/{transfer}', ['as' => 'teams.transfers.action', 'uses' => 'TransferController@userActionTransfer']);
+
 		});
+
 		$router->group(['prefix' => '/trophies'], function ($router) {
-			$router->get('/team/{team}',
-				['as' => 'teams.trophies.by.team', 'uses' => 'TrophyController@trophiesByTeam']);
-			$router->get('/competition/{competition}',
-				['as' => 'teams.trophies.by.competition', 'uses' => 'TrophyController@trophiesByCompetition']);
+
+			$router->get('/team/{team}', ['as' => 'teams.trophies.by.team', 'uses' => 'TrophyController@trophiesByTeam']);
+			$router->get('/competition/{competition}', ['as' => 'teams.trophies.by.competition', 'uses' => 'TrophyController@trophiesByCompetition']);
+
 		});
+
 		$router->get('/overview/{team}', ['as' => 'teams.overview.by.team', 'uses' => 'TeamController@overview']);
+
 		$router->get('/favorite/{team}', ['as' => 'teams.favorite.by.team', 'uses' => 'TeamController@favorite']);
 	});
 });

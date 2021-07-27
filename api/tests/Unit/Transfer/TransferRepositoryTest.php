@@ -38,10 +38,10 @@ class TransferRepositoryTest extends TestCase
 	{
 		$personId = $this->faker->uuid;
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel($personId);
+			$this->persistTransfer($personId);
 		}
 		for ($i = 0; $i < 10; $i++) {
-			$this->createTransferModel();
+			$this->persistTransfer();
 		}
 		$response = $this->transferRepository->findByPersonId($personId);
 		$this->assertCount(5, $response);
@@ -64,7 +64,7 @@ class TransferRepositoryTest extends TestCase
 		$personId = $this->faker->uuid;
 		$startDate = (new DateTimeImmutable())->setDate(2021, 01, 02)->setTime(0, 0, 0);
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel($personId, $startDate);
+			$this->persistTransfer($personId, $startDate);
 		}
 		$response = $this->transferRepository->findByPersonId($personId);
 		$this->assertCount(5, $response);
@@ -85,7 +85,7 @@ class TransferRepositoryTest extends TestCase
 		$personId = $this->faker->uuid;
 		$startDate = (new DateTimeImmutable())->setDate(2021, 03, 02)->setTime(0, 0, 0);
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel($personId, $startDate);
+			$this->persistTransfer($personId, $startDate);
 		}
 		$response = $this->transferRepository->findByPersonId($personId);
 		$this->assertCount(5, $response);
@@ -115,19 +115,19 @@ class TransferRepositoryTest extends TestCase
 		$startDate2019 = (new DateTimeImmutable('2019-02-05'));
 
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2021, $teamId);
+			$this->persistTransfer(uniqid(), $startDate2021, $teamId);
 		}
 
 		for ($i = 0; $i < 3; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2020, $teamId);
+			$this->persistTransfer(uniqid(), $startDate2020, $teamId);
 		}
 
 		for ($i = 0; $i < 2; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2019, $teamId);
+			$this->persistTransfer(uniqid(), $startDate2019, $teamId);
 		}
 
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2019, uniqid(), $teamId);
+			$this->persistTransfer(uniqid(), $startDate2019, uniqid(), $teamId);
 		}
 
 		$this->assertCount(15, $this->transferRepository->findAll());
@@ -163,11 +163,11 @@ class TransferRepositoryTest extends TestCase
 		$startDate2020 = (new DateTimeImmutable('2020-02-05'));
 
 		for ($i = 0; $i < 2; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2021, $teamId);
+			$this->persistTransfer(uniqid(), $startDate2021, $teamId);
 		}
 
 		for ($i = 0; $i < 3; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2020, $teamId);
+			$this->persistTransfer(uniqid(), $startDate2020, $teamId);
 		}
 
 		$this->assertCount(5, $this->transferRepository->findAll());
@@ -192,19 +192,19 @@ class TransferRepositoryTest extends TestCase
 		$startDate2019 = (new DateTimeImmutable('2019-02-05'));
 
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2021, uniqid(), $teamId);
+			$this->persistTransfer(uniqid(), $startDate2021, uniqid(), $teamId);
 		}
 
 		for ($i = 0; $i < 3; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2020, uniqid(), $teamId);
+			$this->persistTransfer(uniqid(), $startDate2020, uniqid(), $teamId);
 		}
 
 		for ($i = 0; $i < 2; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2019, uniqid(), $teamId);
+			$this->persistTransfer(uniqid(), $startDate2019, uniqid(), $teamId);
 		}
 
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2019, $teamId, uniqid());
+			$this->persistTransfer(uniqid(), $startDate2019, $teamId, uniqid());
 		}
 
 		$this->assertCount(15, $this->transferRepository->findAll());
@@ -240,11 +240,11 @@ class TransferRepositoryTest extends TestCase
 		$startDate2020 = (new DateTimeImmutable('2020-02-05'));
 
 		for ($i = 0; $i < 2; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2021, uniqid(), $teamId);
+			$this->persistTransfer(uniqid(), $startDate2021, uniqid(), $teamId);
 		}
 
 		for ($i = 0; $i < 3; $i++) {
-			$this->createTransferModel(uniqid(), $startDate2020, uniqid(), $teamId);
+			$this->persistTransfer(uniqid(), $startDate2020, uniqid(), $teamId);
 		}
 
 		$this->assertCount(5, $this->transferRepository->findAll());
@@ -264,7 +264,7 @@ class TransferRepositoryTest extends TestCase
 	public function testFindByTeamIdAndSeasonWhenItemNotExists()
 	{
 		for ($i = 0; $i < 5; $i++) {
-			$this->createTransferModel();
+			$this->persistTransfer();
 		}
 		$result = $this->transferRepository->findByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, uniqid(), '2020-2021');
 		$this->assertEmpty($result);

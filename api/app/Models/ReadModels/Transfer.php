@@ -19,8 +19,13 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	use ReadModelTimestampTrait;
 
 	const DEFAULT_VALUE = '0';
+
 	const ATTR_TEAM_ID = 'teamId';
 	const ATTR_ON_LOAN_FROM_ID = 'onLoanFromId';
+
+	const TRANSFER_TYPE_TRANSFERRED = 'transferred';
+	const TRANSFER_TYPE_LOAN = 'loan';
+	const TRANSFER_TYPE_LOAN_BACK = 'loan_back';
 
 	private string $id;
 	private string $personId;

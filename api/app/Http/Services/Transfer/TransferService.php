@@ -10,6 +10,7 @@ use App\Exceptions\Projection\ProjectionException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UserActionTransferNotAllow;
 use App\Services\Cache\TransferCacheService;
+use App\Traits\TransferTrait;
 use App\ValueObjects\DTO\PlayerTransferDTO;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ReadModels\Transfer;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class TransferService
 {
+	use TransferTrait;
+
 	const TRANSFER_LIKE = 'like';
 	const TRANSFER_DISLIKE = 'dislike';
 
@@ -77,18 +80,23 @@ class TransferService
 	}
 
 	/**
-	 * @param string $playerId
+	 * @param string $id
 	 * @return mixed
 	 */
-	public function listByPlayer(string $playerId)
+	public function listByPerson(string $id)
 	{
-		$transfers = $this->transferCacheService->rememberForeverTransferByPlayer($playerId, function () use ($playerId) {
-			return $this->transferRepository->findByPlayerId($playerId);
+		$transfers = $this->transferCacheService->rememberForeverTransferByPerson($id, function () use ($id) {
+			$transfers = $this->transferRepository->findByPersonId($id);
+			if (!$transfers) {
+				return $transfers;
+			}
+			return $this->transform($transfers);
 		});
+
 		if (!$transfers) {
 			throw new NotFoundHttpException();
 		}
-		self::sortBySeason($transfers);
+
 		return $transfers;
 	}
 
@@ -151,7 +159,7 @@ class TransferService
 				config('common.error_codes.transfer_update_failed')
 			);
 		}
-		$this->transferCacheService->forget(TransferCacheService::getTransferByPlayerKey($transferItem->getPlayerId()));
+		$this->transferCacheService->forget(TransferCacheService::getTransferByPersonKey($transferItem->getPlayerId()));
 		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getToTeamId(), $transferItem->getSeason()));
 		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getFromTeamId(), $transferItem->getSeason()));
 	}
