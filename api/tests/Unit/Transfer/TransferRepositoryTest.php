@@ -131,7 +131,7 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(15, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId);
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId);
 		$this->assertCount(10, $result);
 		$s2020 = $s2019 = $s2018 = 0;
 		/**
@@ -171,7 +171,7 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(5, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId, '2020-2021');
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId, '2020-2021');
 
 		$this->assertCount(2, $result);
 		/**
@@ -208,7 +208,7 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(15, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId);
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId);
 		$this->assertCount(10, $result);
 		$s2020 = $s2019 = $s2018 = 0;
 		/**
@@ -248,7 +248,7 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(5, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId, '2020-2021');
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId, '2020-2021');
 
 		$this->assertCount(2, $result);
 		/**
@@ -266,7 +266,7 @@ class TransferRepositoryTest extends TestCase
 		for ($i = 0; $i < 5; $i++) {
 			$this->persistTransfer();
 		}
-		$result = $this->transferRepository->findByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, uniqid(), '2020-2021');
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, uniqid(), '2020-2021');
 		$this->assertEmpty($result);
 	}
 

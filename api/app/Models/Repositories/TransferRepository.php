@@ -63,10 +63,11 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 	 * @param string|null $season
 	 * @return array
 	 */
-	public function findByTeamIdAndSeason(string $teamIndex, string $id, string $season = null): array
+	public function findAllByTeamIdAndSeason(string $teamIndex, string $id, string $season = null): array
 	{
 		try {
 			$indexName = $teamIndex == Transfer::ATTR_TEAM_ID ? self::INDEX_TEAM_ID : self::INDEX_ON_LOAN_FROM_ID;
+
 			$queryParams = [
 				'TableName' => static::getTableName(),
 				'IndexName' => $indexName,
@@ -84,12 +85,19 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 				]);
 			}
 
-			$Result = $this->dynamoDbClient->query($queryParams);
+			$results = [];
+
+			do {
+				$result = $this->dynamoDbClient->query($queryParams);
+				$results[] = $this->deserializeResult($result);
+			} while ($queryParams['ExclusiveStartKey'] = $result['LastEvaluatedKey']);
+
+			return call_user_func_array('array_merge', $results);
+
 		} catch (\Exception $e) {
 			$this->sentryHub->captureException($e);
 			return [];
 		}
-		return $this->deserializeResult($Result);
 	}
 
 	/**

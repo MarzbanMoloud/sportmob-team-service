@@ -6,19 +6,20 @@ namespace App\Traits;
 
 use App\Models\ReadModels\Transfer;
 use App\ValueObjects\DTO\TransferDTO;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
 /**
- * Trait TransferTrait
+ * Trait TransferLogicTrait
  * @package App\Traits
  */
-trait TransferTrait
+trait TransferLogicTrait
 {
 	/**
 	 * @param array $transfers
 	 * @return array
 	 */
-	public function transform(array $transfers): array
+	public function transformByPerson(array $transfers): array
 	{
 		$flag = false;
 		$result = [];
@@ -129,5 +130,63 @@ trait TransferTrait
 			}
 		}
 		return array_reverse($result);
+	}
+
+	/**
+	 * @param string $teamId
+	 * @param string|null $season
+	 * @return array
+	 */
+	private function transformByTeam(string $teamId, ?string $season = null)
+	{
+		$transfers = array_merge(
+			$this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId) ?? [],
+			$this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId) ?? []
+		);
+
+		$transformItems = [];
+
+		foreach ($transfers as $transfer) {
+			/** @var Transfer $transfer */
+			if (is_null($transfer->getSeason())) {
+				continue;
+			}
+			$transformItems[$transfer->getSeason()][] = $transfer;
+		}
+
+		$seasons = array_keys($transformItems);
+		if (! $seasons) {
+			throw new NotFoundHttpException();
+		}
+		self::sortBySeason($seasons);
+
+		foreach ($transformItems as $seasonKey => $transfer) {
+			$this->transferCacheService->putTransfersByTeam($teamId, $seasonKey, [
+				'transfers' => $transformItems[$seasonKey],
+				'seasons' => $seasons
+			]);
+		}
+
+		if (is_null($season)) {
+			$season = $seasons[0];
+		}
+
+		return [
+			'transfers' => $transformItems[$season],
+			'seasons' => $seasons
+		];
+	}
+
+	/**
+	 * @param array $seasons
+	 */
+	private static function sortBySeason(array &$seasons)
+	{
+		usort($seasons, static function ($first, $second) {
+			if ($first === $second) {
+				return 0;
+			}
+			return ($first > $second) ? 1 : -1;
+		});
 	}
 }
