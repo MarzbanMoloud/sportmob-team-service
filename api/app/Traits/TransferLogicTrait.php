@@ -152,14 +152,20 @@ trait TransferLogicTrait
 		}
 
 		$seasons = array_keys($transformItems);
+		//TODO:: merge conditions.
 		if (! $seasons) {
 			throw new NotFoundHttpException();
 		}
+
+		if ((!is_null($season) && !in_array($season, $seasons))) {
+			throw new NotFoundHttpException();
+		}
+
 		self::sortBySeason($seasons);
 
 		foreach ($transformItems as $seasonKey => $transfer) {
 			$this->transferCacheService->putTransfersByTeam($teamId, $seasonKey, [
-				'transfers' => $transformItems[$seasonKey],
+				'transfers' => $transfer,
 				'seasons' => $seasons
 			]);
 		}
