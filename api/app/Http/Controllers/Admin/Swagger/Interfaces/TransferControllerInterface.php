@@ -15,12 +15,12 @@ interface TransferControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/admin/players/{player}/transfers",
+	 *     path="/admin/persons/{person}/transfers",
 	 *     tags={"Admin"},
 	 *     @OA\Parameter(
-	 *         name="player",
+	 *         name="person",
 	 *         in="path",
-	 *         description="playerId",
+	 *         description="personId",
 	 *         required=true,
 	 *         example="96557439-49a0-3f4f-aa23-bab108e83fe7",
 	 *         @OA\Schema(type="string")
@@ -42,11 +42,10 @@ interface TransferControllerInterface
 	 *                          type="array",
 	 *     						example= {
 	 *	 							{
-	 *									"transferId": "eyJwbGF5ZXJJZCI6Ijk2NTU3NDM5LTQ5YTAtM2Y0Zi1hYTIzLWJhYjEwOGU4M2ZlNyIsInN0YXJ0RGF0ZSI6IjIwMTktMDQtMDFUMDA6MDA6MDArMDA6MDAifQ==",
-	 *									"player": {
+	 *									"transferId": "eyJwbGF5ZXJJZCI6Ijk2N",
+	 *									"person": {
 	 *										"id": "96557439-49a0-3f4f-aa23-bab108e83fe7",
-	 *										"name": "Dr. Albin Dickens I",
-	 *										"position": "defender"
+	 *										"name": "Dr. Albin Dickens I"
 	 *									},
 	 *									"team": {
 	 *										"to": {
@@ -71,26 +70,6 @@ interface TransferControllerInterface
 	 *                      )
 	 *                 )
 	 *         )
-	 *     ),
-	 *     @OA\Response(
-	 *          response=404,
-	 *          description="When Resource not found",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema(
-	 *                  type="object",
-	 *                  @OA\Property(
-	 *                      property="message",
-	 *                      type="string",
-	 *                      example="Resource not found."
-	 *                  ),
-	 *                  @OA\Property(
-	 *                      property="code",
-	 *                      type="string",
-	 *                      example="TM-404"
-	 *                  ),
-	 *             )
-	 *         )
 	 *     )
 	 * )
 	 * @param string $player
@@ -99,14 +78,14 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Put(
-	 *     path="/admin/players/transfers/{transfer}",
+	 *     path="/admin/persons/transfers/{transfer}",
 	 *     tags={"Admin"},
 	 *     @OA\Parameter(
 	 *          name="transfer",
 	 *          in="path",
 	 *          required=true,
 	 *          description="transferId",
-	 *          example="eyJwbGF5ZXJJZCI6ImMyZmViNDk5LTJkMTctMzI1ZC1hNzIxLTE2YzE1YTJiMjBmMCIsInN0YXJ0RGF0ZSI6IjIwMTktMDMtMDFUMDA6MDA6MDArMDA6MDAifQ==",
+	 *          example="eyJwbGF5ZXJJZCI6ImMy",
 	 *          @OA\Schema(type="string")
 	 *     ),
 	 *     @OA\RequestBody(
@@ -135,26 +114,6 @@ interface TransferControllerInterface
 	 *     @OA\Response(
 	 *          response=204,
 	 *          description="When the update is successful"
-	 *     ),
-	 *     @OA\Response(
-	 *          response=404,
-	 *          description="When Resource not found",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema(
-	 *                  type="object",
-	 *                  @OA\Property(
-	 *                      property="message",
-	 *                      type="string",
-	 *                      example="Resource not found."
-	 *                  ),
-	 *                  @OA\Property(
-	 *                      property="code",
-	 *                      type="string",
-	 *                      example="TM-404"
-	 *                  ),
-	 *             )
-	 *         )
 	 *     )
 	 * )
 	 * @param string $transfer

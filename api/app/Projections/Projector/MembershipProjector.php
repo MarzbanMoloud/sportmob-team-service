@@ -4,7 +4,6 @@
 namespace App\Projections\Projector;
 
 
-use App\Events\Projection\MembershipWasUpdatedProjectorEvent;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
@@ -17,9 +16,9 @@ use App\Services\Cache\Interfaces\BrokerMessageCacheServiceInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use App\Services\Logger\Event;
+use App\Traits\TransferLogicTrait;
 use App\ValueObjects\Broker\Mediator\Message;
-use DateTime;
-use DateTimeImmutable;
+use Exception;
 use Sentry\State\HubInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -30,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class MembershipProjector
 {
-	use TeamTraits;
+	use TeamTraits, TransferLogicTrait;
 
 	const TEAM_TYPE_CLUB = 'club';
 
@@ -78,19 +77,38 @@ class MembershipProjector
 	/**
 	 * @param Message $message
 	 * @throws ProjectionException
+	 * @throws Exception
 	 */
 	public function applyMembershipWasUpdated(Message $message)
 	{
 		$this->eventName = config('mediator-event.events.membership_was_updated');
 		Event::processing($message, $this->eventName);
 
+		$body = $message->getBody();
+		$metadata = $body->getMetadata();
+		$identifier = $body->getIdentifiers();
+
 		$this->checkIdentifierValidation($message);
 
 		$this->checkMetadataValidation($message);
 
-		$this->transferHandle($message);
+		$clubMemberships = [];
 
-		//TODO:: create cache.
+		foreach ($metadata['membership'] as $membership) {
+			if (is_null($membership['dateFrom']) && is_null($membership['dateTo'])) {
+				continue;
+			}
+
+			if ($membership['teamType'] != self::TEAM_TYPE_CLUB) {
+				continue;
+			}
+
+			$clubMemberships[] = $membership;
+		}
+
+		$this->transformByPerson($message, $clubMemberships, $identifier['person'], $metadata['type']);
+
+		//TODO:: create cache and ask question of playerService.
 
 		Event::succeeded($message, $this->eventName);
 	}
@@ -127,65 +145,6 @@ class MembershipProjector
 				throw new ProjectionException($validationMessage,
 					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
-		}
-	}
-
-	/**
-	 * @param array $membership
-	 * @return array
-	 */
-	private function getTeamsName(array $membership): array
-	{
-		$teamsName = [];
-		foreach (['teamId', 'onLoanFrom'] as $field) {
-			if ($membership[$field]) {
-				try {
-					$teamsName[$field] = $this->findTeam($membership[$field])->getName()->getOriginal();
-				} catch (\Throwable $exception) {
-				}
-			}
-		}
-		return $teamsName;
-	}
-
-	/**
-	 * @param Message $message
-	 * @throws ProjectionException
-	 */
-	private function transferHandle(Message $message): void
-	{
-		$body = $message->getBody();
-		$metadata = $body->getMetadata();
-
-		$transferModel = (new Transfer())
-			->setPersonId($body->getIdentifiers()['person'])
-			->setPersonType($metadata['type']);
-
-		foreach ($metadata['membership'] as $membership) {
-			if ($membership['teamType'] != self::TEAM_TYPE_CLUB) {
-				continue;
-			}
-			$transferModel
-				->setId($membership['id'])
-				->setTeamId($membership['teamId'])
-				->setOnLoanFromId($membership['onLoanFrom'] ?? Transfer::DEFAULT_VALUE)
-				->setDateFrom($membership['dateFrom'] ? new DateTimeImmutable($membership['dateFrom']) : Transfer::getDateTimeImmutable())
-				->setDateTo($membership['dateTo'] ? new DateTimeImmutable($membership['dateTo']) : null)
-				->setCreatedAt(new DateTime());
-
-			$teamsName = $this->getTeamsName($membership);
-
-			if (isset($teamsName['teamId'])) {
-				$transferModel->setTeamName($teamsName['teamId']);
-			}
-			if (isset($teamsName['onLoanFrom'])) {
-				$transferModel->setOnLoanFromName($teamsName['onLoanFrom']);
-			}
-
-			$transferModel->prePersist();
-			$this->persistTransfer($transferModel, $message);
-
-			event(new MembershipWasUpdatedProjectorEvent($transferModel, $message));
 		}
 	}
 

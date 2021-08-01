@@ -5,7 +5,9 @@ namespace App\Traits;
 
 
 use App\Models\ReadModels\Transfer;
-use App\ValueObjects\DTO\TransferDTO;
+use App\ValueObjects\Broker\Mediator\Message;
+use DateTimeImmutable;
+use Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
@@ -16,120 +18,115 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 trait TransferLogicTrait
 {
 	/**
-	 * @param array $transfers
-	 * @return array
+	 * @param Message $message
+	 * @param array $memberships
+	 * @param string $personId
+	 * @param string $personType
+	 * @throws Exception
 	 */
-	public function transformByPerson(array $transfers): array
+	public function transformByPerson(Message $message, array $memberships, string $personId, string $personType)
 	{
 		$flag = false;
-		$result = [];
 
-		foreach ($transfers as $key => $transfer) {
-			/** @var Transfer $transfer */
+		foreach ($memberships as $key => $membership) {
 
-			if ($transfer->getDateFrom() == Transfer::getDateTimeImmutable() && is_null($transfer->getDateTo())) {
-				continue;
-			}
+			$teamItem = $this->findTeam($membership['teamId']);
+			$teamName1 = ($teamItem) ? $teamItem->getName()->getOriginal() : null;
 
-			if ($transfer->getOnLoanFromId() == Transfer::DEFAULT_VALUE && $flag == false) {
+			if (is_null($membership['onLoanFrom']) && $flag == false) {
 				$flag = true;
-				$result[] = (new TransferDTO())
-					->setId($transfer->getId())
-					->setPersonId($transfer->getPersonId())
-					->setPersonName($transfer->getPersonName())
-					->setTeamToId($transfer->getTeamId())
-					->setTeamToName($transfer->getTeamName())
-					->setMarketValue($transfer->getMarketValue())
-					->setStartDate($transfer->getDateFrom()->getTimestamp())
-					->setEndDate($transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null)
-					->setAnnouncedDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-					->setContractDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-					->setLike($transfer->getLike())
-					->setDislike($transfer->getDislike())
-					->setSeason(($transfer->getSeason() != Transfer::DEFAULT_VALUE) ? $transfer->getSeason() : null)
+
+				$transfer = (new Transfer())
+					->setId($membership['id'])
+					->setPersonId($personId)
+					->setPersonType($personType)
+					->setToTeamId($membership['teamId'])
+					->setToTeamName($teamName1)
+					->setDateFrom($membership['dateFrom'] ? new DateTimeImmutable($membership['dateFrom']) : Transfer::getDateTimeImmutable())
+					->setDateTo($membership['dateTo'] ? new DateTimeImmutable($membership['dateTo']) : null)
 					->setType(Transfer::TRANSFER_TYPE_TRANSFERRED);
+
+				$transfer->prePersist();
+				$this->persistTransfer($transfer, $message);
+
 				continue;
 			}
 
-			if ($transfer->getOnLoanFromId() != Transfer::DEFAULT_VALUE) {
-				$result[] = (new TransferDTO())
-					->setId(sprintf('%s#%s', $transfer->getId(), Transfer::TRANSFER_TYPE_LOAN))
-					->setPersonId($transfer->getPersonId())
-					->setPersonName($transfer->getPersonName())
-					->setTeamToId($transfer->getTeamId())
-					->setTeamToName($transfer->getTeamName())
-					->setTeamFromId($transfer->getOnLoanFromId())
-					->setTeamFromName($transfer->getOnLoanFromName())
-					->setMarketValue($transfer->getMarketValue())
-					->setStartDate($transfer->getDateFrom()->getTimestamp())
-					->setEndDate($transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null)
-					->setAnnouncedDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-					->setContractDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-					->setLike($transfer->getLike())
-					->setDislike($transfer->getDislike())
-					->setSeason(($transfer->getSeason() != Transfer::DEFAULT_VALUE) ? $transfer->getSeason() : null)
+			if (! is_null($membership['onLoanFrom'])) {
+				$teamItem = $this->findTeam($membership['onLoanFrom']);
+				$teamName2 = ($teamItem) ? $teamItem->getName()->getOriginal() : null;
+
+				$transfer = (new Transfer())
+					->setId(sprintf('%s_%s', $membership['id'], Transfer::TRANSFER_TYPE_LOAN))
+					->setPersonId($personId)
+					->setPersonType($personType)
+					->setFromTeamId($membership['onLoanFrom'])
+					->setFromTeamName($teamName2)
+					->setToTeamId($membership['teamId'])
+					->setToTeamName($teamName1)
+					->setDateFrom($membership['dateFrom'] ? new DateTimeImmutable($membership['dateFrom']) : Transfer::getDateTimeImmutable())
+					->setDateTo($membership['dateTo'] ? new DateTimeImmutable($membership['dateTo']) : null)
 					->setType(Transfer::TRANSFER_TYPE_LOAN);
 
-				$result[] = (new TransferDTO())
-					->setId(sprintf('%s#%s', $transfer->getId(), Transfer::TRANSFER_TYPE_LOAN_BACK))
-					->setPersonId($transfer->getPersonId())
-					->setPersonName($transfer->getPersonName())
-					->setTeamToId($transfer->getOnLoanFromId())
-					->setTeamToName($transfer->getOnLoanFromName())
-					->setTeamFromId($transfer->getTeamId())
-					->setTeamFromName($transfer->getTeamName())
-					->setMarketValue($transfer->getMarketValue())
-					->setStartDate($transfer->getDateFrom()->getTimestamp())
-					->setEndDate($transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null)
-					->setAnnouncedDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-					->setContractDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-					->setLike($transfer->getLike())
-					->setDislike($transfer->getDislike())
-					->setSeason(($transfer->getSeason() != Transfer::DEFAULT_VALUE) ? $transfer->getSeason() : null)
+				$transfer->prePersist();
+				$this->persistTransfer($transfer, $message);
+
+				$transfer = (new Transfer())
+					->setId(sprintf('%s_%s', $membership['id'], Transfer::TRANSFER_TYPE_LOAN_BACK))
+					->setPersonId($personId)
+					->setPersonType($personType)
+					->setToTeamId($membership['onLoanFrom'])
+					->setToTeamName($teamName2)
+					->setFromTeamId($membership['teamId'])
+					->setFromTeamName($teamName1)
+					->setDateFrom($membership['dateFrom'] ? new DateTimeImmutable($membership['dateFrom']) : Transfer::getDateTimeImmutable())
+					->setDateTo($membership['dateTo'] ? new DateTimeImmutable($membership['dateTo']) : null)
 					->setType(Transfer::TRANSFER_TYPE_LOAN_BACK);
+
+				$transfer->prePersist();
+				$this->persistTransfer($transfer, $message);
 			}
 
-			if ($transfer->getOnLoanFromId() == Transfer::DEFAULT_VALUE && $flag == true) {
-				if ($transfers[$key-1]->getOnLoanFromId() != Transfer::DEFAULT_VALUE) {
-					$result[] = (new TransferDTO())
-						->setId($transfer->getId())
-						->setPersonId($transfer->getPersonId())
-						->setPersonName($transfer->getPersonName())
-						->setTeamToId($transfer->getTeamId())
-						->setTeamToName($transfer->getTeamName())
-						->setTeamFromId($transfers[$key-1]->getOnLoanFromId())
-						->setTeamFromName($transfers[$key-1]->getOnLoanFromName())
-						->setMarketValue($transfer->getMarketValue())
-						->setStartDate($transfer->getDateFrom()->getTimestamp())
-						->setEndDate($transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null)
-						->setAnnouncedDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-						->setContractDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-						->setLike($transfer->getLike())
-						->setDislike($transfer->getDislike())
-						->setSeason(($transfer->getSeason() != Transfer::DEFAULT_VALUE) ? $transfer->getSeason() : null)
+			if (is_null($membership['onLoanFrom']) && $flag == true) {
+				if (!is_null($memberships[$key-1]['onLoanFrom'])) {
+					$teamItem = $this->findTeam($memberships[$key-1]['onLoanFrom']);
+					$teamName3 = ($teamItem) ? $teamItem->getName()->getOriginal() : null;
+
+					$transfer = (new Transfer())
+						->setId($membership['id'])
+						->setPersonId($personId)
+						->setPersonType($personType)
+						->setToTeamId($membership['teamId'])
+						->setToTeamName($teamName1)
+						->setFromTeamId($memberships[$key-1]['onLoanFrom'])
+						->setFromTeamName($teamName3)
+						->setDateFrom($membership['dateFrom'] ? new DateTimeImmutable($membership['dateFrom']) : Transfer::getDateTimeImmutable())
+						->setDateTo($membership['dateTo'] ? new DateTimeImmutable($membership['dateTo']) : null)
 						->setType(Transfer::TRANSFER_TYPE_TRANSFERRED);
+
+					$transfer->prePersist();
+					$this->persistTransfer($transfer, $message);
 				} else {
-					$result[] = (new TransferDTO())
-						->setId($transfer->getId())
-						->setPersonId($transfer->getPersonId())
-						->setPersonName($transfer->getPersonName())
-						->setTeamToId($transfer->getTeamId())
-						->setTeamToName($transfer->getTeamName())
-						->setTeamFromId($transfers[$key-1]->getTeamId())
-						->setTeamFromName($transfers[$key-1]->getTeamName())
-						->setMarketValue($transfer->getMarketValue())
-						->setStartDate($transfer->getDateFrom()->getTimestamp())
-						->setEndDate($transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null)
-						->setAnnouncedDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-						->setContractDate($transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null)
-						->setLike($transfer->getLike())
-						->setDislike($transfer->getDislike())
-						->setSeason(($transfer->getSeason() != Transfer::DEFAULT_VALUE) ? $transfer->getSeason() : null)
+					$teamItem = $this->findTeam($memberships[$key-1]['teamId']);
+					$teamName4 = ($teamItem) ? $teamItem->getName()->getOriginal() : null;
+
+					$transfer = (new Transfer())
+						->setId($membership['id'])
+						->setPersonId($personId)
+						->setPersonType($personType)
+						->setToTeamId($membership['teamId'])
+						->setToTeamName($teamName1)
+						->setFromTeamId($memberships[$key-1]['teamId'])
+						->setFromTeamName($teamName4)
+						->setDateFrom($membership['dateFrom'] ? new DateTimeImmutable($membership['dateFrom']) : Transfer::getDateTimeImmutable())
+						->setDateTo($membership['dateTo'] ? new DateTimeImmutable($membership['dateTo']) : null)
 						->setType(Transfer::TRANSFER_TYPE_TRANSFERRED);
+
+					$transfer->prePersist();
+					$this->persistTransfer($transfer, $message);
 				}
 			}
 		}
-		return array_reverse($result);
 	}
 
 	/**
@@ -140,8 +137,8 @@ trait TransferLogicTrait
 	private function transformByTeam(string $teamId, ?string $season = null)
 	{
 		$transfers = array_merge(
-			$this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId) ?? [],
-			$this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId) ?? []
+			$this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TO_TEAM_ID, $teamId) ?? [],
+			$this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_FROM_TEAM_ID, $teamId) ?? []
 		);
 
 		$transformItems = [];
@@ -182,11 +179,12 @@ trait TransferLogicTrait
 	 */
 	private static function sortBySeason(array &$seasons)
 	{
-		usort($seasons, static function ($first, $second) {
-			if ($first === $second) {
-				return 0;
-			}
-			return ($first > $second) ? 1 : -1;
-		});
+		usort($seasons,
+			static function ($first, $second) {
+				if ($first === $second) {
+					return 0;
+				}
+				return ($first < $second) ? 1 : -1;
+			});
 	}
 }

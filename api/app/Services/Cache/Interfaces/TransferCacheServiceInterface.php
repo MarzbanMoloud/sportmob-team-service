@@ -20,7 +20,7 @@ interface TransferCacheServiceInterface
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransfersByTeam(string $teamId, string $season, $function);
+	public function rememberForeverTransfersByTeam($function, string $teamId, ?string $season = null);
 
 	/**
 	 * @param string $teamId

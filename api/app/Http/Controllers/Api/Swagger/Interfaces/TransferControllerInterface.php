@@ -61,10 +61,10 @@ interface TransferControllerInterface
 	 *        						@OA\Property(
 	 *                              	property="id",
 	 *                              	type="string",
-	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYzZDEtM2JkZC04YmZiLTI5M2NmZWJlNDdiYyIsInN0YXJ0RGF0"
+	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGI"
 	 *                           	),
 	 *                         		@OA\Property(
-	 *                              	property="player",
+	 *                              	property="person",
 	 *                              	type="object",
 	 *                              	@OA\Property(
 	 *                                  	property="id",
@@ -75,11 +75,6 @@ interface TransferControllerInterface
 	 *                                  	property="name",
 	 *                                  	type="string",
 	 *                                  	example="Adonis Breitenberg"
-	 *                              	),
-	 *                              	@OA\Property(
-	 *                                  	property="position",
-	 *                                  	type="string",
-	 *                                  	example="defender"
 	 *                              	)
 	 *                          	),
 	 *                         		@OA\Property(
@@ -142,7 +137,7 @@ interface TransferControllerInterface
 	 *                              @OA\Property(
 	 *                                  property="type",
 	 *                                  type="string",
-	 *                                  enum={"transfer", "freeTransfer", "backFromLoan", "loan", "unknown", "playerSwap", "trial"}
+	 *                                  enum={"transfer", "loan_back", "loan"}
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="like",
@@ -214,7 +209,7 @@ interface TransferControllerInterface
 	 *        					@OA\Property(
 	 *                              property="id",
 	 *                              type="string",
-	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYXRlIjoiMjAyMC0wMS0wMSAwMDowMDowMC4wMDAwMDAiLCJ0aW1lem9u"
+	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIw"
 	 *                           ),
 	 *                         		@OA\Property(
 	 *                                property="person",
@@ -228,11 +223,6 @@ interface TransferControllerInterface
 	 *                                    property="name",
 	 *                                    type="string",
 	 *                                    example="Adonis Breitenberg"
-	 *                                ),
-	 *                              	@OA\Property(
-	 *                                    property="position",
-	 *                                    type="string",
-	 *                                    example="defender"
 	 *                                )
 	 *                            ),
 	 *                         		@OA\Property(
@@ -346,7 +336,7 @@ interface TransferControllerInterface
 	 *          in="path",
 	 *          required=true,
 	 *          description="id",
-	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyI",
+	 *          example="eyJwbGF5ZXJJZCI6IjMw",
 	 *          @OA\Schema(type="string")
 	 *     ),
 	 *     @OA\RequestBody(

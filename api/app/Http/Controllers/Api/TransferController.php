@@ -43,9 +43,8 @@ class TransferController extends Controller implements TransferControllerInterfa
 	 */
 	public function listByTeam(string $team, ?string $season = null)
 	{
-		$result['transfers'] = $this->transferService->listByTeam($team, $season);
 		return $this->responseService->createSuccessResponseObject(
-			new TeamTransferResource($result)
+			new TeamTransferResource($this->transferService->listByTeam($team, $season))
 		);
 	}
 

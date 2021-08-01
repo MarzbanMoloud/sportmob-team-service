@@ -10,7 +10,7 @@ use App\Exceptions\Projection\ProjectionException;
 use App\Exceptions\UserActionTransferNotAllow;
 use App\Services\Cache\TransferCacheService;
 use App\Traits\TransferLogicTrait;
-use App\ValueObjects\DTO\PlayerTransferDTO;
+use App\ValueObjects\DTO\PersonTransferDTO;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TransferRepository;
@@ -53,29 +53,26 @@ class TransferService
 	 */
 	public function listByTeam(string $teamId, ?string $season = null)
 	{
-		return $this->transferCacheService->rememberForeverTransfersByTeam($teamId, $season, function () use ($teamId, $season) {
+		return $this->transferCacheService->rememberForeverTransfersByTeam(function () use ($teamId, $season) {
 			return $this->transformByTeam($teamId, $season);
-		});
-
+		}, $teamId, $season);
 	}
 
 	/**
 	 * @param string $id
-	 * @return mixed
+	 * @return array
 	 */
-	public function listByPerson(string $id)
+	public function listByPerson(string $id): array
 	{
 		$transfers = $this->transferCacheService->rememberForeverTransfersByPerson($id, function () use ($id) {
-			$transfers = $this->transferRepository->findByPersonId($id);
-			if (!$transfers) {
-				return $transfers;
-			}
-			return $this->transformByPerson($transfers);
+			return $this->transferRepository->findByPersonId($id);
 		});
 
 		if (!$transfers) {
 			throw new NotFoundHttpException();
 		}
+
+		array_reverse($transfers);
 
 		return $transfers;
 	}
@@ -127,17 +124,17 @@ class TransferService
 	}
 
 	/**
-	 * @param PlayerTransferDTO $playerTransferDTO
+	 * @param PersonTransferDTO $personTransferDTO
 	 * @throws DynamoDBException
 	 */
-	public function updateItem(PlayerTransferDTO $playerTransferDTO)
+	public function updateItem(PersonTransferDTO $personTransferDTO)
 	{
-		$transferItem = $this->findTransfer($playerTransferDTO->getTransferId());
+		$transferItem = $this->findTransfer($personTransferDTO->getTransferId());
 		try {
 			$transferItem
-				->setContractDate((new \DateTimeImmutable())->setTimestamp($playerTransferDTO->getContractDate()))
-				->setAnnouncedDate((new \DateTimeImmutable())->setTimestamp($playerTransferDTO->getAnnouncedDate()))
-				->setMarketValue($playerTransferDTO->getMarketValue());
+				->setContractDate((new \DateTimeImmutable())->setTimestamp($personTransferDTO->getContractDate()))
+				->setAnnouncedDate((new \DateTimeImmutable())->setTimestamp($personTransferDTO->getAnnouncedDate()))
+				->setMarketValue($personTransferDTO->getMarketValue());
 			$this->transferRepository->persist($transferItem);
 		} catch (\Exception $exception) {
 			throw new DynamoDBException(
@@ -147,7 +144,7 @@ class TransferService
 				config('common.error_codes.transfer_update_failed')
 			);
 		}
-		$this->transferCacheService->forget(TransferCacheService::getTransferByPersonKey($transferItem->getPlayerId()));
+		$this->transferCacheService->forget(TransferCacheService::getTransferByPersonKey($transferItem->getPersonId()));
 		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getToTeamId(), $transferItem->getSeason()));
 		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getFromTeamId(), $transferItem->getSeason()));
 	}

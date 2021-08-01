@@ -4,14 +4,16 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exceptions\DynamoDB\DynamoDBException;
 use App\Http\Controllers\Admin\Swagger\Interfaces\TransferControllerInterface;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PlayerTransferRequest;
-use App\Http\Resources\Admin\PlayerTransferResource;
+use App\Http\Requests\PersonTransferRequest;
+use App\Http\Resources\Admin\PersonTransferResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Transfer\TransferService;
-use App\ValueObjects\DTO\PlayerTransferDTO;
+use App\ValueObjects\DTO\PersonTransferDTO;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 
 /**
@@ -35,13 +37,13 @@ class TransferController extends Controller implements TransferControllerInterfa
 	}
 
 	/**
-	 * @param string $player
+	 * @param string $person
 	 * @return mixed
 	 */
-	public function index(string $player)
+	public function index(string $person)
 	{
 		return $this->responseService->createSuccessResponseObject(
-			new PlayerTransferResource($this->transferService->listByPerson($player))
+			new PersonTransferResource($this->transferService->listByPerson($person))
 		);
 	}
 
@@ -49,13 +51,14 @@ class TransferController extends Controller implements TransferControllerInterfa
 	 * @param string $transfer
 	 * @param Request $request
 	 * @return mixed
-	 * @throws \App\Exceptions\DynamoDB\DynamoDBException
+	 * @throws DynamoDBException
+	 * @throws ValidationException
 	 */
 	public function update(string $transfer, Request $request)
 	{
-		(new PlayerTransferRequest())->validation($request);
+		(new PersonTransferRequest())->validation($request);
 		$request->request->add(['transferId' => $transfer]);
-		$this->transferService->updateItem(new PlayerTransferDTO($request->all()));
+		$this->transferService->updateItem(new PersonTransferDTO($request->all()));
 		return $this->responseService->createUpdateResponseObject();
 	}
 }

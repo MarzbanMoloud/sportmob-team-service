@@ -131,14 +131,14 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(15, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId);
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TO_TEAM_ID, $teamId);
 		$this->assertCount(10, $result);
 		$s2020 = $s2019 = $s2018 = 0;
 		/**
 		 * @var Transfer $item
 		 */
 		foreach ($result as $item) {
-			$this->assertEquals($teamId, $item->getTeamId());
+			$this->assertEquals($teamId, $item->getToTeamId());
 			$this->assertContains($item->getSeason(), ["2020-2021", "2019-2020", "2018-2019"]);
 			if ($item->getSeason() == "2020-2021") {
 				$s2020++;
@@ -171,14 +171,14 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(5, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TEAM_ID, $teamId, '2020-2021');
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_TO_TEAM_ID, $teamId, '2020-2021');
 
 		$this->assertCount(2, $result);
 		/**
 		 * @var Transfer $item
 		 */
 		foreach ($result as $item) {
-			$this->assertEquals($teamId, $item->getTeamId());
+			$this->assertEquals($teamId, $item->getToTeamId());
 			$this->assertEquals("2020-2021", $item->getSeason());
 			$this->assertEquals($startDate2021->getTimestamp(), $item->getDateFrom()->getTimestamp());
 		}
@@ -208,14 +208,14 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(15, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId);
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_FROM_TEAM_ID, $teamId);
 		$this->assertCount(10, $result);
 		$s2020 = $s2019 = $s2018 = 0;
 		/**
 		 * @var Transfer $item
 		 */
 		foreach ($result as $item) {
-			$this->assertEquals($teamId, $item->getOnLoanFromId());
+			$this->assertEquals($teamId, $item->getFromTeamId());
 			$this->assertContains($item->getSeason(), ["2020-2021", "2019-2020", "2018-2019"]);
 			if ($item->getSeason() == "2020-2021") {
 				$s2020++;
@@ -248,14 +248,14 @@ class TransferRepositoryTest extends TestCase
 		}
 
 		$this->assertCount(5, $this->transferRepository->findAll());
-		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, $teamId, '2020-2021');
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_FROM_TEAM_ID, $teamId, '2020-2021');
 
 		$this->assertCount(2, $result);
 		/**
 		 * @var Transfer $item
 		 */
 		foreach ($result as $item) {
-			$this->assertEquals($teamId, $item->getOnLoanFromId());
+			$this->assertEquals($teamId, $item->getFromTeamId());
 			$this->assertEquals("2020-2021", $item->getSeason());
 			$this->assertEquals($startDate2021->getTimestamp(), $item->getDateFrom()->getTimestamp());
 		}
@@ -266,7 +266,7 @@ class TransferRepositoryTest extends TestCase
 		for ($i = 0; $i < 5; $i++) {
 			$this->persistTransfer();
 		}
-		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_ON_LOAN_FROM_ID, uniqid(), '2020-2021');
+		$result = $this->transferRepository->findAllByTeamIdAndSeason(Transfer::ATTR_FROM_TEAM_ID, uniqid(), '2020-2021');
 		$this->assertEmpty($result);
 	}
 

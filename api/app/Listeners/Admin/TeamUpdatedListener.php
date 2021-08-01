@@ -9,7 +9,6 @@ use App\Http\Services\Team\Traits\TeamTraits;
 use App\Models\Repositories\TeamRepository;
 use App\Services\BrokerInterface;
 use App\Services\Cache\Interfaces\TeamCacheServiceInterface;
-use App\Services\Cache\TeamCacheService;
 use App\ValueObjects\Broker\Mediator\Message as MediatorMessage;
 use App\ValueObjects\Broker\Mediator\MessageBody;
 use App\ValueObjects\Broker\Mediator\MessageHeader;
@@ -59,6 +58,7 @@ class TeamUpdatedListener
 			"1",
 			new DateTimeImmutable()
 		));
+
 		$messageBody = (new MessageBody(
 			[
 				"team" => $event->team->getId()
@@ -69,20 +69,17 @@ class TeamUpdatedListener
 				"shortName" => $event->team->getName()->getShort(),
 			]
 		));
+
 		$message = (new MediatorMessage())
 			->setHeaders($messageHeader)
 			->setBody($messageBody);
+
 		$this->broker->addMessage(
 			config('mediator-event.events.team_was_updated'),
 			$this->serializer->serialize($message, 'json')
 		)->produceMessage(config('broker.topics.event_team_was_updated'));
-		/**
-		 * Remove Team cache.
-		 */
-		try {
-			$this->teamCacheService->forget(TeamCacheService::getTeamKey($event->team->getId()));
-			$this->findTeam($event->team->getId());
-		} catch (\Exception $e) {
-		}
+
+		/** Remove Team cache. */
+		$this->teamCacheService->putTeam($event->team);
 	}
 }

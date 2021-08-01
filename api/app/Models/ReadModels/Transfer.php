@@ -20,8 +20,8 @@ class Transfer implements DynamoDBRepositoryModelInterface
 
 	const DEFAULT_VALUE = '0';
 
-	const ATTR_TEAM_ID = 'teamId';
-	const ATTR_ON_LOAN_FROM_ID = 'onLoanFromId';
+	const ATTR_TO_TEAM_ID = 'toTeamId';
+	const ATTR_FROM_TEAM_ID = 'fromTeamId';
 
 	const TRANSFER_TYPE_TRANSFERRED = 'transferred';
 	const TRANSFER_TYPE_LOAN = 'loan';
@@ -31,10 +31,10 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	private string $personId;
 	private ?string $personName = null;
 	private string $personType;
-	private string $teamId;
-	private ?string $teamName = null;
-	private string $onLoanFromId = self::DEFAULT_VALUE;
-	private ?string $onLoanFromName = null;
+	private string $toTeamId;
+	private ?string $toTeamName = null;
+	private string $fromTeamId = self::DEFAULT_VALUE;//TODO::change default.
+	private ?string $fromTeamName = null;
 	private DateTimeImmutable $dateFrom;
 	private ?DateTimeImmutable $dateTo = null;
 	private string $season = self::DEFAULT_VALUE;
@@ -43,6 +43,7 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	private ?string $marketValue = null;
 	private ?DateTimeImmutable $announcedDate = null;
 	private ?DateTimeImmutable $contractDate = null;
+	private string $type;
 
 	/**
 	 * Transfer constructor.
@@ -127,72 +128,72 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	/**
 	 * @return string
 	 */
-	public function getTeamId(): string
+	public function getToTeamId(): string
 	{
-		return $this->teamId;
+		return $this->toTeamId;
 	}
 
 	/**
-	 * @param string $teamId
+	 * @param string $toTeamId
 	 * @return Transfer
 	 */
-	public function setTeamId(string $teamId): Transfer
+	public function setToTeamId(string $toTeamId): Transfer
 	{
-		$this->teamId = $teamId;
+		$this->toTeamId = $toTeamId;
 		return $this;
 	}
 
 	/**
 	 * @return string|null
 	 */
-	public function getTeamName(): ?string
+	public function getToTeamName(): ?string
 	{
-		return $this->teamName;
+		return $this->toTeamName;
 	}
 
 	/**
-	 * @param string|null $teamName
+	 * @param string|null $toTeamName
 	 * @return Transfer
 	 */
-	public function setTeamName(?string $teamName): Transfer
+	public function setToTeamName(?string $toTeamName): Transfer
 	{
-		$this->teamName = $teamName;
+		$this->toTeamName = $toTeamName;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getOnLoanFromId(): string
+	public function getFromTeamId(): string
 	{
-		return $this->onLoanFromId;
+		return $this->fromTeamId;
 	}
 
 	/**
-	 * @param string $onLoanFromId
+	 * @param string $fromTeamId
 	 * @return Transfer
 	 */
-	public function setOnLoanFromId(string $onLoanFromId): Transfer
+	public function setFromTeamId(string $fromTeamId): Transfer
 	{
-		$this->onLoanFromId = $onLoanFromId;
+		$this->fromTeamId = $fromTeamId;
 		return $this;
 	}
 
 	/**
 	 * @return string|null
 	 */
-	public function getOnLoanFromName(): ?string
+	public function getFromTeamName(): ?string
 	{
-		return $this->onLoanFromName;
+		return $this->fromTeamName;
 	}
 
 	/**
-	 * @param string|null $onLoanFromName
+	 * @param string|null $fromTeamName
 	 * @return Transfer
 	 */
-	public function setOnLoanFromName(?string $onLoanFromName): Transfer
+	public function setFromTeamName(?string $fromTeamName): Transfer
 	{
-		$this->onLoanFromName = $onLoanFromName;
+		$this->fromTeamName = $fromTeamName;
 		return $this;
 	}
 
@@ -337,6 +338,24 @@ class Transfer implements DynamoDBRepositoryModelInterface
 	public function setContractDate(?DateTimeImmutable $contractDate): Transfer
 	{
 		$this->contractDate = $contractDate;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getType(): string
+	{
+		return $this->type;
+	}
+
+	/**
+	 * @param string $type
+	 * @return Transfer
+	 */
+	public function setType(string $type): Transfer
+	{
+		$this->type = $type;
 		return $this;
 	}
 

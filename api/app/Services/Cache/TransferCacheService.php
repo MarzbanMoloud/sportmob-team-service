@@ -18,7 +18,7 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	 * @param string $season
 	 * @return string
 	 */
-	public static function getTransferByTeamKey(string $teamId, string $season): string
+	public static function getTransferByTeamKey(string $teamId, ?string $season = null): string
 	{
 		return sprintf(self::TRANSFER_BY_TEAM_KEY, $teamId, $season);
 	}
@@ -49,7 +49,7 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransfersByTeam(string $teamId, string $season, $function)
+	public function rememberForeverTransfersByTeam($function, string $teamId, ?string $season = null)
 	{
 		return $this->rememberForever(self::getTransferByTeamKey($teamId, $season), $function);
 	}
