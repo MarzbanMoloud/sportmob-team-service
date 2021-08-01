@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exceptions\DynamoDB\DynamoDBException;
 use App\Http\Controllers\Admin\Swagger\Interfaces\TeamControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TeamUpdateRequest;
@@ -12,6 +13,7 @@ use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Team\TeamService;
 use App\ValueObjects\DTO\TeamDTO;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 
 /**
@@ -51,8 +53,8 @@ class TeamController extends Controller implements TeamControllerInterface
 	 * @param string $team
 	 * @param Request $request
 	 * @return mixed
-	 * @throws \App\Exceptions\DynamoDB\DynamoDBException
-	 * @throws \Illuminate\Validation\ValidationException
+	 * @throws DynamoDBException
+	 * @throws ValidationException
 	 */
 	public function update(string $team, Request $request)
 	{

@@ -18,27 +18,18 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	 * @param string $season
 	 * @return string
 	 */
-	public static function getTransferByTeamKey(string $teamId, string $season): string
+	public static function getTransferByTeamKey(string $teamId, ?string $season = null): string
 	{
 		return sprintf(self::TRANSFER_BY_TEAM_KEY, $teamId, $season);
 	}
 
 	/**
-	 * @param string $playerId
+	 * @param string $id
 	 * @return string
 	 */
-	public static function getTransferByPlayerKey(string $playerId): string
+	public static function getTransferByPersonKey(string $id): string
 	{
-		return sprintf(self::TRANSFER_BY_PLAYER_KEY, $playerId);
-	}
-
-	/**
-	 * @param string $teamId
-	 * @return string
-	 */
-	public static function getAllSeasonsByTeamKey(string $teamId): string
-	{
-		return sprintf(self::TRANSFER_All_SEASONS_BY_TEAM_KEY, $teamId);
+		return sprintf(self::TRANSFER_BY_PERSON_KEY, $id);
 	}
 
 	/**
@@ -58,29 +49,30 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransferByTeam(string $teamId, string $season, $function)
+	public function rememberForeverTransfersByTeam($function, string $teamId, ?string $season = null)
 	{
 		return $this->rememberForever(self::getTransferByTeamKey($teamId, $season), $function);
 	}
 
 	/**
 	 * @param string $teamId
-	 * @param $function
-	 * @return mixed
+	 * @param string $season
+	 * @param array $transfers
+	 * @return mixed|void
 	 */
-	public function rememberForeverAllSeasonsByTeam(string $teamId, $function)
+	public function putTransfersByTeam(string $teamId, string $season, array $transfers)
 	{
-		return $this->rememberForever(self::getAllSeasonsByTeamKey($teamId), $function);
+		$this->put(self::getTransferByTeamKey($teamId, $season), $transfers);
 	}
 
 	/**
-	 * @param string $playerId
+	 * @param string $id
 	 * @param $function
 	 * @return mixed
 	 */
-	public function rememberForeverTransferByPlayer(string $playerId, $function)
+	public function rememberForeverTransfersByPerson(string $id, $function)
 	{
-		return $this->rememberForever(self::getTransferByPlayerKey($playerId), $function);
+		return $this->rememberForever(self::getTransferByPersonKey($id), $function);
 	}
 
 	/**

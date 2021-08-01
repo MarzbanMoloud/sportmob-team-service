@@ -5,20 +5,21 @@ namespace App\Http\Requests;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Routing\ProvidesConvenienceMethods;
 
 
 /**
- * Class PlayerTransferRequest
+ * Class PersonTransferRequest
  * @package App\Http\Requests
  */
-class PlayerTransferRequest
+class PersonTransferRequest
 {
 	use ProvidesConvenienceMethods;
 
 	/**
 	 * @param Request $request
-	 * @throws \Illuminate\Validation\ValidationException
+	 * @throws ValidationException
 	 */
 	public function validation(Request $request)
 	{

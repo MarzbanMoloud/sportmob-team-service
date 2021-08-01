@@ -7,10 +7,10 @@ namespace App\Http\Services\Transfer;
 use App\Exceptions\DynamoDB\DynamoDBException;
 use App\Exceptions\DynamoDB\DynamoDBRepositoryException;
 use App\Exceptions\Projection\ProjectionException;
-use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UserActionTransferNotAllow;
 use App\Services\Cache\TransferCacheService;
-use App\ValueObjects\DTO\PlayerTransferDTO;
+use App\Traits\TransferLogicTrait;
+use App\ValueObjects\DTO\PersonTransferDTO;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ReadModels\Transfer;
 use App\Models\Repositories\TransferRepository;
@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class TransferService
 {
+	use TransferLogicTrait;
+
 	const TRANSFER_LIKE = 'like';
 	const TRANSFER_DISLIKE = 'dislike';
 
@@ -51,44 +53,27 @@ class TransferService
 	 */
 	public function listByTeam(string $teamId, ?string $season = null)
 	{
-		if (is_null($season)) {
-			$season = $this->seasons[0];
-		}
-		return $this->transferCacheService->rememberForeverTransferByTeam($teamId, $season,
-			function () use ($teamId, $season) {
-				return $this->transferRepository->findByTeamIdAndSeason($teamId, $season);
-		});
+		return $this->transferCacheService->rememberForeverTransfersByTeam(function () use ($teamId, $season) {
+			return $this->transformByTeam($teamId, $season);
+		}, $teamId, $season);
 	}
 
 	/**
-	 * @param string $teamId
-	 * @return mixed
+	 * @param string $id
+	 * @return array
 	 */
-	public function getAllSeasons(string $teamId)
+	public function listByPerson(string $id): array
 	{
-		$seasons = $this->transferCacheService->rememberForeverAllSeasonsByTeam($teamId, function () use ($teamId) {
-			return $this->transferRepository->getAllSeasons($teamId);
+		$transfers = $this->transferCacheService->rememberForeverTransfersByPerson($id, function () use ($id) {
+			return $this->transferRepository->findByPersonId($id);
 		});
-		if (! $seasons) {
-			throw new NotFoundHttpException();
-		}
-		rsort($seasons);
-		return $seasons;
-	}
 
-	/**
-	 * @param string $playerId
-	 * @return mixed
-	 */
-	public function listByPlayer(string $playerId)
-	{
-		$transfers = $this->transferCacheService->rememberForeverTransferByPlayer($playerId, function () use ($playerId) {
-			return $this->transferRepository->findByPlayerId($playerId);
-		});
 		if (!$transfers) {
 			throw new NotFoundHttpException();
 		}
-		self::sortBySeason($transfers);
+
+		array_reverse($transfers);
+
 		return $transfers;
 	}
 
@@ -104,8 +89,11 @@ class TransferService
 		if ($this->transferCacheService->hasUserActionTransfer($action, $user, $transfer)) {
 			throw new UserActionTransferNotAllow();
 		}
+
 		$transferItem = $this->findTransfer($transfer);
+
 		if ($action == self::TRANSFER_LIKE) {
+
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_DISLIKE, $user, $transfer)) {
 				$transferItem->setDislike($transferItem->getDislike() - 1);
 				$this->transferCacheService->forget(TransferCacheService::getUserActionTransferKey(self::TRANSFER_DISLIKE, $user, $transfer));
@@ -113,7 +101,9 @@ class TransferService
 			} else {
 				$transferItem->setLike($transferItem->getLike() + 1);
 			}
+
 		} else if ($action == self::TRANSFER_DISLIKE) {
+
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_LIKE, $user, $transfer)) {
 				$transferItem->setLike($transferItem->getLike() - 1);
 				$this->transferCacheService->forget(TransferCacheService::getUserActionTransferKey(self::TRANSFER_LIKE, $user, $transfer));
@@ -121,27 +111,30 @@ class TransferService
 			} else {
 				$transferItem->setDislike($transferItem->getDislike() + 1);
 			}
+
 		}
+
 		try {
 			$this->transferRepository->persist($transferItem);
 		} catch (DynamoDBRepositoryException $exception) {
 			throw new ProjectionException('Failed to update transfer.', $exception->getCode(), $exception);
 		}
+
 		$this->transferCacheService->putUserActionTransfer($action, $user, $transfer);
 	}
 
 	/**
-	 * @param PlayerTransferDTO $playerTransferDTO
+	 * @param PersonTransferDTO $personTransferDTO
 	 * @throws DynamoDBException
 	 */
-	public function updateItem(PlayerTransferDTO $playerTransferDTO)
+	public function updateItem(PersonTransferDTO $personTransferDTO)
 	{
-		$transferItem = $this->findTransfer($playerTransferDTO->getTransferId());
+		$transferItem = $this->findTransfer($personTransferDTO->getTransferId());
 		try {
 			$transferItem
-				->setContractDate((new \DateTimeImmutable())->setTimestamp($playerTransferDTO->getContractDate()))
-				->setAnnouncedDate((new \DateTimeImmutable())->setTimestamp($playerTransferDTO->getAnnouncedDate()))
-				->setMarketValue($playerTransferDTO->getMarketValue());
+				->setContractDate((new \DateTimeImmutable())->setTimestamp($personTransferDTO->getContractDate()))
+				->setAnnouncedDate((new \DateTimeImmutable())->setTimestamp($personTransferDTO->getAnnouncedDate()))
+				->setMarketValue($personTransferDTO->getMarketValue());
 			$this->transferRepository->persist($transferItem);
 		} catch (\Exception $exception) {
 			throw new DynamoDBException(
@@ -151,24 +144,11 @@ class TransferService
 				config('common.error_codes.transfer_update_failed')
 			);
 		}
-		$this->transferCacheService->forget(TransferCacheService::getTransferByPlayerKey($transferItem->getPlayerId()));
+		$this->transferCacheService->forget(TransferCacheService::getTransferByPersonKey($transferItem->getPersonId()));
 		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getToTeamId(), $transferItem->getSeason()));
 		$this->transferCacheService->forget(TransferCacheService::getTransferByTeamKey($transferItem->getFromTeamId(), $transferItem->getSeason()));
 	}
 
-	/**
-	 * @param array $transfers
-	 */
-	private static function sortBySeason(array &$transfers)
-	{
-		usort($transfers,
-			static function (Transfer $first, Transfer $second) {
-				if ($first->getSeason() === $second->getSeason()) {
-					return 0;
-				}
-				return ($first->getSeason() > $second->getSeason()) ? 1 : -1;
-			});
-	}
 
 	/**
 	 * @param string $transfer
@@ -176,28 +156,13 @@ class TransferService
 	 */
 	private function findTransfer(string $transfer): Transfer
 	{
-		$transferDecoded = base64_decode($transfer);
-		list($playerId, $startDate) = explode('#', $transferDecoded);
-		/**
-		 * @var Transfer $transferItem
-		 */
+		/*** @var Transfer $transferItem */
 		$transferItem = $this->transferRepository->find([
-			'playerId' => $playerId,
-			'startDate' => $startDate
+			'id' => $transfer,
 		]);
 		if (!$transferItem) {
 			throw new NotFoundHttpException();
 		}
 		return $transferItem;
-	}
-
-	/**
-	 * @param $seasons
-	 * @return $this
-	 */
-	public function setSeasons($seasons): TransferService
-	{
-		$this->seasons = $seasons;
-		return $this;
 	}
 }

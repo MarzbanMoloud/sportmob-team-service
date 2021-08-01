@@ -5,10 +5,10 @@ namespace App\ValueObjects\DTO;
 
 
 /**
- * Class PlayerTransferDTO
+ * Class PersonTransferDTO
  * @package App\ValueObjects\DTO
  */
-class PlayerTransferDTO
+class PersonTransferDTO
 {
 	private array $request;
 

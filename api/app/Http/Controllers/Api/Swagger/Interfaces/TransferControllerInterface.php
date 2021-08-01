@@ -61,10 +61,10 @@ interface TransferControllerInterface
 	 *        						@OA\Property(
 	 *                              	property="id",
 	 *                              	type="string",
-	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYzZDEtM2JkZC04YmZiLTI5M2NmZWJlNDdiYyIsInN0YXJ0RGF0"
+	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGI"
 	 *                           	),
 	 *                         		@OA\Property(
-	 *                              	property="player",
+	 *                              	property="person",
 	 *                              	type="object",
 	 *                              	@OA\Property(
 	 *                                  	property="id",
@@ -75,11 +75,6 @@ interface TransferControllerInterface
 	 *                                  	property="name",
 	 *                                  	type="string",
 	 *                                  	example="Adonis Breitenberg"
-	 *                              	),
-	 *                              	@OA\Property(
-	 *                                  	property="position",
-	 *                                  	type="string",
-	 *                                  	example="defender"
 	 *                              	)
 	 *                          	),
 	 *                         		@OA\Property(
@@ -142,7 +137,7 @@ interface TransferControllerInterface
 	 *                              @OA\Property(
 	 *                                  property="type",
 	 *                                  type="string",
-	 *                                  enum={"transfer", "freeTransfer", "backFromLoan", "loan", "unknown", "playerSwap", "trial"}
+	 *                                  enum={"transfer", "loan_back", "loan"}
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="like",
@@ -169,26 +164,6 @@ interface TransferControllerInterface
 	 *                      )
 	 *                 )
 	 *         )
-	 *     ),
-	 *     @OA\Response(
-	 *          response=404,
-	 *          description="When Resource not found",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema(
-	 *                  type="object",
-	 *                  @OA\Property(
-	 *                      property="message",
-	 *                      type="string",
-	 *                      example="Resource not found."
-	 *                  ),
-	 *                  @OA\Property(
-	 *                      property="code",
-	 *                      type="string",
-	 *                      example="TM-404 or TM-001"
-	 *                  )
-	 *             )
-	 *         )
 	 *     )
 	 * )
 	 * @param string $team
@@ -198,12 +173,12 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/transfers/player/{player}",
+	 *     path="/{lang}/transfers/person/{person}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
-	 *         name="player",
+	 *         name="person",
 	 *         in="path",
-	 *         description="playerId",
+	 *         description="personId",
 	 *         required=true,
 	 *         example="cee429ce-70ee-38f1-9f11-5e829fd5db0c",
 	 *         @OA\Schema(type="string")
@@ -234,10 +209,10 @@ interface TransferControllerInterface
 	 *        					@OA\Property(
 	 *                              property="id",
 	 *                              type="string",
-	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIwLTYXRlIjoiMjAyMC0wMS0wMSAwMDowMDowMC4wMDAwMDAiLCJ0aW1lem9u"
+	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIw"
 	 *                           ),
 	 *                         		@OA\Property(
-	 *                                property="player",
+	 *                                property="person",
 	 *                                type="object",
 	 *                              	@OA\Property(
 	 *                                    property="id",
@@ -248,11 +223,6 @@ interface TransferControllerInterface
 	 *                                    property="name",
 	 *                                    type="string",
 	 *                                    example="Adonis Breitenberg"
-	 *                                ),
-	 *                              	@OA\Property(
-	 *                                    property="position",
-	 *                                    type="string",
-	 *                                    example="defender"
 	 *                                )
 	 *                            ),
 	 *                         		@OA\Property(
@@ -315,7 +285,7 @@ interface TransferControllerInterface
 	 *                              @OA\Property(
 	 *                                  property="type",
 	 *                                  type="string",
-	 *     								enum={"transfer", "freeTransfer", "backFromLoan", "loan", "unknown", "playerSwap", "trial"}
+	 *     								enum={"transfer", "loanBack", "loan"}
 	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="like",
@@ -335,31 +305,11 @@ interface TransferControllerInterface
 	 *                      )
 	 *                 )
 	 *         )
-	 *     ),
-	 *     @OA\Response(
-	 *          response=404,
-	 *          description="When Resource not found",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema(
-	 *                  type="object",
-	 *                  @OA\Property(
-	 *                      property="message",
-	 *                      type="string",
-	 *                      example="Resource not found."
-	 *                  ),
-	 *                  @OA\Property(
-	 *                      property="code",
-	 *                      type="string",
-	 *                      example="TM-404"
-	 *                  )
-	 *             )
-	 *         )
 	 *     )
 	 * )
-	 * @param string $player
+	 * @param string $person
 	 */
-	public function listByPlayer(string $player);
+	public function listByPerson(string $person);
 
 	/**
 	 * @OA\Put(
@@ -386,7 +336,7 @@ interface TransferControllerInterface
 	 *          in="path",
 	 *          required=true,
 	 *          description="id",
-	 *          example="eyJwbGF5ZXJJZCI6IjMwMjlhM2YzLWI1ZjMtM2M2Mi05ZWRmLTU5OTBkMTc0ZTdkYyI",
+	 *          example="eyJwbGF5ZXJJZCI6IjMw",
 	 *          @OA\Schema(type="string")
 	 *     ),
 	 *     @OA\RequestBody(
@@ -422,26 +372,6 @@ interface TransferControllerInterface
 	 *                      property="code",
 	 *                      type="string",
 	 *                      example="TM-002"
-	 *                  ),
-	 *             )
-	 *         )
-	 *     ),
-	 *     @OA\Response(
-	 *          response=404,
-	 *          description="When Resource not found",
-	 *          @OA\MediaType(
-	 *             mediaType="application/json",
-	 *             @OA\Schema(
-	 *                  type="object",
-	 *                  @OA\Property(
-	 *                      property="message",
-	 *                      type="string",
-	 *                      example="Resource not found."
-	 *                  ),
-	 *                  @OA\Property(
-	 *                      property="code",
-	 *                      type="string",
-	 *                      example="TM-404"
 	 *                  ),
 	 *             )
 	 *         )

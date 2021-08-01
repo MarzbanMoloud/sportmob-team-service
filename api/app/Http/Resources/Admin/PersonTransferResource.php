@@ -5,31 +5,29 @@ namespace App\Http\Resources\Admin;
 
 
 use App\Models\ReadModels\Transfer;
-use DateTimeInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 
 /**
- * Class PlayerTransferResource
+ * Class PersonTransferResource
  * @package App\Http\Resources\Admin
  */
-class PlayerTransferResource extends JsonResource
+class PersonTransferResource extends JsonResource
 {
 	/**
-	 * @param \Illuminate\Http\Request $transfers
+	 * @param $resource
 	 * @return array|array[]
 	 */
-	public function toArray($transfers): array
+	public function toArray($resource): array
 	{
 		return [
 			'links' => [],
 			'data' => array_map(function (Transfer $transfer) {
 				return [
-					'id' => base64_encode(sprintf('%s#%s', $transfer->getPlayerId(), $transfer->getStartDate()->format(DateTimeInterface::ATOM))),
-					'player' => [
-						'id' => $transfer->getPlayerId(),
-						'name' => $transfer->getPlayerName(),
-						'position' => $transfer->getPlayerPosition(),
+					'id' => $transfer->getId(),
+					'person' => [
+						'id' => $transfer->getPersonId(),
+						'name' => $transfer->getPersonName(),
 					],
 					'team' => [
 						'to' => [
@@ -41,8 +39,8 @@ class PlayerTransferResource extends JsonResource
 							'name' => $transfer->getFromTeamName(),
 						]
 					],
-					'startDate' => $transfer->getStartDate()->getTimestamp(),
-					'endDate' => $transfer->getEndDate() ? $transfer->getEndDate()->getTimestamp() : null,
+					'startDate' => ($transfer->getDateFrom() != Transfer::getDateTimeImmutable()) ? $transfer->getDateFrom()->getTimestamp() : null,
+					'endDate' => $transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null,
 					'marketValue' => $transfer->getMarketValue(),
 					'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null,
 					'contractDate' => $transfer->getContractDate()? $transfer->getContractDate()->getTimestamp() : null,

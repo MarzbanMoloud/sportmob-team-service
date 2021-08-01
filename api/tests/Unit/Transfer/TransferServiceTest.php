@@ -6,11 +6,14 @@ namespace Tests\Unit\Transfer;
 
 use App\Http\Services\Transfer\TransferService;
 use App\Models\ReadModels\Transfer;
+use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TransferRepository;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
 use Faker\Factory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\SerializerInterface;
 use TestCase;
+use Tests\Traits\TeamRepositoryTestTrait;
 use Tests\Traits\TransferRepositoryTestTrait;
 
 
@@ -20,12 +23,14 @@ use Tests\Traits\TransferRepositoryTestTrait;
  */
 class TransferServiceTest extends TestCase
 {
-	use TransferRepositoryTestTrait;
+	use TransferRepositoryTestTrait, TeamRepositoryTestTrait;
 
 	private \Faker\Generator $faker;
 	private TransferRepository $transferRepository;
 	private TransferService $transferService;
 	private TransferCacheServiceInterface $transferCacheService;
+	private SerializerInterface $serializer;
+	private TeamRepository $teamRepository;
 
 	protected function setUp(): void
 	{
@@ -33,36 +38,40 @@ class TransferServiceTest extends TestCase
 		$this->faker = Factory::create();
 		$this->transferRepository = app(TransferRepository::class);
 		$this->transferService = app(TransferService::class);
+		$this->teamRepository = app(TeamRepository::class);
 		$this->transferCacheService = app(TransferCacheServiceInterface::class);
+		$this->serializer = app(SerializerInterface::class);
 		$this->createTransferTable();
+		$this->createTeamTable();
 	}
 
 	public function testListByTeam()
 	{
 		$fakeTeamId = $this->faker->uuid;
-		$fakeTeamName = $this->faker->name;
-		$this->persistBatchDataForListByTeam($fakeTeamId, $fakeTeamName);
-		$response = $this->transferService->listByTeam($fakeTeamId, '2019-2020');
-		foreach ($response as $transfer) {
+		$this->persistBatchDataForTeam($fakeTeamId);
+		$response = $this->transferService->listByTeam($fakeTeamId, '2015-2016');
+		$this->assertCount(2, $response['transfers']);
+		foreach ($response['transfers'] as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
+		$this->assertCount(8, $response['seasons']);
 	}
 
 	public function testListByTeamWithoutSeason()
 	{
 		$fakeTeamId = $this->faker->uuid;
-		$fakeTeamName = $this->faker->name;
-		$this->persistBatchDataForListByTeam($fakeTeamId, $fakeTeamName);
-		$response = $this->transferService
-			->setSeasons($this->transferService->getAllSeasons($fakeTeamId))
-			->listByTeam($fakeTeamId);
-		foreach ($response as $transfer) {
+		$this->persistBatchDataForTeam($fakeTeamId);
+		$response = $this->transferService->listByTeam($fakeTeamId);
+		$this->assertCount(1, $response['transfers']);
+		foreach ($response['transfers'] as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
+		$this->assertCount(8, $response['seasons']);
 	}
 
 	public function testListByTeamWhenItemNotExist()
 	{
+		$this->expectException(NotFoundHttpException::class);
 		$response = $this->transferService->listByTeam($this->faker->uuid, '2020-2021');
 		$this->assertEmpty($response);
 	}
@@ -71,36 +80,17 @@ class TransferServiceTest extends TestCase
 	{
 		$this->expectException(NotFoundHttpException::class);
 		$fakeTeamId = $this->faker->uuid;
-		$response = $this->transferService
-			->setSeasons($this->transferService->getAllSeasons($fakeTeamId))
-			->listByTeam($fakeTeamId);
+		$response = $this->transferService->listByTeam($fakeTeamId);
 		foreach ($response as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
 	}
 
-	public function testGetAllSeasons()
-	{
-		$fakeTeamId = $this->faker->uuid;
-		$fakeTeamName = $this->faker->name;
-		$this->persistBatchDataForListByTeam($fakeTeamId, $fakeTeamName);
-		$response = $this->transferService->getAllSeasons($fakeTeamId);
-		$this->assertNotEmpty($response);
-		$this->assertCount(2, $response);
-	}
-
-	public function testGetAllSeasonsWhenItemNotExist()
-	{
-		$this->expectException(NotFoundHttpException::class);
-		$this->transferService->getAllSeasons($this->faker->uuid);
-	}
-
-	public function testListByPlayer()
+	public function testListByPerson()
 	{
 		$fakePlayerId = $this->faker->uuid;
-		$fakePlayerName = $this->faker->name;
-		$this->persistBatchDataForListByPlayer($fakePlayerId, $fakePlayerName);
-		$response = $this->transferService->listByPlayer($fakePlayerId);
+		$this->persistBatchDataForPerson($fakePlayerId);
+		$response = $this->transferService->listByPerson($fakePlayerId);
 		foreach ($response as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
@@ -109,7 +99,7 @@ class TransferServiceTest extends TestCase
 	public function testListByPlayerWhenItemNotExist()
 	{
 		$this->expectException(NotFoundHttpException::class);
-		$this->transferService->listByPlayer($this->faker->uuid);
+		$this->transferService->listByPerson($this->faker->uuid);
 	}
 
 	protected function tearDown(): void

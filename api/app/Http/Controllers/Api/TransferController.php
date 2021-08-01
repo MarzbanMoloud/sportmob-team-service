@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Swagger\Interfaces\TransferControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransferActionRequest;
-use App\Http\Resources\Api\PlayerTransferResource;
+use App\Http\Resources\Api\PersonTransferResource;
 use App\Http\Resources\Api\TeamTransferResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Transfer\TransferService;
@@ -43,23 +43,19 @@ class TransferController extends Controller implements TransferControllerInterfa
 	 */
 	public function listByTeam(string $team, ?string $season = null)
 	{
-		$result['seasons'] = $this->transferService->getAllSeasons($team);
-		$result['transfers'] = $this->transferService
-			->setSeasons($result['seasons'])
-			->listByTeam($team, $season);
 		return $this->responseService->createSuccessResponseObject(
-			new TeamTransferResource($result)
+			new TeamTransferResource($this->transferService->listByTeam($team, $season))
 		);
 	}
 
 	/**
-	 * @param string $player
+	 * @param string $person
 	 * @return mixed
 	 */
-	public function listByPlayer(string $player)
+	public function listByPerson(string $person)
 	{
 		return $this->responseService->createSuccessResponseObject(
-			new PlayerTransferResource($this->transferService->listByPlayer($player))
+			new PersonTransferResource($this->transferService->listByPerson($person))
 		);
 	}
 

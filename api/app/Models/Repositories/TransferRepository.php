@@ -16,8 +16,8 @@ use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryInterface;
 class TransferRepository extends DynamoDBRepository implements DynamoDBRepositoryInterface
 {
 	const INDEX_PERSON = 'IndexPerson';
-	const INDEX_TEAM_ID = 'IndexToTeam';
-	const INDEX_ON_LOAN_FROM_ID = 'IndexFromTeam';
+	const INDEX_TO_TEAM_ID = 'IndexToTeamId';
+	const INDEX_FROM_TEAM_ID = 'IndexFromTeamId';
 
 	/**
 	 * @return string
@@ -63,10 +63,11 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 	 * @param string|null $season
 	 * @return array
 	 */
-	public function findByTeamIdAndSeason(string $teamIndex, string $id, string $season = null): array
+	public function findAllByTeamIdAndSeason(string $teamIndex, string $id, string $season = null): array
 	{
 		try {
-			$indexName = $teamIndex == Transfer::ATTR_TEAM_ID ? self::INDEX_TEAM_ID : self::INDEX_ON_LOAN_FROM_ID;
+			$indexName = $teamIndex == Transfer::ATTR_TO_TEAM_ID ? self::INDEX_TO_TEAM_ID : self::INDEX_FROM_TEAM_ID;
+
 			$queryParams = [
 				'TableName' => static::getTableName(),
 				'IndexName' => $indexName,
@@ -84,12 +85,19 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 				]);
 			}
 
-			$Result = $this->dynamoDbClient->query($queryParams);
+			$results = [];
+
+			do {
+				$result = $this->dynamoDbClient->query($queryParams);
+				$results[] = $this->deserializeResult($result);
+			} while ($queryParams['ExclusiveStartKey'] = $result['LastEvaluatedKey']);
+
+			return call_user_func_array('array_merge', $results);
+
 		} catch (\Exception $e) {
 			$this->sentryHub->captureException($e);
 			return [];
 		}
-		return $this->deserializeResult($Result);
 	}
 
 	/**
@@ -109,19 +117,15 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				],
 				[
-					'AttributeName' => 'dateFrom',
-					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
-				],
-				[
 					'AttributeName' => 'season',
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				],
 				[
-					'AttributeName' => 'teamId',
+					'AttributeName' => 'toTeamId',
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				],
 				[
-					'AttributeName' => 'onLoanFromId',
+					'AttributeName' => 'fromTeamId',
 					'AttributeType' => DynamoDBRepositoryInterface::TYPE_STRING
 				]
 			],
@@ -140,7 +144,7 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 							'KeyType' => DynamoDBRepositoryInterface::KEY_HASH
 						],
 						[
-							'AttributeName' => 'dateFrom',
+							'AttributeName' => 'season',
 							'KeyType' => DynamoDBRepositoryInterface::KEY_RANGE
 						]
 					],
@@ -151,10 +155,10 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 					]
 				],
 				[
-					'IndexName' => self::INDEX_TEAM_ID,
+					'IndexName' => self::INDEX_TO_TEAM_ID,
 					'KeySchema' => [
 						[
-							'AttributeName' => 'teamId',
+							'AttributeName' => 'toTeamId',
 							'KeyType' => DynamoDBRepositoryInterface::KEY_HASH
 						],
 						[
@@ -169,10 +173,10 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 					]
 				],
 				[
-					'IndexName' => self::INDEX_ON_LOAN_FROM_ID,
+					'IndexName' => self::INDEX_FROM_TEAM_ID,
 					'KeySchema' => [
 						[
-							'AttributeName' => 'onLoanFromId',
+							'AttributeName' => 'fromTeamId',
 							'KeyType' => DynamoDBRepositoryInterface::KEY_HASH
 						],
 						[

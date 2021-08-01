@@ -34,10 +34,10 @@ class FavoriteResource extends JsonResource
 	}
 
 	/**
-	 * @param \Illuminate\Http\Request $data
+	 * @param $resource
 	 * @return array|array[]
 	 */
-	public function toArray($data): array
+	public function toArray($resource): array
 	{
 		return [
 			'links' => [],

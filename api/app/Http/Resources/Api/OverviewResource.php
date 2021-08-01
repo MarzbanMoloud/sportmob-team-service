@@ -34,10 +34,10 @@ class OverviewResource extends JsonResource
 	}
 
 	/**
-	 * @param $data
+	 * @param $resource
 	 * @return array|array[]
 	 */
-	public function toArray($data): array
+	public function toArray($resource): array
 	{
 		return [
 			'links' => [],
