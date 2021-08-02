@@ -16,6 +16,7 @@ use App\Models\ReadModels\Team;
 use App\Models\ReadModels\TeamsMatch;
 use App\Models\ReadModels\Transfer;
 use App\Models\ReadModels\Trophy;
+use App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface;
 use App\Models\Repositories\TeamRepository;
 use App\Models\Repositories\TeamsMatchRepository;
 use App\Models\Repositories\TransferRepository;
@@ -172,7 +173,7 @@ class TeamProjector
 	private function checkMetadataValidation(Message $message): void
 	{
 		$metadata = $message->getBody()->getMetadata();
-		$requiredFields = ['fullName', 'type', 'country', 'gender'];
+		$requiredFields = ['fullName', 'type', 'country', 'countryId', 'gender'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($metadata[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
@@ -190,7 +191,7 @@ class TeamProjector
 	/**
 	 * @param string $teamId
 	 * @param Message $message
-	 * @return \App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface
+	 * @return DynamoDBRepositoryModelInterface
 	 * @throws ProjectionException
 	 */
 	private function checkItemNotExist(string $teamId, Message $message)
@@ -214,10 +215,10 @@ class TeamProjector
 		return (new Team())
 			->setId($teamId)
 			->setGender($metadata['gender'])
-			->setFounded($metadata['founded'] ?? '' )
+			->setFounded($metadata['founded'])
 			->setCountry($metadata['country'])
 			->setCountryId($metadata['countryId'])
-			->setCity($metadata['city'] ?? '')
+			->setCity($metadata['city'])
 			->setType($metadata['type'])
 			->setName(
 				(new TeamName())
@@ -229,12 +230,12 @@ class TeamProjector
 	}
 
 	/**
-	 * @param \App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface $teamModel
+	 * @param DynamoDBRepositoryModelInterface $teamModel
 	 * @param array $metadata
 	 * @return mixed
 	 */
 	private function updateTeamModel(
-		\App\Models\Repositories\DynamoDB\Interfaces\DynamoDBRepositoryModelInterface $teamModel,
+		DynamoDBRepositoryModelInterface $teamModel,
 		array $metadata
 	) {
 		return $teamModel->setName(

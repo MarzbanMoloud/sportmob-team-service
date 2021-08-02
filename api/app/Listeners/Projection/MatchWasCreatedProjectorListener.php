@@ -62,7 +62,9 @@ class MatchWasCreatedProjectorListener
 	public function handle(MatchWasCreatedProjectorEvent $event)
 	{
 		$identifier = $event->mediatorMessage->getBody()->getIdentifiers();
+
 		$this->eventName = config('mediator-event.events.match_was_created');
+
 		if (!$this->brokerMessageCacheService->hasCompetitionName($identifier['competition'])) {
 			$message = (new Message())
 				->setHeaders(
@@ -84,7 +86,9 @@ class MatchWasCreatedProjectorListener
 			Event::needToAsk($message, $this->eventName, self::BROKER_EVENT_KEY, config('broker.services.competition_name'));
 			return;
 		}
+
 		$competitionName = $this->brokerMessageCacheService->getCompetitionName($identifier['competition']);
+
 		$this->updateTeamsMatch($identifier['match'], $identifier['home'], $competitionName, $event->mediatorMessage);
 		$this->updateTeamsMatch($identifier['match'], $identifier['away'], $competitionName, $event->mediatorMessage);
 	}
@@ -101,11 +105,14 @@ class MatchWasCreatedProjectorListener
 			'matchId' => $matchId,
 			'teamId' => $teamId
 		]);
+
 		if (!$teamsMatchItem) {
 			return;
 		}
+
 		/** @var TeamsMatch $teamsMatchItem */
 		$teamsMatchItem->setCompetitionName($competitionName);
+
 		try {
 			$this->teamsMatchRepository->persist($teamsMatchItem);
 		} catch (DynamoDBRepositoryException $exception) {

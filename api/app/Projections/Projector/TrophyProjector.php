@@ -87,17 +87,23 @@ class TrophyProjector
 	{
 		$body = $message->getBody();
 		$identifiers = $body->getIdentifiers();
+
 		$this->checkIdentifiersValidation($message);
+
 		/** @var Team $team */
 		if (!$team = $this->teamRepository->find(['id' => $identifiers['team']])) {
 			$validationMessage = sprintf('Could not find team by given Id : %s', $identifiers['team']);
 			Event::failed($message, $this->eventName, $validationMessage);
 			throw new ProjectionException($validationMessage);
 		}
+
 		$trophyModel = $this->createTrophyModel($identifiers, $team, $position);
+
 		$trophyModel->prePersist();
 		$this->persistTrophy($trophyModel, $message);
+
 		event(new TrophyProjectorEvent($trophyModel, $this->eventName, $message));
+
 		/** Create cache by call service */
 		try {
 			$this->trophyCacheService->forget(TrophyCacheService::getTrophyByCompetitionKey($identifiers['competition']));
@@ -115,14 +121,10 @@ class TrophyProjector
 	 */
 	private function checkIdentifiersValidation(Message $message): void
 	{
-		$requiredFields = [
-			'competition' => 'Competition',
-			'tournament' => 'Tournament',
-			'team' => 'Team'
-		];
-		foreach ($requiredFields as $fieldName => $prettyFieldName) {
+		$requiredFields = ['competition', 'tournament', 'team'];
+		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
-				$validationMessage = sprintf("%s field is empty.", $prettyFieldName);
+				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
 				Event::failed($message, $this->eventName, $validationMessage);
 				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}

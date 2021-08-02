@@ -63,6 +63,7 @@ class TrophyProjectorListener
 	public function handle(TrophyProjectorEvent $event)
 	{
 		if (!$this->brokerMessageCacheService->hasTournamentInfo($event->trophy->getTournamentId())) {
+
 			$message = (new Message())
 				->setHeaders(
 					(new Headers())
@@ -77,17 +78,22 @@ class TrophyProjectorListener
 					'entity' => config('broker.services.tournament_name'),
 					'id' => $event->trophy->getTournamentId()
 				]);
+
 			$this->broker->flushMessages()->addMessage(
 				self::BROKER_EVENT_KEY,
 				$this->serializer->serialize($message, 'json')
 			)->produceMessage(config('broker.topics.question_competition'));
+
 			Event::needToAsk($message, $event->eventName, self::BROKER_EVENT_KEY, config('broker.services.competition_name'));
 			return;
 		}
+
 		$tournamentInfo = $this->brokerMessageCacheService->getTournamentInfo($event->trophy->getTournamentId());
+
 		$event->trophy
 			->setCompetitionName($tournamentInfo['competitionName'])
 			->setTournamentSeason($tournamentInfo['season']);
+
 		try {
 			$this->trophyRepository->persist($event->trophy);
 		} catch (DynamoDBRepositoryException $exception) {

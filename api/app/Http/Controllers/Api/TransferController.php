@@ -4,6 +4,8 @@
 namespace App\Http\Controllers\Api;
 
 
+use App\Exceptions\Projection\ProjectionException;
+use App\Exceptions\UserActionTransferNotAllow;
 use App\Http\Controllers\Api\Swagger\Interfaces\TransferControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransferActionRequest;
@@ -12,6 +14,7 @@ use App\Http\Resources\Api\TeamTransferResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Transfer\TransferService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 
 /**
@@ -64,9 +67,9 @@ class TransferController extends Controller implements TransferControllerInterfa
 	 * @param string $transfer
 	 * @param Request $request
 	 * @return mixed
-	 * @throws \App\Exceptions\Projection\ProjectionException
-	 * @throws \App\Exceptions\UserActionTransferNotAllow
-	 * @throws \Illuminate\Validation\ValidationException
+	 * @throws ProjectionException
+	 * @throws UserActionTransferNotAllow
+	 * @throws ValidationException
 	 */
 	public function userActionTransfer(string $action, string $transfer, Request $request)
 	{

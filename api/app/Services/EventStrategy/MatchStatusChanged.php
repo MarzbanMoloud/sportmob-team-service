@@ -4,6 +4,7 @@
 namespace App\Services\EventStrategy;
 
 
+use App\Exceptions\Projection\ProjectionException;
 use App\Projections\Projector\MatchProjector;
 use App\Services\EventStrategy\Interfaces\EventInterface;
 use App\Services\Logger\Event;
@@ -35,7 +36,7 @@ class MatchStatusChanged implements EventInterface
 
 	/**
 	 * @param Message $message
-	 * @throws \App\Exceptions\Projection\ProjectionException
+	 * @throws ProjectionException
 	 */
 	public function handle(Message $message): void
 	{

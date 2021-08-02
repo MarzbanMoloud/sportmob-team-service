@@ -75,19 +75,29 @@ class MatchProjector
 	 */
 	public function applyMatchWasCreated(Message $message): void
 	{
+		$this->eventName = config('mediator-event.events.match_was_created');
+
+		Event::processing($message, $this->eventName);
+
 		$body = $message->getBody();
 		$identifier = $body->getIdentifiers();
-		$this->eventName = config('mediator-event.events.match_was_created');
-		Event::processing($message, $this->eventName);
+
 		$this->checkIdentifiersValidation($message);
+
 		$this->checkMetadataValidation($message);
+
 		$homeTeamsMatchModel = $this->createTeamsMatchModel($message);
 		$awayTeamsMatchModel = $this->createTeamsMatchModel($message, false);
+
 		$this->persistTeamsMatch($homeTeamsMatchModel, $message);
 		$this->persistTeamsMatch($awayTeamsMatchModel, $message);
+
 		event(new MatchWasCreatedProjectorEvent($message));
+
 		$this->teamsMatchCacheService->forget('teams_match*');
+
 		$this->createTeamsMatchCache([$identifier['home'], $identifier['away']]);
+
 		Event::succeeded($message, $this->eventName);
 	}
 
@@ -97,24 +107,32 @@ class MatchProjector
 	 */
 	public function applyMatchFinished(Message $message): void
 	{
+		$this->eventName = config('mediator-event.events.match_finished');
+
+		Event::processing($message, $this->eventName);
+
 		$body = $message->getBody();
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
-		$this->eventName = config('mediator-event.events.match_finished');
-		Event::processing($message, $this->eventName);
+
 		if (empty($identifier['match'])){
 			$validationMessage = 'Match field is empty.';
 			Event::failed($message, $this->eventName, $validationMessage);
 			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
+
 		if (empty($metadata['scores'])){
 			$validationMessage = 'Scores field is empty.';
 			Event::failed($message, $this->eventName, $validationMessage);
 			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
+
 		$teamsMatchItems = $this->checkItemExist($identifier['match'], $message);
+
 		$score = $this->excludeScoreTypes($metadata['scores']);
+
 		$this->teamsMatchCacheService->forget('teams_match*');
+
 		if ($identifier['winner'] == "") {
 			foreach ($teamsMatchItems as $teamsMatch) {
 				/** @var TeamsMatch $teamsMatch */
@@ -123,6 +141,7 @@ class MatchProjector
 			}
 			goto successfullyLog;
 		}
+
 		foreach ($teamsMatchItems as $teamsMatch) {
 			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchFinishedEvent(
@@ -133,6 +152,7 @@ class MatchProjector
 			);
 			$this->createTeamsMatchCache([$teamsMatch->getTeamId()]);
 		}
+
 		successfullyLog:
 		Event::succeeded($message, $this->eventName);
 	}
@@ -143,29 +163,38 @@ class MatchProjector
 	 */
 	public function applyMatchStatusChanged(Message $message): void
 	{
+		$this->eventName = config('mediator-event.events.match_status_changed');
+
+		Event::processing($message, $this->eventName);
+
 		$body = $message->getBody();
 		$identifier = $body->getIdentifiers();
 		$metadata = $body->getMetadata();
-		$this->eventName = config('mediator-event.events.match_status_changed');
-		Event::processing($message, $this->eventName);
+
 		if (empty($identifier['match'])){
 			$validationMessage = 'Match field is empty.';
 			Event::failed($message, $this->eventName, $validationMessage);
 			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
+
 		if (empty($metadata['status'])){
 			$validationMessage = 'Status field is empty.';
 			Event::failed($message, $this->eventName, $validationMessage);
 			throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 		}
+
 		$teamsMatchItems = $this->checkItemExist($identifier['match'], $message);
+
 		$status = ($metadata['status'] == self::MATCH_STATUS_GAME_ENDED) ? TeamsMatch::STATUS_FINISHED : TeamsMatch::STATUS_UNKNOWN;
+
 		$this->teamsMatchCacheService->forget('teams_match*');
+
 		foreach ($teamsMatchItems as $teamsMatch) {
 			/** @var TeamsMatch $teamsMatch */
 			$this->updateTeamsMatchByMatchStatusChanged($teamsMatch, $status, $message);
 			$this->createTeamsMatchCache([$teamsMatch->getTeamId()]);
 		}
+
 		Event::succeeded($message, $this->eventName);
 	}
 
@@ -178,7 +207,7 @@ class MatchProjector
 		$requiredFields = ['match', 'home', 'away', 'competition'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
-				$validationMessage = sprintf("%s field is empty.", $fieldName);
+				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
 				Event::failed($message, $this->eventName, $validationMessage);
 				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
@@ -194,7 +223,7 @@ class MatchProjector
 		$requiredFields = ['date'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getMetadata()[$fieldName])) {
-				$validationMessage = sprintf("%s field is empty.", $fieldName);
+				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
 				Event::failed($message, $this->eventName, $validationMessage);
 				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
