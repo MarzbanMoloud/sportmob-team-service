@@ -38,6 +38,13 @@ interface TransferCacheServiceInterface
 	public function rememberForeverTransfersByPerson(string $id, $function);
 
 	/**
+	 * @param string $id
+	 * @param array $transfers
+	 * @return mixed
+	 */
+	public function putTransfersByPerson(string $id, array $transfers);
+
+	/**
 	 * @param string $action
 	 * @param string $user
 	 * @param string $transfer

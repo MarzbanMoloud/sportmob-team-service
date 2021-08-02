@@ -104,11 +104,20 @@ class MembershipProjector
 			}
 
 			$clubMemberships[] = $membership;
+
+			try {
+				$this->transferCacheService->forget(sprintf('transfer_team_%s_*', $membership['teamId']));
+				if (!is_null($membership['onLoanFrom'])) {
+					$this->transferCacheService->forget(sprintf('transfer_team_%s_*', $membership['onLoanFrom']));
+				}
+			} catch (Exception $e) {
+			}
 		}
 
 		$this->transformByPerson($message, $clubMemberships, $identifier['person'], $metadata['type']);
 
-		//TODO:: create cache and ask question of playerService.
+		//TODO:: ask question of playerService.
+		$this->transferCacheService->putTransfersByPerson($identifier['person'], $this->transferRepository->findByPersonId($identifier['person']));
 
 		Event::succeeded($message, $this->eventName);
 	}

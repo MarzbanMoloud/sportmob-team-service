@@ -76,6 +76,15 @@ class TransferCacheService extends CacheService implements TransferCacheServiceI
 	}
 
 	/**
+	 * @param string $id
+	 * @param array $transfers
+	 */
+	public function putTransfersByPerson(string $id, array $transfers)
+	{
+		$this->put(self::getTransferByPersonKey($id), $transfers);
+	}
+
+	/**
 	 * @param string $action
 	 * @param string $user
 	 * @param string $transfer
