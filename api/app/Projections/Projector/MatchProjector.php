@@ -220,7 +220,7 @@ class MatchProjector
 	 */
 	private function checkMetadataValidation(Message $message): void
 	{
-		$requiredFields = ['date'];
+		$requiredFields = ['date', 'time'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getMetadata()[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
