@@ -53,6 +53,8 @@ services:
             - DATA_DIR=/tmp/localstack/data
             - DEFAULT_REGION=us-west-2
             - HOSTNAME_EXTERNAL=localstack
+        volumes:
+            - ./Docker/data/localstack:/tmp/localstack
         networks:
             es-service-network:
 
