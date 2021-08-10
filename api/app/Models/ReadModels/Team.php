@@ -23,8 +23,8 @@ class Team implements DynamoDBRepositoryModelInterface
 	private string $id;
 	private string $country;
 	private string $countryId;
-	private string $city;
-	private string $founded;
+	private ?string $city = null;
+	private ?string $founded = null;
 	private string $gender;
 	private TeamName $name;
 	private bool $active = true;
@@ -93,36 +93,36 @@ class Team implements DynamoDBRepositoryModelInterface
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getCity(): string
+	public function getCity(): ?string
 	{
 		return $this->city;
 	}
 
 	/**
-	 * @param string $city
+	 * @param string|null $city
 	 * @return Team
 	 */
-	public function setCity(string $city): Team
+	public function setCity(?string $city): Team
 	{
 		$this->city = $city;
 		return $this;
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getFounded(): string
+	public function getFounded(): ?string
 	{
 		return $this->founded;
 	}
 
 	/**
-	 * @param string $founded
+	 * @param string|null $founded
 	 * @return Team
 	 */
-	public function setFounded(string $founded): Team
+	public function setFounded(?string $founded): Team
 	{
 		$this->founded = $founded;
 		return $this;
