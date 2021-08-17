@@ -431,7 +431,7 @@ class EventStrategyHandleTest extends TestCase
 					"person": "%s"
 				 },
 				"metadata": {
-					"type": "player",
+					"type": "",
 					"membership": []
 				}
 			}

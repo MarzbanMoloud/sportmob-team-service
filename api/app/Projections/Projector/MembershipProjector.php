@@ -92,6 +92,12 @@ class MembershipProjector
 
 		$this->checkMetadataValidation($message);
 
+		if (empty($metadata['membership'])) {
+			$validationMessage = 'Membership field is empty.';
+			Event::failed($message, $this->eventName, $validationMessage);
+			return;
+		}
+
 		$clubMemberships = [];
 
 		foreach ($metadata['membership'] as $membership) {
@@ -146,13 +152,12 @@ class MembershipProjector
 	private function checkMetadataValidation(Message $message): void
 	{
 		$metadata = $message->getBody()->getMetadata();
-		$requiredFields = ['membership', 'type'];
+		$requiredFields = ['type'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($metadata[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
 				Event::failed($message, $this->eventName, $validationMessage);
-				throw new ProjectionException($validationMessage,
-					ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
+				throw new ProjectionException($validationMessage, ResponseServiceInterface::STATUS_CODE_VALIDATION_ERROR);
 			}
 		}
 	}
