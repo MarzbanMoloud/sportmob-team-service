@@ -45,10 +45,16 @@ class TransferRepository extends DynamoDBRepository implements DynamoDBRepositor
 			$Result = $this->dynamoDbClient->query([
 				'TableName' => static::getTableName(),
 				'IndexName' => self::INDEX_PERSON,
-				'KeyConditionExpression' => 'personId = :personId',
+				'KeyConditionExpression' => '#personId = :personId',
+				'FilterExpression'          => '#type <> :type',
 				'ExpressionAttributeValues' => $this->marshalJson([
 					':personId' => $id,
-				])
+					':type' => Transfer::TRANSFER_TYPE_LOAN_BACK,
+				]),
+				'ExpressionAttributeNames' => [
+					'#type' => 'type',
+					'#personId' => 'personId'
+				]
 			]);
 		} catch (\Exception $e) {
 			$this->sentryHub->captureException($e);
