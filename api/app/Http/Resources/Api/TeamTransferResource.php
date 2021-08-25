@@ -39,11 +39,19 @@ class TeamTransferResource extends JsonResource
 	 */
 	public function toArray($resource): array
 	{
+		$seasons = [];
+		foreach ($this->resource['seasons'] as $season) {
+			if ($season == Transfer::DEFAULT_VALUE){
+				continue;
+			}
+			$seasons[] = $season;
+		}
+
 		return [
 			'links' => [],
 			'data' => [
 				'transfers' => $this->makeTransferData(),
-				'seasons' => $this->resource['seasons']
+				'seasons' => $seasons
 			]
 		];
 	}
