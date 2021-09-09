@@ -42,22 +42,62 @@ services:
         networks:
             es-service-network:
 
-    #Local AWS cloud service
-    localstack:
-        container_name: es_service_localstack
-        image: localstack/localstack
-        ports:
-            - "4566:4566"
-        environment:
-            - SERVICES=sns , sqs
-            - DATA_DIR=/tmp/localstack/data
-            - DEFAULT_REGION=us-west-2
-            - HOSTNAME_EXTERNAL=localstack
+    #prometheus Service
+    prometheus:
+        container_name: es_service_prometheus
+        image: prom/prometheus:latest
         volumes:
-            - ./Docker/data/localstack:/tmp/localstack
+            - ./Docker/config/prometheus:/etc/prometheus
+        command:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus'
+            - '--web.console.libraries=/etc/prometheus/console_libraries'
+            - '--web.console.templates=/etc/prometheus/consoles'
+            - '--storage.tsdb.retention.time=200h'
+            - '--web.enable-lifecycle'
+        restart: unless-stopped
+        expose:
+            - 9090
+        labels:
+            org.label-schema.group: "monitoring"
         networks:
             es-service-network:
 
+    #alertmanager Service
+    alertmanager:
+        container_name: es_service_alertmanager
+        image: prom/alertmanager:latest
+        volumes:
+            - ./Docker/config/alertmanager:/etc/alertmanager
+        command:
+            - '--config.file=/etc/alertmanager/config.yml'
+            - '--storage.path=/alertmanager'
+        restart: unless-stopped
+        expose:
+            - 9093
+        labels:
+            org.label-schema.group: "monitoring"
+        networks:
+            es-service-network:
+
+    #grafana Service
+    grafana:
+        container_name: es_service_grafana
+        image: grafana/grafana:6.7.2
+        volumes:
+            - ./Docker/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+            - ./Docker/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+        environment:
+            - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+            - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+            - GF_USERS_ALLOW_SIGN_UP=false
+        restart: unless-stopped
+        expose:
+            - 3000
+        labels:
+            org.label-schema.group: "monitoring"
+        networks:
+            es-service-network:
 networks:
     es-service-network:
 
