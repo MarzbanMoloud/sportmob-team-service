@@ -14,6 +14,7 @@ return [
     'sns'      => [
         'region'      => env( 'AWS_REGION'  ),
         'version'     => env( 'AWS_VERSION', 'latest' ),
+        'endpoint' => env('AWS_SNS_ENDPOINT' ),
         "credentials" => [
             "key"    => env( 'AWS_ACCESS_KEY_ID'  ),
             "secret" => env( 'AWS_SECRET_ACCESS_KEY' )
@@ -22,6 +23,7 @@ return [
     'sqs'      => [
         'region'      => env( 'AWS_REGION' ),
         'version'     => env( 'AWS_VERSION', 'latest' ),
+        'endpoint' => env('AWS_SQS_ENDPOINT' ),
         "credentials" => [
             "key"    => env( 'AWS_ACCESS_KEY_ID' ),
             "secret" => env( 'AWS_SECRET_ACCESS_KEY' )

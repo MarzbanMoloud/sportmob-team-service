@@ -51,7 +51,7 @@ trait AmazonBrokerTrait
             foreach ($topics as $key => $topic) {
                 $Topic =
                     $this->snsClient->createTopic([
-                        'Name' => sprintf("%s.fifo", $topic),
+                        'Name' => config('aws.sns.endpoint') ? sprintf("%s", $topic) : sprintf("%s.fifo", $topic),
                         'Attributes' => [
                             'FifoTopic' => 'true',
                             'ContentBasedDeduplication' => 'false',
