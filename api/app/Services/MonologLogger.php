@@ -13,8 +13,8 @@ class MonologLogger extends Logger
         $Sentry = app( HubInterface::class );
         try {
             parent::alert( $message, $context );
-        } catch (\Exception $e) {
-            $Sentry->captureException( $e->getPrevious() );
+        } catch (\Throwable $throwable) {
+            $Sentry->captureException( $throwable );
         }
     }
 

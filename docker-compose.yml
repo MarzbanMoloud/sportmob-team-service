@@ -98,6 +98,7 @@ services:
             org.label-schema.group: "monitoring"
         networks:
             es-service-network:
+
 networks:
     es-service-network:
 
