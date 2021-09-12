@@ -62,7 +62,7 @@ services:
         labels:
             org.label-schema.group: "monitoring"
         networks:
-            es-service-network:
+            team-service-network:
 
     #alertmanager Service
     alertmanager:
@@ -79,7 +79,7 @@ services:
         labels:
             org.label-schema.group: "monitoring"
         networks:
-            es-service-network:
+            team-service-network:
 
     #grafana Service
     grafana:
@@ -98,7 +98,7 @@ services:
         labels:
             org.label-schema.group: "monitoring"
         networks:
-            es-service-network:
+            team-service-network:
 
 networks:
     team-service-network:
