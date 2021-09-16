@@ -152,9 +152,8 @@ services:
         volumes:
             - ./Docker/config/caddy:/etc/caddy
         environment:
-            - ADMIN_USER=${CADDY_ADMIN_USER}
-            - ADMIN_PASSWORD=${CADDY_ADMIN_PASSWORD}
-            - ADMIN_PASSWORD_HASH=${CADDY_ADMIN_PASSWORD_HASH}
+            - ADMIN_USER=${CADDY_ADMIN_USER:-admin}
+            - ADMIN_PASSWORD=${CADDY_ADMIN_PASSWORD:-admin}
         restart: unless-stopped
         labels:
             org.label-schema.group: "monitoring"
