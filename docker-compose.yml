@@ -154,6 +154,7 @@ services:
         environment:
             - ADMIN_USER=${CADDY_ADMIN_USER:-admin}
             - ADMIN_PASSWORD=${CADDY_ADMIN_PASSWORD:-admin}
+            - ADMIN_PASSWORD_HASH=${CADDY_ADMIN_PASSWORD_HASH:-JDJhJDE0JE91S1FrN0Z0VEsyWmhrQVpON1VzdHVLSDkyWHdsN0xNbEZYdnNIZm1pb2d1blg4Y09mL0ZP}
         restart: unless-stopped
         labels:
             org.label-schema.group: "monitoring"
