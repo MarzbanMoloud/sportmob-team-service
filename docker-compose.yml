@@ -46,7 +46,7 @@ services:
     #prometheus Service
     prometheus:
         container_name: team_service_prometheus
-        image: prom/prometheus:latest
+            image: prom/prometheus:v2.30.0
         volumes:
             - ./Docker/config/prometheus:/etc/prometheus
         command:
@@ -67,7 +67,7 @@ services:
     #alertmanager Service
     alertmanager:
         container_name: team_service_alertmanager
-        image: prom/alertmanager:latest
+        image: prom/alertmanager:v0.23.0
         volumes:
             - ./Docker/config/alertmanager:/etc/alertmanager
         command:
@@ -84,7 +84,7 @@ services:
     #nodeexporter Service
     nodeexporter:
         container_name: team_service_nodeexporter
-        image: prom/node-exporter:v0.18.1
+        image: prom/node-exporter:v1.2.2
         volumes:
             - /proc:/host/proc:ro
             - /sys:/host/sys:ro
@@ -105,7 +105,7 @@ services:
     #cadvisor Service
     cadvisor:
         container_name: team_service_cadvisor
-        image: gcr.io/google-containers/cadvisor:v0.34.0
+        image: gcr.io/cadvisor/cadvisor:v0.40.0
         privileged: true
         devices:
             - /dev/kmsg:/dev/kmsg
@@ -114,7 +114,6 @@ services:
             - /var/run:/var/run:ro
             - /sys:/sys:ro
             - /var/lib/docker:/var/lib/docker:ro
-            - /cgroup:/cgroup:ro
         restart: unless-stopped
         expose:
             - ${CADVISOR_EXPOSE_PORT:-8080}
@@ -126,7 +125,7 @@ services:
     #grafana Service
     grafana:
         container_name: team_service_grafana
-        image: grafana/grafana:6.7.2
+            image: grafana/grafana:8.1.4
         volumes:
             - ./Docker/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
             - ./Docker/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
@@ -142,14 +141,27 @@ services:
         networks:
             team-service-network:
 
+    #pushgateway Service
+    #    pushgateway:
+    #        container_name: es_service_pushgateway
+    #        image: prom/pushgateway:v1.4.1
+    #        restart: unless-stopped
+    #        expose:
+    #            - 9091
+    #        labels:
+    #            org.label-schema.group: "monitoring"
+    #        networks:
+    #            es-service-network:
+
     #caddy Service
     caddy:
         container_name: team_service_caddy
-        image: caddy:latest
+        image: caddy:2.3.0
         ports:
             - ${GRAFANA_EXPOSE_PORT:-3000}:3000
             - ${PROMETHEUS_EXPOSE_PORT:-9090}:9090
             - ${ALERT_MANAGER_EXPOSE_PORT:-9093}:9093
+        #            - 9091:9091
         volumes:
             - ./Docker/config/caddy:/etc/caddy
         environment:
