@@ -15,7 +15,7 @@ services:
         container_name: team_service_nginx
         image: nginx:latest
         ports:
-            - 8091:80
+            - ${NGINX_EXPOSE_PORT:-8091}:80
         volumes:
             - ./api:/usr/share/nginx
             - ./Docker/config/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -38,7 +38,7 @@ services:
         container_name: team_service_dynamo
         image: amazon/dynamodb-local:latest
         ports:
-            - 8883:8000
+            - ${DYNAMODB_EXPOSE_PORT:-8883}:8000
         command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
         networks:
             team-service-network:
@@ -58,7 +58,7 @@ services:
             - '--web.enable-lifecycle'
         restart: unless-stopped
         expose:
-            - 9090
+            - ${PROMETHEUS_EXPOSE_PORT:-9090}
         labels:
             org.label-schema.group: "monitoring"
         networks:
@@ -75,7 +75,49 @@ services:
             - '--storage.path=/alertmanager'
         restart: unless-stopped
         expose:
-            - 9093
+            - ${ALERT_MANAGER_EXPOSE_PORT:-9093}
+        labels:
+            org.label-schema.group: "monitoring"
+        networks:
+            es-service-network:
+
+    #nodeexporter Service
+    nodeexporter:
+        container_name: es_service_nodeexporter
+        image: prom/node-exporter:v0.18.1
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.rootfs=/rootfs'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+        restart: unless-stopped
+        expose:
+            - ${NODE_EXPORTER_EXPOSE_PORT:-9100}
+        labels:
+            org.label-schema.group: "monitoring"
+        networks:
+            es-service-network:
+
+    #cadvisor Service
+    cadvisor:
+        container_name: es_service_cadvisor
+        image: gcr.io/google-containers/cadvisor:v0.34.0
+        privileged: true
+        devices:
+            - /dev/kmsg:/dev/kmsg
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:ro
+            - /sys:/sys:ro
+            - /var/lib/docker:/var/lib/docker:ro
+            - /cgroup:/cgroup:ro
+        restart: unless-stopped
+        expose:
+            - ${CADVISOR_EXPOSE_PORT:-8080}
         labels:
             org.label-schema.group: "monitoring"
         networks:
@@ -89,12 +131,32 @@ services:
             - ./Docker/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
             - ./Docker/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
         environment:
-            - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
-            - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-            - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+            - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+            - GF_USERS_ALLOW_SIGN_UP=${GRAFANA_USERS_ALLOW_SIGN_UP:-false}
         restart: unless-stopped
         expose:
-            - 3000
+            - ${GRAFANA_EXPOSE_PORT:-3000}
+        labels:
+            org.label-schema.group: "monitoring"
+        networks:
+            es-service-network:
+
+    #caddy Service
+    caddy:
+        container_name: es_service_caddy
+        image: caddy:latest
+        ports:
+            - ${GRAFANA_EXPOSE_PORT:-3000}:3000
+            - ${PROMETHEUS_EXPOSE_PORT:-9090}:9090
+            - ${ALERT_MANAGER_EXPOSE_PORT:-9093}:9093
+        volumes:
+            - ./Docker/config/caddy:/etc/caddy
+        environment:
+            - ADMIN_USER=${CADDY_ADMIN_USER:-admin}
+            - ADMIN_PASSWORD=${CADDY_ADMIN_PASSWORD:-admin}
+            - ADMIN_PASSWORD_HASH=${CADDY_ADMIN_PASSWORD_HASH:-JDJhJDE0JE91S1FrN0Z0VEsyWmhrQVpON1VzdHVLSDkyWHdsN0xNbEZYdnNIZm1pb2d1blg4Y09mL0ZP}
+        restart: unless-stopped
         labels:
             org.label-schema.group: "monitoring"
         networks:
