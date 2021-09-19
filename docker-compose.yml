@@ -46,7 +46,7 @@ services:
     #prometheus Service
     prometheus:
         container_name: team_service_prometheus
-            image: prom/prometheus:v2.30.0
+        image: prom/prometheus:v2.30.0
         volumes:
             - ./Docker/config/prometheus:/etc/prometheus
         command:
@@ -125,7 +125,7 @@ services:
     #grafana Service
     grafana:
         container_name: team_service_grafana
-            image: grafana/grafana:8.1.4
+        image: grafana/grafana:8.1.4
         volumes:
             - ./Docker/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
             - ./Docker/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
