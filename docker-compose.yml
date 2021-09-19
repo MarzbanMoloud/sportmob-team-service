@@ -79,7 +79,7 @@ services:
         labels:
             org.label-schema.group: "monitoring"
         networks:
-            es-service-network:
+            team-service-network:
 
     #nodeexporter Service
     nodeexporter:
@@ -100,7 +100,7 @@ services:
         labels:
             org.label-schema.group: "monitoring"
         networks:
-            es-service-network:
+            team-service-network:
 
     #cadvisor Service
     cadvisor:
@@ -140,7 +140,7 @@ services:
         labels:
             org.label-schema.group: "monitoring"
         networks:
-            es-service-network:
+            team-service-network:
 
     #caddy Service
     caddy:
