@@ -45,7 +45,7 @@ services:
 
     #prometheus Service
     prometheus:
-        container_name: es_service_prometheus
+        container_name: team_service_prometheus
         image: prom/prometheus:latest
         volumes:
             - ./Docker/config/prometheus:/etc/prometheus
@@ -66,7 +66,7 @@ services:
 
     #alertmanager Service
     alertmanager:
-        container_name: es_service_alertmanager
+        container_name: team_service_alertmanager
         image: prom/alertmanager:latest
         volumes:
             - ./Docker/config/alertmanager:/etc/alertmanager
@@ -83,7 +83,7 @@ services:
 
     #nodeexporter Service
     nodeexporter:
-        container_name: es_service_nodeexporter
+        container_name: team_service_nodeexporter
         image: prom/node-exporter:v0.18.1
         volumes:
             - /proc:/host/proc:ro
@@ -104,7 +104,7 @@ services:
 
     #cadvisor Service
     cadvisor:
-        container_name: es_service_cadvisor
+        container_name: team_service_cadvisor
         image: gcr.io/google-containers/cadvisor:v0.34.0
         privileged: true
         devices:
@@ -125,7 +125,7 @@ services:
 
     #grafana Service
     grafana:
-        container_name: es_service_grafana
+        container_name: team_service_grafana
         image: grafana/grafana:6.7.2
         volumes:
             - ./Docker/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
@@ -144,7 +144,7 @@ services:
 
     #caddy Service
     caddy:
-        container_name: es_service_caddy
+        container_name: team_service_caddy
         image: caddy:latest
         ports:
             - ${GRAFANA_EXPOSE_PORT:-3000}:3000
