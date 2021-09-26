@@ -73,42 +73,80 @@ interface TransferControllerInterface
 	 *                              	),
 	 *                              	@OA\Property(
 	 *                                  	property="name",
-	 *                                  	type="string",
-	 *                                  	example="Adonis Breitenberg"
+	 *                                  	type="object",
+	 *     									@OA\Property(
+	 *                                  		property="full",
+	 *                                  		type="string",
+	 *                                  		example="Adonis Breitenberg"
+	 *                              		),
+	 *     									@OA\Property(
+	 *                                  		property="short",
+	 *                                  		type="string",
+	 *                                  		example="Adonis. B"
+	 *                              		),
+	 *     									@OA\Property(
+	 *                                  		property="official",
+	 *                                  		type="string",
+	 *                                  		example="Adonis Breitenberg"
+	 *                              		)
 	 *                              	)
 	 *                          	),
-	 *                         		@OA\Property(
-	 *                              	property="team",
-	 *                              	type="object",
+	 *                              @OA\Property(
+	 *                                  property="toTeam",
+	 *                                  type="object",
 	 *                              	@OA\Property(
-	 *                                  	property="to",
+	 *                                  	property="id",
+	 *                                  	type="string",
+	 *                                  	example="723a7d16-4e1d-3899-bef1-38680a67f11a"
+	 *                              	),
+	 *                              	@OA\Property(
+	 *                                  	property="name",
 	 *                                  	type="object",
-	 *                              		@OA\Property(
-	 *                                  		property="id",
+	 *                                  	@OA\Property(
+	 *                                  		property="full",
 	 *                                  		type="string",
-	 *                                  		example="723a7d16-4e1d-3899-bef1-38680a67f11a"
+	 *                                  		example="Barcelona"
 	 *                              		),
-	 *                              		@OA\Property(
-	 *                                  		property="name",
+	 *                                  	@OA\Property(
+	 *                                  		property="short",
+	 *                                  		type="string",
+	 *                                  		example="Barca"
+	 *                              		),
+	 *                                  	@OA\Property(
+	 *                                  		property="official",
 	 *                                  		type="string",
 	 *                                  		example="Barcelona"
 	 *                              		)
+	 *                              	)
+	 *                              ),
+	 *                              @OA\Property(
+	 *                                  property="fromTeam",
+	 *                                  type="object",
+	 *                              	@OA\Property(
+	 *                                  	property="id",
+	 *                                  	type="string",
+	 *                                  	example="fafe4497-b23e-3d7f-95db-da8b7da43ecc"
 	 *                              	),
 	 *                              	@OA\Property(
-	 *                                  	property="from",
+	 *                                  	property="name",
 	 *                                  	type="object",
-	 *                              		@OA\Property(
-	 *                                  		property="id",
+	 *                                  	@OA\Property(
+	 *                                  		property="full",
 	 *                                  		type="string",
-	 *                                  		example="fafe4497-b23e-3d7f-95db-da8b7da43ecc"
+	 *                                  		example="real madrid"
 	 *                              		),
-	 *                              		@OA\Property(
-	 *                                  		property="name",
+	 *                                  	@OA\Property(
+	 *                                  		property="short",
+	 *                                  		type="string",
+	 *                                  		example="real"
+	 *                              		),
+	 *                                  	@OA\Property(
+	 *                                  		property="official",
 	 *                                  		type="string",
 	 *                                  		example="real madrid"
 	 *                              		)
 	 *                              	)
-	 *                          	),
+	 *                              ),
 	 *                              @OA\Property(
 	 *                                  property="marketValue",
 	 *                                  type="string",
@@ -221,15 +259,26 @@ interface TransferControllerInterface
 	 *                                ),
 	 *                              	@OA\Property(
 	 *                                    property="name",
-	 *                                    type="string",
-	 *                                    example="Adonis Breitenberg"
+	 *                                    type="object",
+	 *                                    @OA\Property(
+	 *                                    	property="full",
+	 *                                    	type="string",
+	 *                                    	example="Adonis Breitenberg"
+	 *                                	  ),
+	 *                                    @OA\Property(
+	 *                                    	property="short",
+	 *                                    	type="string",
+	 *                                    	example="Adonis. B"
+	 *                                	  ),
+	 *                                    @OA\Property(
+	 *                                    	property="official",
+	 *                                    	type="string",
+	 *                                    	example="Adonis Breitenberg"
+	 *                                	  )
 	 *                                )
 	 *                            ),
-	 *                         		@OA\Property(
-	 *                                property="team",
-	 *                                type="object",
 	 *                              	@OA\Property(
-	 *                                    property="to",
+	 *                                    property="toTeam",
 	 *                                    type="object",
 	 *                              		@OA\Property(
 	 *                                        property="id",
@@ -238,12 +287,26 @@ interface TransferControllerInterface
 	 *                                    ),
 	 *                              		@OA\Property(
 	 *                                        property="name",
-	 *                                        type="string",
-	 *                                        example="Barcelona"
+	 *                                        type="object",
+	 *     									  @OA\Property(
+	 *                                        	property="full",
+	 *                                        	type="string",
+	 *                                        	example="Barcelona"
+	 *                                    	  ),
+	 *     									  @OA\Property(
+	 *                                        	property="short",
+	 *                                        	type="string",
+	 *                                        	example="Barca"
+	 *                                    	  ),
+	 *     									  @OA\Property(
+	 *                                        	property="official",
+	 *                                        	type="string",
+	 *                                        	example="Barcelona"
+	 *                                    	  ),
 	 *                                    )
 	 *                                ),
 	 *                              	@OA\Property(
-	 *                                    property="from",
+	 *                                    property="fromTeam",
 	 *                                    type="object",
 	 *                              		@OA\Property(
 	 *                                        property="id",
@@ -252,11 +315,24 @@ interface TransferControllerInterface
 	 *                                    ),
 	 *                              		@OA\Property(
 	 *                                        property="name",
-	 *                                        type="string",
-	 *                                        example="real madrid"
+	 *                                        type="object",
+	 *     									  @OA\Property(
+	 *                                        	property="full",
+	 *                                        	type="string",
+	 *                                        	example="real madrid"
+	 *                                    	  ),
+	 *     									  @OA\Property(
+	 *                                        	property="short",
+	 *                                        	type="string",
+	 *                                        	example="real"
+	 *                                    	  ),
+	 *     									  @OA\Property(
+	 *                                        	property="official",
+	 *                                        	type="string",
+	 *                                        	example="real madrid"
+	 *                                    	  )
 	 *                                    )
-	 *                                )
-	 *                            ),
+	 *                                ),
 	 *                              @OA\Property(
 	 *                                  property="marketValue",
 	 *                                  type="string",

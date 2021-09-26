@@ -50,17 +50,27 @@ interface TrophyControllerInterface
 	 *									"id": "51a45d69-a854-3acf-8660-13184c93e2cd",
 	 *									"name": "PremierLeague_2"
 	 *								},
-	 *								"tournament": {
+	 *								"trophies": {
 	 *									{
-	 * 										"id": "6b025699-b528-33b0-871e-be53d75c0de6",
-	 *										"season": "2017/2018",
-	 *										"winner": {
+	 *     									"tournament": {
+	 *											"id": "6b025699-b528-33b0-871e-be53d75c0de6",
+	 *											"season": "2017/2018",
+	 *	 									},
+	 *										"winnerTeam": {
 	 *											"id": "672ead46-a66c-30e1-b6f8-f577c9c28332",
-	 *											"name": "Ervin Block"
+	 *     										"name": {
+	 *												"full": "Ervin Block",
+	 *     											"short": "Ervin .B",
+	 *     											"official": "Ervin Block"
+	 *	 										}
 	 *										},
-	 *										"runnerUp": {
+	 *										"runnerUpTeam": {
 	 *											"id": "eaa6c82e-9d83-30d9-89e2-860a2dda4503",
-	 *											"name": "Manchester city"
+	 *     										"name": {
+	 *												"full": "Manchester city",
+	 *     											"short": "Manchester",
+	 *     											"official": "Manchester city"
+	 *	 										}
 	 *										}
 	 *									}
 	 *								}
@@ -132,15 +142,25 @@ interface TrophyControllerInterface
 	 *                          type="array",
 	 *                            example= {
 	 *	 							{
-	 *									"season": "2017/2018",
-	 *									"id": "007f646e-b7f7-334e-963f-2df2153a588e",
-	 *										"runnerUp": {
+	 *     								"tournament": {
+	 *										"season": "2017/2018",
+	 *										"id": "007f646e-b7f7-334e-963f-2df2153a588e",
+	 *	 								},
+	 *									"runnerUpTeam": {
 	 *										"id": "30904db2-ee74-3559-81e4-7ea6ee6bbc91",
-	 *										"name": "Manchester city"
+	 *     									"name": {
+	 *											"full": "Manchester city",
+	 *											"short": "Manchester",
+	 *											"official": "Manchester city"
+	 *	 									},
 	 *									},
-	 *									"winner": {
+	 *									"winnerTeam": {
 	 *										"id": "fd521439-1f40-3e10-a2b3-a396c50e4450",
-	 *										"name": "Maximilian Ebert"
+	 *     									"name": {
+	 *											"full": "Maximilian Ebert",
+	 *											"short": "Maximilian",
+	 *											"official": "Maximilian Ebert"
+	 *	 									},
 	 *									}
 	 *								}
 	 *	 						},
