@@ -138,8 +138,8 @@ interface TransferControllerInterface
 	 *                     @OA\Property(
 	 *                          property="data",
 	 *                          type="array",
-	 *     						@OA\Items(),
 	 *         					example={"2019-2020", "2019-2020"},
+	 *     						@OA\Items(),
 	 *                      )
 	 *                 )
 	 *         )
