@@ -36,7 +36,7 @@ interface TransferControllerInterface
 	 *         name="season",
 	 *         in="path",
 	 *         description="season",
-	 *         required=false,
+	 *         required=true,
 	 *         example="2020-2021",
 	 *         @OA\Schema(type="string")
 	 *     ),
@@ -54,151 +54,45 @@ interface TransferControllerInterface
 	 *                     ),
 	 *                     @OA\Property(
 	 *                          property="data",
-	 *                          type="object",
-	 *         					@OA\Property(
-	 *                          	property="transfers",
-	 *                          	type="object",
-	 *        						@OA\Property(
-	 *                              	property="id",
-	 *                              	type="string",
-	 *                              	example="eyJwbGF5ZXJJZCI6ImY3YTRjNGI"
-	 *                           	),
-	 *                         		@OA\Property(
-	 *                              	property="person",
-	 *                              	type="object",
-	 *                              	@OA\Property(
-	 *                                  	property="id",
-	 *                                  	type="string",
-	 *                                  	example="4c6f05da-5004-3aed-9cb3-eb9a0d55e591"
-	 *                              	),
-	 *                              	@OA\Property(
-	 *                                  	property="name",
-	 *                                  	type="object",
-	 *     									@OA\Property(
-	 *                                  		property="full",
-	 *                                  		type="string",
-	 *                                  		example="Adonis Breitenberg"
-	 *                              		),
-	 *     									@OA\Property(
-	 *                                  		property="short",
-	 *                                  		type="string",
-	 *                                  		example="Adonis. B"
-	 *                              		),
-	 *     									@OA\Property(
-	 *                                  		property="official",
-	 *                                  		type="string",
-	 *                                  		example="Adonis Breitenberg"
-	 *                              		)
-	 *                              	)
-	 *                          	),
-	 *                              @OA\Property(
-	 *                                  property="toTeam",
-	 *                                  type="object",
-	 *                              	@OA\Property(
-	 *                                  	property="id",
-	 *                                  	type="string",
-	 *                                  	example="723a7d16-4e1d-3899-bef1-38680a67f11a"
-	 *                              	),
-	 *                              	@OA\Property(
-	 *                                  	property="name",
-	 *                                  	type="object",
-	 *                                  	@OA\Property(
-	 *                                  		property="full",
-	 *                                  		type="string",
-	 *                                  		example="Barcelona"
-	 *                              		),
-	 *                                  	@OA\Property(
-	 *                                  		property="short",
-	 *                                  		type="string",
-	 *                                  		example="Barca"
-	 *                              		),
-	 *                                  	@OA\Property(
-	 *                                  		property="official",
-	 *                                  		type="string",
-	 *                                  		example="Barcelona"
-	 *                              		)
-	 *                              	)
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="fromTeam",
-	 *                                  type="object",
-	 *                              	@OA\Property(
-	 *                                  	property="id",
-	 *                                  	type="string",
-	 *                                  	example="fafe4497-b23e-3d7f-95db-da8b7da43ecc"
-	 *                              	),
-	 *                              	@OA\Property(
-	 *                                  	property="name",
-	 *                                  	type="object",
-	 *                                  	@OA\Property(
-	 *                                  		property="full",
-	 *                                  		type="string",
-	 *                                  		example="real madrid"
-	 *                              		),
-	 *                                  	@OA\Property(
-	 *                                  		property="short",
-	 *                                  		type="string",
-	 *                                  		example="real"
-	 *                              		),
-	 *                                  	@OA\Property(
-	 *                                  		property="official",
-	 *                                  		type="string",
-	 *                                  		example="real madrid"
-	 *                              		)
-	 *                              	)
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="marketValue",
-	 *                                  type="string",
-	 *                                  example="200"
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="startDate",
-	 *                                  type="integer",
-	 *                                  example=1577836800
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="endDate",
-	 *                                  type="integer",
-	 *                                  example=1610431027
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="announcedDate",
-	 *                                  type="integer",
-	 *                                  example=1610431027
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="contractDate",
-	 *                                  type="integer",
-	 *                                  example=1610431027
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="type",
-	 *                                  type="string",
-	 *                                  enum={"transfer", "loan_back", "loan"}
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="like",
-	 *                                  type="integer",
-	 *                                  example=0
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="dislike",
-	 *                                  type="integer",
-	 *                                  example=1
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="season",
-	 *                                  type="string",
-	 *                                  example="2019-2020"
-	 *                              )
-	 *                         ),
-	 *     					   @OA\Property(
-	 *                             property="seasons",
-	 *                             type="array",
-	 *                             example={"2019-2020", "2019-2020"},
-	 *     						   @OA\Items()
-	 *                         )
+	 *                          type="array",
+	 *     						@OA\Items(),
+	 *         					example={
+	 *								{
+	 *									"id": "eyJwbGF5ZXJJZCI6ImY3YTRjNGI",
+	 *									"person": {
+	 *									"id": "4c6f05da-5004-3aed-9cb3-eb9a0d55e591",
+	 *									"name": {
+	 *									"full": "Adonis Breitenberg",
+	 *									"short": "Adonis. B",
+	 *									"official": "Adonis Breitenberg"
+	 *									}
+	 *									},
+	 *									"toTeam": {
+	 *									"id": "723a7d16-4e1d-3899-bef1-38680a67f11a",
+	 *									"name": {
+	 *									"full": "Barcelona",
+	 *									"short": "Barca",
+	 *									"official": "Barcelona"
+	 *									}
+	 *									},
+	 *									"fromTeam": {
+	 *									"id": "fafe4497-b23e-3d7f-95db-da8b7da43ecc",
+	 *									"name": {
+	 *									"full": "real madrid",
+	 *									"short": "real",
+	 *									"official": "real madrid"
+	 *									}
+	 *									},
+	 *									"marketValue": 200,
+	 *									"startDate": 1577836800,
+	 *									"endDate": 1610431027,
+	 *									"type": "transferred | loan | loan_back",
+	 *									"like": 0,
+	 *									"dislike": 1,
+	 *									"season": "2019-2020"
+	 *									}
+	 *	                       },
+	 *
 	 *                      )
 	 *                 )
 	 *         )
@@ -207,7 +101,53 @@ interface TransferControllerInterface
 	 * @param string $team
 	 * @param string|null $season
 	 */
-	public function listByTeam(string $team, ?string $season = null);
+	public function listByTeam(string $team, string $season);
+
+	/**
+	 * @OA\Get(
+	 *     path="/{lang}/transfers/team/{team}",
+	 *     tags={"Transfer"},
+	 *     @OA\Parameter(
+	 *         name="team",
+	 *         in="path",
+	 *         description="teamId",
+	 *         required=true,
+	 *         example="cee429ce-70ee-38f1-9f11-5e829fd5db0c",
+	 *         @OA\Schema(type="string")
+	 *     ),
+	 *     @OA\Parameter(
+	 *         name="lang",
+	 *         in="path",
+	 *         description="language",
+	 *         required=true,
+	 *         example="en",
+	 *         @OA\Schema(type="string")
+	 *     ),
+	 *     @OA\Response(
+	 *          response=200,
+	 *          description="when response is OK",
+	 *          @OA\MediaType(
+	 *             mediaType="application/json",
+	 *             @OA\Schema(
+	 *                     type="object",
+	 *                     @OA\Property(
+	 *                         property="links",
+	 *                         type="array",
+	 *                         @OA\Items()
+	 *                     ),
+	 *                     @OA\Property(
+	 *                          property="data",
+	 *                          type="array",
+	 *     						@OA\Items(),
+	 *         					example={"2019-2020", "2019-2020"},
+	 *                      )
+	 *                 )
+	 *         )
+	 *     )
+	 * )
+	 * @param string $team
+	 */
+	public function seasonsByTeam(string $team);
 
 	/**
 	 * @OA\Get(
@@ -243,142 +183,35 @@ interface TransferControllerInterface
 	 *                     ),
 	 *                     @OA\Property(
 	 *                          property="data",
-	 *                          type="object",
-	 *        					@OA\Property(
-	 *                              property="id",
-	 *                              type="string",
-	 *                              example="eyJwbGF5ZXJJZCI6ImY3YTRjNGIw"
-	 *                           ),
-	 *                         		@OA\Property(
-	 *                                property="person",
-	 *                                type="object",
-	 *                              	@OA\Property(
-	 *                                    property="id",
-	 *                                    type="string",
-	 *                                    example="4c6f05da-5004-3aed-9cb3-eb9a0d55e591"
-	 *                                ),
-	 *                              	@OA\Property(
-	 *                                    property="name",
-	 *                                    type="object",
-	 *                                    @OA\Property(
-	 *                                    	property="full",
-	 *                                    	type="string",
-	 *                                    	example="Adonis Breitenberg"
-	 *                                	  ),
-	 *                                    @OA\Property(
-	 *                                    	property="short",
-	 *                                    	type="string",
-	 *                                    	example="Adonis. B"
-	 *                                	  ),
-	 *                                    @OA\Property(
-	 *                                    	property="official",
-	 *                                    	type="string",
-	 *                                    	example="Adonis Breitenberg"
-	 *                                	  )
-	 *                                )
-	 *                            ),
-	 *                              	@OA\Property(
-	 *                                    property="toTeam",
-	 *                                    type="object",
-	 *                              		@OA\Property(
-	 *                                        property="id",
-	 *                                        type="string",
-	 *                                        example="723a7d16-4e1d-3899-bef1-38680a67f11a"
-	 *                                    ),
-	 *                              		@OA\Property(
-	 *                                        property="name",
-	 *                                        type="object",
-	 *     									  @OA\Property(
-	 *                                        	property="full",
-	 *                                        	type="string",
-	 *                                        	example="Barcelona"
-	 *                                    	  ),
-	 *     									  @OA\Property(
-	 *                                        	property="short",
-	 *                                        	type="string",
-	 *                                        	example="Barca"
-	 *                                    	  ),
-	 *     									  @OA\Property(
-	 *                                        	property="official",
-	 *                                        	type="string",
-	 *                                        	example="Barcelona"
-	 *                                    	  ),
-	 *                                    )
-	 *                                ),
-	 *                              	@OA\Property(
-	 *                                    property="fromTeam",
-	 *                                    type="object",
-	 *                              		@OA\Property(
-	 *                                        property="id",
-	 *                                        type="string",
-	 *                                        example="fafe4497-b23e-3d7f-95db-da8b7da43ecc"
-	 *                                    ),
-	 *                              		@OA\Property(
-	 *                                        property="name",
-	 *                                        type="object",
-	 *     									  @OA\Property(
-	 *                                        	property="full",
-	 *                                        	type="string",
-	 *                                        	example="real madrid"
-	 *                                    	  ),
-	 *     									  @OA\Property(
-	 *                                        	property="short",
-	 *                                        	type="string",
-	 *                                        	example="real"
-	 *                                    	  ),
-	 *     									  @OA\Property(
-	 *                                        	property="official",
-	 *                                        	type="string",
-	 *                                        	example="real madrid"
-	 *                                    	  )
-	 *                                    )
-	 *                                ),
-	 *                              @OA\Property(
-	 *                                  property="marketValue",
-	 *                                  type="string",
-	 *                                  example="200"
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="startDate",
-	 *                                  type="integer",
-	 *                                  example=1577836800
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="endDate",
-	 *                                  type="integer",
-	 *                                  example=1610431027
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="announcedDate",
-	 *                                  type="integer",
-	 *                                  example=1610431027
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="contractDate",
-	 *                                  type="integer",
-	 *                                  example=1610431027
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="type",
-	 *                                  type="string",
-	 *     								enum={"transfer", "loanBack", "loan"}
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="like",
-	 *                                  type="integer",
-	 *                                  example=0
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="dislike",
-	 *                                  type="integer",
-	 *                                  example=1
-	 *                              ),
-	 *                              @OA\Property(
-	 *                                  property="season",
-	 *                                  type="string",
-	 *                                  example="2019-2020"
-	 *                              )
-	 *                      )
+	 *                          type="array",
+	 *     @OA\Items(),
+	 *     						example= {{
+	 *							"id": "eyJwbGF5ZXJJZCI6ImY3YTRjNGIw",
+	 *							"toTeam": {
+	 *							"id": "723a7d16-4e1d-3899-bef1-38680a67f11a",
+	 *							"name": {
+	 *							"full": "Barcelona",
+	 *							"short": "Barca",
+	 *							"official": "Barcelona"
+	 *							}
+	 *							},
+	 *							"fromTeam": {
+	 *							"id": "fafe4497-b23e-3d7f-95db-da8b7da43ecc",
+	 *							"name": {
+	 *							"full": "real madrid",
+	 *							"short": "real",
+	 *							"official": "real madrid"
+	 *							}
+	 *							},
+	 *							"marketValue": 200,
+	 *							"startDate": 1577836800,
+	 *							"endDate": 1610431027,
+	 *							"type": "transferred | loan | loan_back",
+	 *							"like": 0,
+	 *							"dislike": 1,
+	 *							"season": "2019-2020"
+	 *							}}
+	 *        					)
 	 *                 )
 	 *         )
 	 *     )

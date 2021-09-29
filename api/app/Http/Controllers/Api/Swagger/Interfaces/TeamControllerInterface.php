@@ -46,7 +46,7 @@ interface TeamControllerInterface
 	 *                          property="data",
 	 *                          type="object",
 	 *                          @OA\Property(
-	 *                              property="upcoming",
+	 *                              property="nextMatch",
 	 *                            	type="object",
 	 *	 							@OA\Property(
 	 *                                    property="competition",
@@ -130,7 +130,7 @@ interface TeamControllerInterface
 	 *                              )
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="finished",
+	 *                              property="teamForm",
 	 *                                type="array",
 	 *                                example={
 	 *                                    {
@@ -202,7 +202,7 @@ interface TeamControllerInterface
 	 *                          property="data",
 	 *                          type="object",
 	 *                          @OA\Property(
-	 *                              property="upcoming",
+	 *                              property="nextMatch",
 	 *                            	type="object",
 	 *	 							@OA\Property(
 	 *                                  property="homeTeam",
@@ -268,7 +268,7 @@ interface TeamControllerInterface
 	 *                              )
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="finished",
+	 *                              property="previousMatch",
 	 *								type="object",
 	 *     							@OA\Property(
 	 *                                    property="team",
@@ -337,9 +337,9 @@ interface TeamControllerInterface
 	 * 								),
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="lastMatches",
+	 *                              property="teamFormSymbols",
 	 *								type="array",
-	 *     							example = {"draw", "draw", "loss","draw", "win"},
+	 *     							example = {"D", "D", "L","D", "W"},
 	 *     							@OA\Items()
 	 * 							)
 	 *                      )
