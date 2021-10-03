@@ -130,11 +130,11 @@ interface TeamControllerInterface
 	 *                              )
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="teamForm",
+	 *                              property="teamFormObject",
 	 *                                type="array",
 	 *                                example={
 	 *                                    {
-	 *                                        "team": {
+	 *                                        "oppTeam": {
 	 *                                            "id": "1fa692ec-3fac-3858-83e3-2ed5b5bd2673",
 	 *                                            "name": {
 	 *                                                "full": "Blake Breitenberg DDS",
@@ -144,7 +144,7 @@ interface TeamControllerInterface
 	 *                                        },
 	 *                                        "date": 1611055800,
 	 *                                        "result": {
-	 *                                             "score": {
+	 *                                             "total": {
 	 *													"home": 1,
 	 *													"away": 1
 	 *												},
@@ -192,16 +192,16 @@ interface TeamControllerInterface
 	 *          @OA\MediaType(
 	 *             mediaType="application/json",
 	 *             @OA\Schema(
+	 *                 type="object",
+	 *                 @OA\Property(
+	 *                     property="links",
+	 *                     type="array",
+	 *                     @OA\Items()
+	 *                 ),
+	 *                 @OA\Property(
+	 *                     property="data",
 	 *                     type="object",
-	 *                     @OA\Property(
-	 *                         property="links",
-	 *                         type="array",
-	 *                         @OA\Items()
-	 *                     ),
-	 *                     @OA\Property(
-	 *                          property="data",
-	 *                          type="object",
-	 *                          @OA\Property(
+	 *     				   @OA\Property(
 	 *                              property="nextMatch",
 	 *                            	type="object",
 	 *	 							@OA\Property(
@@ -230,17 +230,17 @@ interface TeamControllerInterface
 	 *                                            type="string",
 	 *                                            example="Blake Breitenberg DDS"
 	 *                                        )
-	 *                                    )
-	 *                               ),
-	 *	 							 @OA\Property(
-	 *                                  property="awayTeam",
-	 *                                  type="object",
-	 *                         			@OA\Property(
+	 *                                   )
+	 *                             ),
+	 *	 						   @OA\Property(
+	 *                                 property="awayTeam",
+	 *                                 type="object",
+	 *                         		   @OA\Property(
 	 *                                       property="id",
 	 *                                       type="string",
 	 *                                       example="b6f01b9b-610b-3b0b-bd7d-3fae92cf2d32"
-	 *                                   ),
-	 *                         			 @OA\Property(
+	 *                                 ),
+	 *                         		   @OA\Property(
 	 *                                       property="name",
 	 *                                       type="object",
 	 *     									 @OA\Property(
@@ -258,20 +258,19 @@ interface TeamControllerInterface
 	 *                                            type="string",
 	 *                                            example="Sadye Kuphal"
 	 *                                        )
-	 *                                    )
-	 *                                ),
-	 *                              ),
-	 *     							@OA\Property(
-	 *                                    property="date",
-	 *                                    type="number",
-	 *                                    example=1611315000
-	 *                              )
+	 *                                 )
+	 *                             ),
+	 *     						   @OA\Property(
+	 *                                 property="date",
+	 *                                 type="number",
+	 *                                 example=1611315000
+	 *                             )
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="previousMatch",
-	 *								type="object",
-	 *     							@OA\Property(
-	 *                                    property="team",
+	 *                                property="previousMatch",
+	 *								  type="object",
+	 *     							  @OA\Property(
+	 *                                    property="awayTeam",
 	 *                                    type="object",
 	 *                                    @OA\Property(
 	 *                              			property="id",
@@ -284,17 +283,45 @@ interface TeamControllerInterface
 	 *                                    		@OA\Property(
 	 *                              				property="full",
 	 *												type="string",
-	 *     											example="Sylvia"
+	 *     											example="Sylvia1"
 	 * 									  		),
 	 *                                    		@OA\Property(
 	 *                              				property="short",
 	 *												type="string",
-	 *     											example="Syl"
+	 *     											example="Syl1"
 	 * 									  		),
 	 *                                    		@OA\Property(
 	 *                              				property="official",
 	 *												type="string",
-	 *     											example="Sylvia"
+	 *     											example="Sylvia1"
+	 * 									  		)
+	 * 									 ),
+	 *                               ),
+	 *     							 @OA\Property(
+	 *                                    property="homeTeam",
+	 *                                    type="object",
+	 *                                    @OA\Property(
+	 *                              			property="id",
+	 *											type="string",
+	 *     										example="6ad8f80e-bc4b-390e-b68c-82c50dca9211"
+	 * 									  ),
+	 *                                    @OA\Property(
+	 *                              			property="name",
+	 *											type="object",
+	 *                                    		@OA\Property(
+	 *                              				property="full",
+	 *												type="string",
+	 *     											example="Sylvia2"
+	 * 									  		),
+	 *                                    		@OA\Property(
+	 *                              				property="short",
+	 *												type="string",
+	 *     											example="Syl2"
+	 * 									  		),
+	 *                                    		@OA\Property(
+	 *                              				property="official",
+	 *												type="string",
+	 *     											example="Sylvia2"
 	 * 									  		)
 	 * 									  ),
 	 *                              ),
@@ -337,15 +364,47 @@ interface TeamControllerInterface
 	 * 								),
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="teamFormSymbols",
-	 *								type="array",
-	 *     							example = {"D", "D", "L","D", "W"},
-	 *     							@OA\Items()
+	 *                              property="TeamFormSymbols",
+	 *								type="object",
+	 *     							@OA\Property(
+	 *                                    property="team",
+	 *                                    type="object",
+	 *                                    @OA\Property(
+	 *                              			property="id",
+	 *											type="string",
+	 *     										example="6ad8f80e-bc4b-390e-b68c-82c50dca9200"
+	 * 									  ),
+	 *                                    @OA\Property(
+	 *                              			property="name",
+	 *											type="object",
+	 *                                    		@OA\Property(
+	 *                              				property="full",
+	 *												type="string",
+	 *     											example="Sylvia3"
+	 * 									  		),
+	 *                                    		@OA\Property(
+	 *                              				property="short",
+	 *												type="string",
+	 *     											example="Syl3"
+	 * 									  		),
+	 *                                    		@OA\Property(
+	 *                              				property="official",
+	 *												type="string",
+	 *     											example="Sylvia3"
+	 * 									  		)
+	 * 									  ),
+	 *                              ),
+	 *     							@OA\Property(
+	 *                              	property="away",
+	 *     								type="array",
+	 *									example = {"D", "D", "L","D", "W"},
+	 *     								@OA\Items()
+	 * 								)
 	 * 							)
-	 *                      )
 	 *                 )
+	 *             )
 	 *         )
-	 *     )
+	 *    )
 	 * )
 	 * @param string $team
 	 */
