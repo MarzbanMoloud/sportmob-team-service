@@ -130,10 +130,18 @@ interface TeamControllerInterface
 	 *                              )
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="teamFormObject",
+	 *                              property="teamForm",
 	 *                                type="array",
 	 *                                example={
-	 *                                    {
+	 *     								"team": {
+	 *                                            "id": "1fa692ec-3fac-3858-83e3-2ed5b5bd2656",
+	 *                                            "name": {
+	 *                                                "full": "Real Madrid",
+	 *                                                "short": "Real",
+	 *                                                "official": "Real Madrid"
+	 *                                            }
+	 *                                    },
+	 *                                    "form": {
 	 *                                        "oppTeam": {
 	 *                                            "id": "1fa692ec-3fac-3858-83e3-2ed5b5bd2673",
 	 *                                            "name": {
@@ -364,7 +372,7 @@ interface TeamControllerInterface
 	 * 								),
 	 *                          ),
 	 *     						@OA\Property(
-	 *                              property="TeamFormSymbols",
+	 *                              property="teamFormSymbols",
 	 *								type="object",
 	 *     							@OA\Property(
 	 *                                    property="team",
@@ -395,7 +403,7 @@ interface TeamControllerInterface
 	 * 									  ),
 	 *                              ),
 	 *     							@OA\Property(
-	 *                              	property="away",
+	 *                              	property="form",
 	 *     								type="array",
 	 *									example = {"D", "D", "L","D", "W"},
 	 *     								@OA\Items()
