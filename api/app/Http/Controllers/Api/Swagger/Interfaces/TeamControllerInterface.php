@@ -141,7 +141,7 @@ interface TeamControllerInterface
 	 *                                                "official": "Real Madrid"
 	 *                                            }
 	 *                                    },
-	 *                                    "form": {
+	 *                                    "form": {{
 	 *                                        "oppTeam": {
 	 *                                            "id": "1fa692ec-3fac-3858-83e3-2ed5b5bd2673",
 	 *                                            "name": {
@@ -162,7 +162,7 @@ interface TeamControllerInterface
 	 *												}
 	 *                                        }
 	 *                                    }
-	 *                                },
+	 *                                }},
 	 *								@OA\Items()
 	 *                            )
 	 *                      )
