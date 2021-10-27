@@ -12,7 +12,7 @@ interface TeamControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/overview/{team}",
+	 *     path="/tm/{lang}/overview/{team}",
 	 *     tags={"Overview"},
 	 *     @OA\Parameter(
 	 *         name="lang",
@@ -48,6 +48,11 @@ interface TeamControllerInterface
 	 *                          @OA\Property(
 	 *                              property="nextMatch",
 	 *                            	type="object",
+	 *     							@OA\Property(
+	 *                                    property="id",
+	 *                                    type="string",
+	 *                                    example="bb94b02d-a4cd-30f9-a5d9-697cc0142458"
+	 *                              ),
 	 *	 							@OA\Property(
 	 *                                    property="competition",
 	 *                                    type="object",
@@ -132,37 +137,50 @@ interface TeamControllerInterface
 	 *     						@OA\Property(
 	 *                              property="teamForm",
 	 *                                type="array",
-	 *                                example={
-	 *     								"team": {
-	 *                                            "id": "1fa692ec-3fac-3858-83e3-2ed5b5bd2656",
-	 *                                            "name": {
-	 *                                                "full": "Real Madrid",
-	 *                                                "short": "Real",
-	 *                                                "official": "Real Madrid"
-	 *                                            }
-	 *                                    },
-	 *                                    "form": {{
-	 *                                        "oppTeam": {
-	 *                                            "id": "1fa692ec-3fac-3858-83e3-2ed5b5bd2673",
-	 *                                            "name": {
-	 *                                                "full": "Blake Breitenberg DDS",
-	 *                                                "short": "Blake Breitenberg DDS",
-	 *                                                "official": "Blake Breitenberg DDS Team"
-	 *                                            }
-	 *                                        },
-	 *                                        "date": 1611055800,
-	 *                                        "result": {
-	 *                                             "total": {
-	 *													"home": 1,
-	 *													"away": 1
+	 *                                example= {
+	 *									"team": {
+	 *										"id": "c781de0f-83a7-3f8c-be3a-90e0faa1a654",
+	 *										"name": {
+	 *											"full": "Ezekiel Block",
+	 *											"short": "Ezekiel Block",
+	 *											"official": "Ezekiel Block"
+	 *										}
+	 *									},
+	 *									"form": {
+	 *										{
+	 *											"id": "a6ff3a3c-b66a-333c-9e0f-06e9f01d3f7f",
+	 *											"homeTeam": {
+	 *												"id": "c781de0f-83a7-3f8c-be3a-90e0faa1a654",
+	 *												"name": {
+	 *													"full": "Ezekiel Block",
+	 *													"short": "Ezekiel Block"
+	 *												}
+	 *											},
+	 *											"awayTeam": {
+	 *												"id": "2143fdd0-4871-3777-9eaf-885f6d98bc36",
+	 *												"name": {
+	 *													"full": "Ruthie Zieme",
+	 *													"short": "Ruthie Zieme"
+	 *												}
+	 *											},
+	 *											"competition": {
+	 *												"id": "0cb4a362-a5dc-3b6e-b0b5-cd0a6581df8b",
+	 *												"name": "Marquis Daniel"
+	 *											},
+	 *											"date": 1611055800,
+	 *											"coverage": "low",
+	 *											"result": {
+	 *												"total": {
+	 *													"home": 2,
+	 *													"away": 2
 	 *												},
 	 *												"penalty": {
 	 *													"home": 1,
 	 *													"away": 1
 	 *												}
-	 *                                        }
-	 *                                    }
-	 *                                }},
+	 *											}
+	 *										}
+	 *	 								}},
 	 *								@OA\Items()
 	 *                            )
 	 *                      )
@@ -176,7 +194,7 @@ interface TeamControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/favorite/{team}",
+	 *     path="/tm/{lang}/favorite/{team}",
 	 *     tags={"Favorite"},
 	 *     @OA\Parameter(
 	 *         name="lang",
@@ -212,6 +230,11 @@ interface TeamControllerInterface
 	 *     				   @OA\Property(
 	 *                              property="nextMatch",
 	 *                            	type="object",
+	 *     							@OA\Property(
+	 *                                  property="id",
+	 *                                  type="string",
+	 *                                  example="212f51e6-b803-3eac-bfe4-a451d78fa94f"
+	 *                              ),
 	 *	 							@OA\Property(
 	 *                                  property="homeTeam",
 	 *                                  type="object",
@@ -278,7 +301,7 @@ interface TeamControllerInterface
 	 *                                property="previousMatch",
 	 *								  type="object",
 	 *     							  @OA\Property(
-	 *                                    property="awayTeam",
+	 *                                    property="team",
 	 *                                    type="object",
 	 *                                    @OA\Property(
 	 *                              			property="id",
@@ -306,7 +329,7 @@ interface TeamControllerInterface
 	 * 									 ),
 	 *                               ),
 	 *     							 @OA\Property(
-	 *                                    property="homeTeam",
+	 *                                    property="form",
 	 *                                    type="object",
 	 *                                    @OA\Property(
 	 *                              			property="id",
@@ -314,62 +337,108 @@ interface TeamControllerInterface
 	 *     										example="6ad8f80e-bc4b-390e-b68c-82c50dca9211"
 	 * 									  ),
 	 *                                    @OA\Property(
-	 *                              			property="name",
+	 *                              			property="homeTeam",
 	 *											type="object",
 	 *                                    		@OA\Property(
-	 *                              				property="full",
+	 *                              				property="id",
 	 *												type="string",
-	 *     											example="Sylvia2"
+	 *     											example="5551f69f-05d4-394c-bf8f-3d1cc5d725e6"
 	 * 									  		),
 	 *                                    		@OA\Property(
-	 *                              				property="short",
-	 *												type="string",
-	 *     											example="Syl2"
+	 *                              				property="name",
+	 *												type="object",
+	 *     											@OA\Property(
+	 *                              					property="full",
+	 *													type="string",
+	 *     												example="Samara Keebler"
+	 * 									  			),
+	 *     											@OA\Property(
+	 *                              					property="short",
+	 *													type="string",
+	 *     												example="Samara Keebler"
+	 * 									  			)
 	 * 									  		),
-	 *                                    		@OA\Property(
-	 *                              				property="official",
-	 *												type="string",
-	 *     											example="Sylvia2"
-	 * 									  		)
 	 * 									  ),
-	 *                              ),
-	 *                              @OA\Property(
-	 *                              	property="date",
-	 *									type="number",
-	 *     								example=1611055800
-	 * 								),
-	 *                              @OA\Property(
-	 *                              	property="result",
-	 *									type="object",
-	 *     								@OA\Property(
-	 *                              		property="score",
+	 *                                    @OA\Property(
+	 *                              			property="awayTeam",
+	 *											type="object",
+	 *                                    		@OA\Property(
+	 *                              				property="id",
+	 *												type="string",
+	 *     											example="1205ceb2-e574-35e4-a789-4094317fb95e"
+	 * 									  		),
+	 *                                    		@OA\Property(
+	 *                              				property="name",
+	 *												type="object",
+	 *     											@OA\Property(
+	 *                              					property="full",
+	 *													type="string",
+	 *     												example="Otha Price"
+	 * 									  			),
+	 *     											@OA\Property(
+	 *                              					property="short",
+	 *													type="string",
+	 *     												example="Otha Price"
+	 * 									  			)
+	 * 									  		),
+	 * 									  ),
+	 *      							  @OA\Property(
+	 *                              		property="result",
 	 *										type="object",
 	 *     									@OA\Property(
-	 *                              			property="home",
-	 *											type="number",
-	 *     										example=1
+	 *                              			property="score",
+	 *											type="object",
+	 *     										@OA\Property(
+	 *                              				property="home",
+	 *												type="number",
+	 *     											example=1
+	 * 											),
+	 *     										@OA\Property(
+	 *                              				property="away",
+	 *												type="number",
+	 *     											example=1
+	 * 											)
 	 * 										),
 	 *     									@OA\Property(
-	 *                              			property="away",
-	 *											type="number",
-	 *     										example=1
+	 *                              			property="penalty",
+	 *											type="object",
+	 *     										@OA\Property(
+	 *                              				property="home",
+	 *												type="number",
+	 *     											example=1
+	 * 											),
+	 *     										@OA\Property(
+	 *                              				property="away",
+	 *												type="number",
+	 *     											example=1
+	 * 											)
 	 * 										)
 	 * 									),
-	 *     								@OA\Property(
-	 *                              		property="penalty",
+	 *      							@OA\Property(
+	 *                              		property="date",
+	 *										type="number",
+	 *     									example=1611055800
+	 * 									),
+	 *      							@OA\Property(
+	 *                              		property="coverage",
+	 *										type="string",
+	 *     									example="low"
+	 * 									),
+	 *      							@OA\Property(
+	 *                              		property="competition",
 	 *										type="object",
 	 *     									@OA\Property(
-	 *                              			property="home",
-	 *											type="number",
-	 *     										example=1
+	 *                              			property="id",
+	 *											type="string",
+	 *     										example="699547fe-f848-3c23-99b4-fe3646aa3a0b"
 	 * 										),
 	 *     									@OA\Property(
-	 *                              			property="away",
-	 *											type="number",
-	 *     										example=1
-	 * 										)
-	 * 									)
-	 * 								),
+	 *                              			property="name",
+	 *											type="string",
+	 *     										example="Waino Littel"
+	 * 										),
+	 * 									),
+	 *                              ),
 	 *                          ),
 	 *     						@OA\Property(
 	 *                              property="teamFormSymbols",

@@ -6,6 +6,11 @@ namespace App\Http\Resources\Api;
 
 use App\Http\Resources\Api\Traits\CalculateResultTrait;
 use App\Models\ReadModels\TeamsMatch;
+use App\ValueObjects\Response\CompetitionResponse;
+use App\ValueObjects\Response\MatchResponse;
+use App\ValueObjects\Response\NameResponse;
+use App\ValueObjects\Response\TeamForm;
+use App\ValueObjects\Response\TeamResponse;
 use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
 use SportMob\Translation\Client;
@@ -42,16 +47,8 @@ class OverviewResource extends JsonResource
 		return [
 			'links' => [],
 			'data' => [
-				'team' => [
-					'id' => $this->resource['team']['id'],
-					'name' => [
-						'original' => ($this->resource['team']['name']['original']) ? $this->client->getByLang($this->resource['team']['name']['original'], $this->lang) : null,
-						'short' => ($this->resource['team']['name']['short']) ? $this->client->getByLang($this->resource['team']['name']['short'], $this->lang) : null,
-						'official' => ($this->resource['team']['name']['official']) ? $this->client->getByLang($this->resource['team']['name']['official'], $this->lang) : null,
-					]
-				],
-				TeamsMatch::STATUS_UPCOMING => $this->makeUpcomingData(),
-				TeamsMatch::STATUS_FINISHED => $this->makeFinishedData(),
+				'nextMatch' => $this->makeNextMatchData(),
+				'teamForm' => $this->makeTeamFormData(),
 			]
 		];
 	}
@@ -59,37 +56,26 @@ class OverviewResource extends JsonResource
 	/**
 	 * @return array
 	 */
-	private function makeUpcomingData(): array
+	private function makeNextMatchData(): array
 	{
 		try {
-			/**
-			 * @var TeamsMatch $upcoming
-			 */
+			/** @var TeamsMatch $upcoming */
 			$upcoming = $this->resource['upcoming'][0];
-			return [
-				'competition' => [
-					'id' => $upcoming->getCompetitionId(),
-					'name' => ($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
-				],
-				'team' => [
-					'home' => [
-						'id' => $upcoming->getTeamId(),
-						'name' => [
-							'original' => ($upcoming->getTeamName()->getOriginal()) ? $this->client->getByLang($upcoming->getTeamName()->getOriginal(), $this->lang) : null,
-							'short' => ($upcoming->getTeamName()->getShort()) ? $this->client->getByLang($upcoming->getTeamName()->getShort(), $this->lang) : null,
-						]
-					],
-					'away' => [
-						'id' => $upcoming->getOpponentId(),
-						'name' => [
-							'original' => ($upcoming->getOpponentName()->getOriginal()) ? $this->client->getByLang($upcoming->getOpponentName()->getOriginal(), $this->lang) : null,
-							'short' => ($upcoming->getOpponentName()->getShort()) ? $this->client->getByLang($upcoming->getOpponentName()->getShort(), $this->lang) : null
-						]
-					]
-				],
-				'date' => TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
-				'coverage' => $upcoming->getCoverage()
-			];
+
+			list($home, $away) = $this->checkHomeAwayTeam($upcoming);
+
+			return MatchResponse::create(
+				$upcoming->getMatchId(),
+				$home,
+				$away,
+				TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
+				CompetitionResponse::create(
+					$upcoming->getCompetitionId(),
+					($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
+				),
+				$upcoming->getCoverage()
+			)->toArray();
+
 		} catch (Exception $exception) {
 			return [];
 		}
@@ -98,24 +84,85 @@ class OverviewResource extends JsonResource
 	/**
 	 * @return array
 	 */
-	private function makeFinishedData(): array
+	private function makeTeamFormData(): array
 	{
 		try {
-			return array_map(function (TeamsMatch $teamsMatch) {
-				return [
-					'team' => [
-						'id' => $teamsMatch->getOpponentId(),
-						'name' => [
-							'original' => ($teamsMatch->getOpponentName()->getOriginal()) ? $this->client->getByLang($teamsMatch->getOpponentName()->getOriginal(), $this->lang) : null,
-							'short' => ($teamsMatch->getOpponentName()->getShort()) ? $this->client->getByLang($teamsMatch->getOpponentName()->getShort(), $this->lang) : null,
-						]
-					],
-					'date' => TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
-					'result' => $this->getResult($teamsMatch->getResult())
-				];
+			$form = array_map(function (TeamsMatch $teamsMatch) {
+				list($home, $away) = $this->checkHomeAwayTeam($teamsMatch);
+
+				return MatchResponse::create(
+					$teamsMatch->getMatchId(),
+					$home,
+					$away,
+					TeamsMatch::getMatchDate($teamsMatch->getSortKey())->getTimestamp(),
+					CompetitionResponse::create(
+						$teamsMatch->getCompetitionId(),
+						($teamsMatch->getCompetitionName()) ? $this->client->getByLang($teamsMatch->getCompetitionName(), $this->lang) : null
+					),
+					$teamsMatch->getCoverage(),
+					$teamsMatch->getResult()
+				)->toArray();
+
 			}, $this->resource['finished']);
+
+			return TeamForm::create(
+				TeamResponse::create(
+					$this->resource['team']['id'],
+					NameResponse::create(
+						$this->client->getByLang($this->resource['team']['name']['original'], $this->lang),
+						($this->resource['team']['name']['short']) ? $this->client->getByLang($this->resource['team']['name']['short'], $this->lang) : null,
+						($this->resource['team']['name']['official']) ? $this->client->getByLang($this->resource['team']['name']['official'], $this->lang) : null
+					)
+				),
+				$form
+			)->toArray();
+
 		} catch (Exception $exception) {
 			return [];
 		}
+	}
+
+	/**
+	 * @param TeamsMatch $teamsMatch
+	 * @return array
+	 */
+	private function checkHomeAwayTeam(TeamsMatch $teamsMatch): array
+	{
+		if ($teamsMatch->isHome()) {
+			$home = TeamResponse::create(
+				$teamsMatch->getTeamId(),
+				NameResponse::create(
+					$this->client->getByLang($teamsMatch->getTeamName()->getOriginal(), $this->lang),
+					($teamsMatch->getTeamName()->getShort()) ? $this->client->getByLang($teamsMatch->getTeamName()->getShort(),
+						$this->lang) : null
+				)
+			);
+			$away = TeamResponse::create(
+				$teamsMatch->getOpponentId(),
+				NameResponse::create(
+					$this->client->getByLang($teamsMatch->getOpponentName()->getOriginal(), $this->lang),
+					($teamsMatch->getOpponentName()->getShort()) ? $this->client->getByLang($teamsMatch->getOpponentName()->getShort(),
+						$this->lang) : null
+				)
+			);
+		} else {
+			$home = TeamResponse::create(
+				$teamsMatch->getOpponentId(),
+				NameResponse::create(
+					$this->client->getByLang($teamsMatch->getOpponentName()->getOriginal(), $this->lang),
+					($teamsMatch->getOpponentName()->getShort()) ? $this->client->getByLang($teamsMatch->getOpponentName()->getShort(),
+						$this->lang) : null
+				)
+			);
+			$away = TeamResponse::create(
+				$teamsMatch->getTeamId(),
+				NameResponse::create(
+					$this->client->getByLang($teamsMatch->getTeamName()->getOriginal(), $this->lang),
+					($teamsMatch->getTeamName()->getShort()) ? $this->client->getByLang($teamsMatch->getTeamName()->getShort(),
+						$this->lang) : null
+				)
+			);
+		}
+		return array($home, $away);
 	}
 }

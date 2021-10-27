@@ -338,8 +338,8 @@ class MatchProjector
 		$formattedScore = [];
 		foreach ($score as $item) {
 			$formattedScore[$item['type']] =  [
-				'home' => $item['home'],
-				'away' => $item['away']
+				'home' => (int) $item['home'],
+				'away' => (int) $item['away']
 			];
 		}
 		$teamsMatch

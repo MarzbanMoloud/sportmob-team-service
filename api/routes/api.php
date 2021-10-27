@@ -10,7 +10,7 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
-$router->group(['middleware' => 'logging'], function ($router) {
+$router->group(['middleware' => 'logging', 'prefix' => 'tm'], function ($router) {
 	$router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function ($router) {
 
 		$router->group(['prefix' => '/teams'], function ($router) {
