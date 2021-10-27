@@ -5,23 +5,23 @@ namespace App\ValueObjects\Response;
 
 
 /**
- * Class TeamForm
+ * Class TeamFormSymbolsResponse
  * @package App\ValueObjects\Response
  */
-class TeamForm
+class TeamFormSymbolsResponse
 {
 	private TeamResponse $team;
-	private ?array $form;
+	private ?array $form = null;
 
 	/**
 	 * @param TeamResponse $team
 	 * @param array|null $form
-	 * @return TeamForm
+	 * @return TeamFormSymbolsResponse
 	 */
 	public static function create(
 		TeamResponse $team,
-		?array $form = null
-	): TeamForm {
+		?array $form
+	): TeamFormSymbolsResponse {
 		$instance = new self();
 		$instance->team = $team;
 		$instance->form = $form;
