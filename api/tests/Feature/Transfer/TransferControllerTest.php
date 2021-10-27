@@ -74,33 +74,25 @@ class TransferControllerTest extends TestCase
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
-		$this->assertNotEmpty($response['data']['transfers']);
-		$this->assertCount(2, $response['data']['transfers']);
-		foreach ($response['data']['transfers'] as $transferItem) {
+		$this->assertCount(2, $response['data']);
+		foreach ($response['data'] as $transferItem) {
 			$this->assertNotNull($transferItem['id']);
+			$this->assertNotEmpty($transferItem['toTeam']);
+			$this->assertNotNull($transferItem['toTeam']['id']);
+			$this->assertNotNull($transferItem['toTeam']['name']['full']);
+			$this->assertNull($transferItem['fromTeam']);
 			$this->assertNotEmpty($transferItem['person']);
 			$this->assertNotNull($transferItem['person']['id']);
 			$this->assertNotNull($transferItem['person']['name']);
-			$this->assertNotEmpty($transferItem['team']);
-			$this->assertCount(2, $transferItem['team']);
-			$this->assertNotEmpty($transferItem['team']['to']);
-			$this->assertNotNull($transferItem['team']['to']['id']);
-			$this->assertNotNull($transferItem['team']['to']['name']);
-			$this->assertNotEmpty($transferItem['team']['from']);
-			$this->assertNotNull($transferItem['team']['from']['id']);
-			$this->assertNotNull($transferItem['team']['from']['name']);
+			$this->assertNotNull($transferItem['person']['name']['full']);
 			$this->assertNotNull($transferItem['marketValue']);
 			$this->assertNotNull($transferItem['startDate']);
 			$this->assertNotNull($transferItem['endDate']);
-			$this->assertNotNull($transferItem['announcedDate']);
-			$this->assertNotNull($transferItem['contractDate']);
 			$this->assertNotNull($transferItem['type']);
 			$this->assertNotNull($transferItem['like']);
 			$this->assertNotNull($transferItem['dislike']);
 			$this->assertNotNull($transferItem['season']);
 		}
-		$this->assertNotEmpty($response['data']['seasons']);
-		$this->assertCount(8, $response['data']['seasons']);
 		/**
 		 * Read from Cache.
 		 */
@@ -109,33 +101,25 @@ class TransferControllerTest extends TestCase
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
-		$this->assertNotEmpty($response['data']['transfers']);
-		$this->assertCount(2, $response['data']['transfers']);
-		foreach ($response['data']['transfers'] as $transferItem) {
+		$this->assertCount(2, $response['data']);
+		foreach ($response['data'] as $transferItem) {
 			$this->assertNotNull($transferItem['id']);
+			$this->assertNotEmpty($transferItem['toTeam']);
+			$this->assertNotNull($transferItem['toTeam']['id']);
+			$this->assertNotNull($transferItem['toTeam']['name']['full']);
+			$this->assertNull($transferItem['fromTeam']);
 			$this->assertNotEmpty($transferItem['person']);
 			$this->assertNotNull($transferItem['person']['id']);
 			$this->assertNotNull($transferItem['person']['name']);
-			$this->assertNotEmpty($transferItem['team']);
-			$this->assertCount(2, $transferItem['team']);
-			$this->assertNotEmpty($transferItem['team']['to']);
-			$this->assertNotNull($transferItem['team']['to']['id']);
-			$this->assertNotNull($transferItem['team']['to']['name']);
-			$this->assertNotEmpty($transferItem['team']['from']);
-			$this->assertNotNull($transferItem['team']['from']['id']);
-			$this->assertNotNull($transferItem['team']['from']['name']);
+			$this->assertNotNull($transferItem['person']['name']['full']);
 			$this->assertNotNull($transferItem['marketValue']);
 			$this->assertNotNull($transferItem['startDate']);
 			$this->assertNotNull($transferItem['endDate']);
-			$this->assertNotNull($transferItem['announcedDate']);
-			$this->assertNotNull($transferItem['contractDate']);
 			$this->assertNotNull($transferItem['type']);
 			$this->assertNotNull($transferItem['like']);
 			$this->assertNotNull($transferItem['dislike']);
 			$this->assertNotNull($transferItem['season']);
 		}
-		$this->assertNotEmpty($response['data']['seasons']);
-		$this->assertCount(8, $response['data']['seasons']);
 	}
 
 	public function testListByTeamWithOutSeason()

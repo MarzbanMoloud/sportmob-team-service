@@ -29,7 +29,8 @@ $router->group(['middleware' => 'logging', 'prefix' => 'tm'], function ($router)
 
 		$router->group(['prefix' => '/transfers'], function ($router) {
 
-			$router->get('/team/{team}[/{season}]', ['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);
+			$router->get('/team/{team}', ['as' => 'seasons.team.list', 'uses' => 'TransferController@seasonsByTeam']);
+			$router->get('/team/{team}/{season}', ['as' => 'teams.transfers.team.list', 'uses' => 'TransferController@listByTeam']);
 			$router->get('/person/{person}', ['as' => 'teams.transfers.person.list', 'uses' => 'TransferController@listByPerson']);
 			$router->put('/{action}/{transfer}', ['as' => 'teams.transfers.action', 'uses' => 'TransferController@userActionTransfer']);
 

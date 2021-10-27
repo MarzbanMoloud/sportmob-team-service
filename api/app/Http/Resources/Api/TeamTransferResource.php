@@ -6,7 +6,10 @@ namespace App\Http\Resources\Api;
 
 use App\Models\ReadModels\Transfer;
 use App\Services\Cache\Interfaces\TransferCacheServiceInterface;
-use DateTimeInterface;
+use App\ValueObjects\Response\NameResponse;
+use App\ValueObjects\Response\PersonResponse;
+use App\ValueObjects\Response\TeamResponse;
+use App\ValueObjects\Response\TransferResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use SportMob\Translation\Client;
 
@@ -39,55 +42,41 @@ class TeamTransferResource extends JsonResource
 	 */
 	public function toArray($resource): array
 	{
-		$seasons = [];
-		foreach ($this->resource['seasons'] as $season) {
-			if ($season == Transfer::DEFAULT_VALUE){
-				continue;
-			}
-			$seasons[] = $season;
-		}
-
 		return [
 			'links' => [],
-			'data' => [
-				'transfers' => $this->makeTransferData(),
-				'seasons' => $seasons
-			]
+			'data' => $this->makeTransferData()
 		];
 	}
 
-	/**
-	 * @return array
-	 */
-	private function makeTransferData()
+	private function makeTransferData(): array
 	{
 		return array_map(function (Transfer $transfer) {
-			return [
-				'id' => $transfer->getId(),
-				'person' => [
-					'id' => $transfer->getPersonId(),
-					'name' => ($transfer->getPersonName()) ? $this->client->getByLang($transfer->getPersonName(), $this->lang) : null,
-				],
-				'team' => [
-					'to' => [
-						'id' => $transfer->getToTeamId(),
-						'name' => ($transfer->getToTeamName()) ? $this->client->getByLang($transfer->getToTeamName(), $this->lang) : null
-					],
-					'from' => [
-						'id' => $transfer->getFromTeamId(),
-						'name' => ($transfer->getFromTeamName()) ? $this->client->getByLang($transfer->getFromTeamName(), $this->lang) : null
-					]
-				],
-				'marketValue' => $transfer->getMarketValue(),
-				'startDate' => ($transfer->getDateFrom() != Transfer::getDateTimeImmutable()) ? $transfer->getDateFrom()->getTimestamp() : null,
-				'endDate' => $transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null,
-				'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null,
-				'contractDate' => $transfer->getContractDate() ? $transfer->getContractDate()->getTimestamp() : null,
-				'type' => $transfer->getType(),
-				'like' => $transfer->getLike(),
-				'dislike' => $transfer->getDislike(),
-				'season' => $transfer->getSeason()
-			];
+			return TransferResponse::create(
+				$transfer->getId(),
+				TeamResponse::create(
+					$transfer->getToTeamId(),
+					NameResponse::create($this->client->getByLang($transfer->getToTeamName(), $this->lang))
+				),
+				$transfer->getType(),
+				$transfer->getLike(),
+				$transfer->getDislike(),
+				$transfer->getPersonId() ? PersonResponse::create(
+					$transfer->getPersonId(),
+					$transfer->getPersonName() ? NameResponse::create($this->client->getByLang($transfer->getPersonName(), $this->lang)) : null
+				) : null,
+				$transfer->getFromTeamId() ? TeamResponse::create(
+					$transfer->getFromTeamId(),
+					NameResponse::create(
+						$transfer->getFromTeamId(),
+						$this->client->getByLang($transfer->getFromTeamName(), $this->lang)
+					)
+				) : null,
+				$transfer->getSeason(),
+				($transfer->getDateFrom() != Transfer::getDateTimeImmutable()) ? $transfer->getDateFrom()->getTimestamp() : null,
+				$transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null,
+				$transfer->getMarketValue()
+			)->toArray();
+
 		}, $this->resource['transfers']);
 	}
 }

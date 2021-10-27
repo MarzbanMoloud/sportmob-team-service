@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Swagger\Interfaces\TransferControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransferActionRequest;
 use App\Http\Resources\Api\PersonTransferResource;
+use App\Http\Resources\Api\TeamSeasonsResource;
 use App\Http\Resources\Api\TeamTransferResource;
 use App\Http\Services\Response\Interfaces\ResponseServiceInterface;
 use App\Http\Services\Transfer\TransferService;
@@ -39,12 +40,19 @@ class TransferController extends Controller implements TransferControllerInterfa
 		$this->responseService = $responseService;
 	}
 
+	public function seasonsByTeam(string $team)
+	{
+		return $this->responseService->createSuccessResponseObject(
+			new TeamSeasonsResource($this->transferService->listByTeam($team))
+		);
+	}
+
 	/**
 	 * @param string $team
 	 * @param string|null $season
 	 * @return mixed
 	 */
-	public function listByTeam(string $team, ?string $season = null)
+	public function listByTeam(string $team, string $season)
 	{
 		return $this->responseService->createSuccessResponseObject(
 			new TeamTransferResource($this->transferService->listByTeam($team, $season))
