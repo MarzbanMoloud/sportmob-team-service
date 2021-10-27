@@ -5,6 +5,10 @@ namespace App\Http\Resources\Api;
 
 
 use App\Models\ReadModels\Transfer;
+use App\ValueObjects\Response\NameResponse;
+use App\ValueObjects\Response\PersonResponse;
+use App\ValueObjects\Response\TeamResponse;
+use App\ValueObjects\Response\TransferResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use SportMob\Translation\Client;
 
@@ -52,42 +56,39 @@ class PersonTransferResource extends JsonResource
 			/**
 			 * @var Transfer $transfer
 			 */
-			$transferFormatted = [
-				'id' => $transfer->getId(),
-				'person' => [
-					'id' => $transfer->getPersonId(),
-					'name' => ($transfer->getPersonName()) ? $this->client->getByLang($transfer->getPersonName(), $this->lang) : null,
-				],
-				'team' => [
-					'to' => [
-						'id' => $transfer->getToTeamId(),
-						'name' => ($transfer->getToTeamName()) ? $this->client->getByLang($transfer->getToTeamName(), $this->lang) : null
-					],
-					'from' => [
-						'id' => $transfer->getFromTeamId(),
-						'name' => ($transfer->getFromTeamName()) ? $this->client->getByLang($transfer->getFromTeamName(), $this->lang) : null,
-					]
-				],
-				'marketValue' => $transfer->getMarketValue(),
-				'startDate' => ($transfer->getDateFrom() != Transfer::getDateTimeImmutable()) ? $transfer->getDateFrom()->getTimestamp() : null,
-				'endDate' => $transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null,
-				'announcedDate' => $transfer->getAnnouncedDate() ? $transfer->getAnnouncedDate()->getTimestamp() : null,
-				'contractDate' => $transfer->getContractDate() ? $transfer->getContractDate()->getTimestamp() : null,
-				'type' => ($transfer->getType()) ? $this->client->getByLang($transfer->getType(), $this->lang) : null,
-				'like' => $transfer->getLike(),
-				'dislike' => $transfer->getDislike(),
-				'season' => $transfer->getSeason()
-			];
+			$transferFormatted = TransferResponse::create(
+				$transfer->getId(),
+				TeamResponse::create(
+					$transfer->getToTeamId(),
+					$transfer->getToTeamName() ? NameResponse::create($this->client->getByLang($transfer->getToTeamName(), $this->lang)) : null
+				),
+				$this->client->getByLang($transfer->getType(), $this->lang),
+				$transfer->getLike(),
+				$transfer->getDislike(),
+				PersonResponse::create(
+					$transfer->getPersonId(),
+					($transfer->getPersonName()) ? NameResponse::create($this->client->getByLang($transfer->getPersonName(), $this->lang)) : null
+				),
+				$transfer->getFromTeamId() ? TeamResponse::create(
+					$transfer->getFromTeamId(),
+					($transfer->getFromTeamName()) ? NameResponse::create($this->client->getByLang($transfer->getFromTeamName(), $this->lang)) : null
+				) : null,
+				$transfer->getSeason(),
+				($transfer->getDateFrom() != Transfer::getDateTimeImmutable()) ? $transfer->getDateFrom()->getTimestamp() : null,
+				$transfer->getDateTo() ? $transfer->getDateTo()->getTimestamp() : null,
+				$transfer->getMarketValue()
+			)->toArray();
+
 			$transferResult[] = $transferFormatted;
 			if ($transfer->getType() == Transfer::TRANSFER_TYPE_LOAN)  {
 
-				$teamTo = $transferFormatted['team']['to'];
-				$teamFrom = $transferFormatted['team']['from'];
+				$teamTo = $transferFormatted['toTeam'];
+				$teamFrom = $transferFormatted['fromTeam'];
 
 				$transferFormatted['id'] = str_replace('loan', 'loan_back', $transfer->getId());
 				$transferFormatted['type'] = $this->client->getByLang('loan_back', $this->lang);
-				$transferFormatted['team']['to'] = $teamFrom;
-				$transferFormatted['team']['from'] = $teamTo;
+				$transferFormatted['toTeam'] = $teamFrom;
+				$transferFormatted['fromTeam'] = $teamTo;
 
 				$transferResult[] = $transferFormatted;
 			}
@@ -95,7 +96,7 @@ class PersonTransferResource extends JsonResource
 
 		return [
 			'links' => [],
-			'data' => $transferResult
+			'data' => array_reverse($transferResult)
 		];
 	}
 }
