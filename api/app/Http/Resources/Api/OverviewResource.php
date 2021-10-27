@@ -10,6 +10,7 @@ use App\ValueObjects\Response\CompetitionResponse;
 use App\ValueObjects\Response\MatchResponse;
 use App\ValueObjects\Response\NameResponse;
 use App\ValueObjects\Response\TeamForm;
+use App\ValueObjects\Response\TeamFormResponse;
 use App\ValueObjects\Response\TeamResponse;
 use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -105,7 +106,7 @@ class OverviewResource extends JsonResource
 
 			}, $this->resource['finished']);
 
-			return TeamForm::create(
+			return TeamFormResponse::create(
 				TeamResponse::create(
 					$this->resource['team']['id'],
 					NameResponse::create(
