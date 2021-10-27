@@ -25,9 +25,10 @@ class MatchResponse
 	private ?array $referees = null;
 	private ?int $priority = null;
 	private ?array $incidents = null;
-	private ?TeamFormSymbols $homeTeamFormSymbols = null;
-	private ?TeamFormSymbols $awayTeamFormSymbols = null;
+	private ?TeamFormSymbolsResponse $homeTeamFormSymbols = null;
+	private ?TeamFormSymbolsResponse $awayTeamFormSymbols = null;
 	private ?array $ranking = null;
+	private ?TournamentResponse $tournament = null;
 
 	/**
 	 * @param string $id
@@ -45,9 +46,10 @@ class MatchResponse
 	 * @param array|null $referees
 	 * @param int|null $priority
 	 * @param array|null $incidents
-	 * @param TeamFormSymbols|null $homeTeamFormSymbols
-	 * @param TeamFormSymbols|null $awayTeamFormSymbols
+	 * @param TeamFormSymbolsResponse|null $homeTeamFormSymbols
+	 * @param TeamFormSymbolsResponse|null $awayTeamFormSymbols
 	 * @param array|null $ranking
+	 * @param TournamentResponse|null $tournament
 	 * @return MatchResponse
 	 */
 	public static function create(
@@ -66,9 +68,10 @@ class MatchResponse
 		?array $referees = null,
 		?int $priority = null,
 		?array $incidents = null,
-		?TeamFormSymbols $homeTeamFormSymbols = null,
-		?TeamFormSymbols $awayTeamFormSymbols = null,
-		?array $ranking = null
+		?TeamFormSymbolsResponse $homeTeamFormSymbols = null,
+		?TeamFormSymbolsResponse $awayTeamFormSymbols = null,
+		?array $ranking = null,
+		?TournamentResponse $tournament = null
 	): MatchResponse {
 		$instance = new self();
 		$instance->id = $id;
@@ -89,6 +92,7 @@ class MatchResponse
 		$instance->homeTeamFormSymbols = $homeTeamFormSymbols;
 		$instance->awayTeamFormSymbols = $awayTeamFormSymbols;
 		$instance->ranking = $ranking;
+		$instance->tournament = $tournament;
 		return $instance;
 	}
 
@@ -116,6 +120,7 @@ class MatchResponse
 			'homeTeamFormSymbols' => $this->homeTeamFormSymbols ? $this->homeTeamFormSymbols->toArray() : null,
 			'awayTeamFormSymbols' => $this->awayTeamFormSymbols ? $this->awayTeamFormSymbols->toArray() : null,
 			'ranking' => $this->ranking,
+			'tournament' => $this->tournament ? $this->tournament->toArray() : null,
         ]);
     }
 }
