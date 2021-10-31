@@ -46,7 +46,7 @@ class OverviewResource extends JsonResource
 	public function toArray($resource): array
 	{
 		return [
-			'links' => [],
+			'links' => (object) null,
 			'data' => [
 				'nextMatch' => $this->makeNextMatchData(),
 				'teamForm' => $this->makeTeamFormData(),

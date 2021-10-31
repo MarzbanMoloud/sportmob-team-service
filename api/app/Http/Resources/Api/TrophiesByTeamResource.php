@@ -35,7 +35,7 @@ class TrophiesByTeamResource extends JsonResource
 	public function toArray($data): array
 	{
 		return [
-			'links' => [],
+			'links' => (object) null,
 			'data' => $this->makeData()
 		];
 	}

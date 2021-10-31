@@ -43,7 +43,7 @@ class TeamTransferResource extends JsonResource
 	public function toArray($resource): array
 	{
 		return [
-			'links' => [],
+			'links' => (object) null,
 			'data' => $this->makeTransferData()
 		];
 	}

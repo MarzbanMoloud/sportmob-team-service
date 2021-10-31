@@ -223,6 +223,7 @@ class TeamControllerTest extends TestCase
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
 		$this->assertNotEmpty($response['data']['nextMatch']);
+		$this->assertNotNull($response['data']['nextMatch']['id']);
 		$this->assertNotEmpty($response['data']['nextMatch']['competition']);
 		$this->assertNotNull($response['data']['nextMatch']['competition']['id']);
 		$this->assertNotNull($response['data']['nextMatch']['competition']['name']);
@@ -262,6 +263,7 @@ class TeamControllerTest extends TestCase
 			$this->assertNotNull($item['competition']['id']);
 			$this->assertNotNull($item['competition']['name']);
 			$this->assertNotNull($item['date']);
+			$this->assertNotNull($item['coverage']);
 			$this->assertNotEmpty($item['result']);
 			$this->assertNotNull($item['result']['total']['home']);
 			$this->assertNotNull($item['result']['total']['away']);
@@ -277,6 +279,7 @@ class TeamControllerTest extends TestCase
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
 		$this->assertNotEmpty($response['data']['nextMatch']);
+		$this->assertNotNull($response['data']['nextMatch']['id']);
 		$this->assertNotEmpty($response['data']['nextMatch']['competition']);
 		$this->assertNotNull($response['data']['nextMatch']['competition']['id']);
 		$this->assertNotNull($response['data']['nextMatch']['competition']['name']);
@@ -316,6 +319,7 @@ class TeamControllerTest extends TestCase
 			$this->assertNotNull($item['competition']['id']);
 			$this->assertNotNull($item['competition']['name']);
 			$this->assertNotNull($item['date']);
+			$this->assertNotNull($item['coverage']);
 			$this->assertNotEmpty($item['result']);
 			$this->assertNotNull($item['result']['total']['home']);
 			$this->assertNotNull($item['result']['total']['away']);
@@ -475,7 +479,7 @@ class TeamControllerTest extends TestCase
 		 * Read from DB
 		 */
 		$this->TeamsMatchCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/overview/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/overview/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -514,7 +518,7 @@ class TeamControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->teamsMatchRepository->drop();
-		$response = $this->json('GET', sprintf('/en/overview/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/overview/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -678,7 +682,7 @@ class TeamControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->TeamsMatchCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/overview/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/overview/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -711,7 +715,7 @@ class TeamControllerTest extends TestCase
 		 * Read from Cache.
 		 */
 		$this->teamsMatchRepository->drop();
-		$response = $this->json('GET', sprintf('/en/overview/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/overview/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -744,7 +748,7 @@ class TeamControllerTest extends TestCase
 	public function testOverviewWhenTeamNotExist()
 	{
 		$teamId = $this->faker->uuid;
-		$response = $this->json('GET', sprintf('/en/overview/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/overview/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
 		$this->assertEquals(config('common.error_codes.resource_not_found'), $response['code']);
@@ -925,7 +929,7 @@ class TeamControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->TeamsMatchCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -971,7 +975,7 @@ class TeamControllerTest extends TestCase
 		 */
 		$this->teamsMatchRepository->drop();
 		$this->teamRepository->drop();
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -1015,7 +1019,7 @@ class TeamControllerTest extends TestCase
 	public function testFavoriteWhenTeamNotExist()
 	{
 		$teamId = $this->faker->uuid;
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
 		$this->assertEquals(config('common.error_codes.resource_not_found'), $response['code']);
@@ -1172,7 +1176,7 @@ class TeamControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->TeamsMatchCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -1205,7 +1209,7 @@ class TeamControllerTest extends TestCase
 		 */
 		$this->teamsMatchRepository->drop();
 		$this->teamRepository->drop();
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -1362,7 +1366,7 @@ class TeamControllerTest extends TestCase
 		 * Read from DB.
 		 */
 		$this->TeamsMatchCacheService->flush();
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);
@@ -1382,7 +1386,7 @@ class TeamControllerTest extends TestCase
 		 */
 		$this->teamsMatchRepository->drop();
 		$this->teamRepository->drop();
-		$response = $this->json('GET', sprintf('/en/favorite/%s', $teamId));
+		$response = $this->json('GET', sprintf('/tm/en/favorite/%s', $teamId));
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
 		$this->assertNotEmpty($response['data']);

@@ -95,7 +95,7 @@ class PersonTransferResource extends JsonResource
 		}
 
 		return [
-			'links' => [],
+			'links' => (object) null,
 			'data' => array_reverse($transferResult)
 		];
 	}

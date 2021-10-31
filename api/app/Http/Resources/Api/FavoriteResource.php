@@ -46,7 +46,7 @@ class FavoriteResource extends JsonResource
 	public function toArray($resource): array
 	{
 		return [
-			'links' => [],
+			'links' => (object) null,
 			'data' => [
 				'nextMatch' => $this->makeNextMatchData(),
 				'previousMatch' => $this->makeTeamFormData(),

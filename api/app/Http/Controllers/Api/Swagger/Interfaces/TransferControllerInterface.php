@@ -14,7 +14,7 @@ interface TransferControllerInterface
 {
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/transfers/team/{team}/{season}",
+	 *     path="/tm/{lang}/transfers/team/{team}/{season}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="team",
@@ -105,7 +105,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/transfers/team/{team}",
+	 *     path="/tm/{lang}/transfers/team/{team}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="team",
@@ -151,7 +151,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Get(
-	 *     path="/{lang}/transfers/person/{person}",
+	 *     path="/tm/{lang}/transfers/person/{person}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *         name="person",
@@ -222,7 +222,7 @@ interface TransferControllerInterface
 
 	/**
 	 * @OA\Put(
-	 *     path="/{lang}/transfers/{action}/{transfer}",
+	 *     path="/tm/{lang}/transfers/{action}/{transfer}",
 	 *     tags={"Transfer"},
 	 *     @OA\Parameter(
 	 *          name="action",
