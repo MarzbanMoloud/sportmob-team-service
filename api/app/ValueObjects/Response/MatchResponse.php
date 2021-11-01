@@ -14,13 +14,14 @@ class MatchResponse
 	private TeamResponse $homeTeam;
 	private TeamResponse $awayTeam;
 	private int $date;
-	private ?CompetitionResponse $competition = null;
+	private CompetitionResponse $competition;
+	private TournamentResponse $tournament;
+	private StageResponse $stage;
 	private ?string $coverage = null;
 	private ?array $result = null;//TODO:: change!
 	private ?string $currentStatus = null;
 	private ?string $status = null;
 	private ?MatchStatusResponse $statuses = null;
-	private ?string $stage = null;
 	private ?string $venue = null;
 	private ?array $referees = null;
 	private ?int $priority = null;
@@ -28,20 +29,20 @@ class MatchResponse
 	private ?TeamFormSymbolsResponse $homeTeamFormSymbols = null;
 	private ?TeamFormSymbolsResponse $awayTeamFormSymbols = null;
 	private ?array $ranking = null;
-	private ?TournamentResponse $tournament = null;
 
 	/**
 	 * @param string $id
 	 * @param TeamResponse $homeTeam
 	 * @param TeamResponse $awayTeam
 	 * @param int $date
-	 * @param CompetitionResponse|null $competition
+	 * @param CompetitionResponse $competition
+	 * @param StageResponse $stage
+	 * @param TournamentResponse $tournament
 	 * @param string|null $coverage
 	 * @param array|null $result
 	 * @param string|null $currentStatus
 	 * @param string|null $status
 	 * @param MatchStatusResponse|null $statuses
-	 * @param string|null $stage
 	 * @param string|null $venue
 	 * @param array|null $referees
 	 * @param int|null $priority
@@ -49,7 +50,6 @@ class MatchResponse
 	 * @param TeamFormSymbolsResponse|null $homeTeamFormSymbols
 	 * @param TeamFormSymbolsResponse|null $awayTeamFormSymbols
 	 * @param array|null $ranking
-	 * @param TournamentResponse|null $tournament
 	 * @return MatchResponse
 	 */
 	public static function create(
@@ -57,21 +57,21 @@ class MatchResponse
 		TeamResponse $homeTeam,
 		TeamResponse $awayTeam,
 		int $date,
-		?CompetitionResponse $competition = null,
+		CompetitionResponse $competition,
+		StageResponse $stage,
+		TournamentResponse $tournament,
 		?string $coverage = null,
 		?array $result = null,
 		?string $currentStatus = null,
 		?string $status = null,
 		?MatchStatusResponse $statuses = null,
-		?string $stage = null,
 		?string $venue = null,
 		?array $referees = null,
 		?int $priority = null,
 		?array $incidents = null,
 		?TeamFormSymbolsResponse $homeTeamFormSymbols = null,
 		?TeamFormSymbolsResponse $awayTeamFormSymbols = null,
-		?array $ranking = null,
-		?TournamentResponse $tournament = null
+		?array $ranking = null
 	): MatchResponse {
 		$instance = new self();
 		$instance->id = $id;
@@ -105,14 +105,14 @@ class MatchResponse
             'id' => $this->id,
             'homeTeam' => $this->homeTeam ? $this->homeTeam->toArray() : null,
             'awayTeam' => $this->awayTeam ? $this->awayTeam->toArray() : null,
-            'competition' => $this->competition ? $this->competition->toArray() : null,
+            'competition' => $this->competition->toArray(),
+			'stage' => $this->stage->toArray(),
             'date' => $this->date,
 			'coverage' => $this->coverage,
 			'result' => $this->result,
 			'currentStatus' => $this->currentStatus,
 			'status' => $this->status,
 			'statuses' => $this->statuses ? $this->statuses->toArray() : null,
-			'stage' => $this->stage,
 			'venue' => $this->venue,
 			'referees' => $this->referees,
 			'priority' => $this->priority,
@@ -120,7 +120,7 @@ class MatchResponse
 			'homeTeamFormSymbols' => $this->homeTeamFormSymbols ? $this->homeTeamFormSymbols->toArray() : null,
 			'awayTeamFormSymbols' => $this->awayTeamFormSymbols ? $this->awayTeamFormSymbols->toArray() : null,
 			'ranking' => $this->ranking,
-			'tournament' => $this->tournament ? $this->tournament->toArray() : null,
+			'tournament' => $this->tournament->toArray(),
         ]);
     }
 }
