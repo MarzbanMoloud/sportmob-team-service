@@ -33,9 +33,9 @@ class TournamentResponse
 	 */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'season' => $this->season
-        ];
+        ]);
     }
 }

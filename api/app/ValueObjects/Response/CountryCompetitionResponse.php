@@ -33,9 +33,9 @@ class CountryCompetitionResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'country' => $this->country->toArray(),
             'competitions' => $this->competitions
-        ];
+        ]);
     }
 }

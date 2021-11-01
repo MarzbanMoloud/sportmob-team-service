@@ -37,10 +37,10 @@ class MatchStatResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'home' => $this->home,
             'away' => $this->away,
             'type' => $this->type,
-        ];
+        ]);
     }
 }

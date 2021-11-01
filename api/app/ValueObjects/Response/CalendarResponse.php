@@ -41,11 +41,11 @@ class CalendarResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'competition' => $this->competition->toArray(),
             'tournament' => $this->tournament->toArray(),
             'country' => $this->country->toArray(),
             'matches' => $this->matches,
-        ];
+        ]);
     }
 }
