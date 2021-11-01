@@ -37,10 +37,10 @@ class AggregationResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'draw' => $this->draw,
             'homeWins' => $this->homeWins,
             'awayWins' => $this->awayWins,
-        ];
+        ]);
     }
 }

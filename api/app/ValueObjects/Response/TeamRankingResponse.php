@@ -61,7 +61,7 @@ class TeamRankingResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'team' => $this->team,
             'rank' => $this->rank,
             'point' => $this->point,
@@ -71,6 +71,6 @@ class TeamRankingResponse
             'drawn' => $this->drawn,
             'goalsFor' => $this->goalsFor,
             'goalsAgainst' => $this->goalsAgainst,
-        ];
+        ]);
     }
 }

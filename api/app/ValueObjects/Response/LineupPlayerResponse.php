@@ -45,12 +45,12 @@ class LineupPlayerResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'player' => $this->player->toArray(),
             'type' => $this->type,
             'positionZone' => $this->positionZone,
             'shirtNumber' => $this->shirtNumber,
             'subPosition' => $this->subPosition,
-        ];
+        ]);
     }
 }
