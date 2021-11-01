@@ -33,9 +33,9 @@ class CommentaryPlayerResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'player' => $this->player->toArray(),
             'team' => $this->team->toArray(),
-        ];
+        ]);
     }
 }

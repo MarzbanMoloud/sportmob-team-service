@@ -53,7 +53,7 @@ class IncidentResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'type' => $this->type,
             'team' => $this->team,
@@ -61,6 +61,6 @@ class IncidentResponse
             'half' => $this->half,
             'reason' => $this->reason,
             'players' => $this->players,
-        ];
+        ]);
     }
 }

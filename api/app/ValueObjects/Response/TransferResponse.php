@@ -69,7 +69,7 @@ class TransferResponse
 	 */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'toTeam' => $this->toTeam->toArray(),
             'fromTeam' => $this->fromTeam ? $this->fromTeam->toArray() : null,
@@ -81,6 +81,6 @@ class TransferResponse
 			'like' => $this->like,
 			'dislike' => $this->dislike,
 			'season' => $this->season,
-        ];
+        ]);
     }
 }

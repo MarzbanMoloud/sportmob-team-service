@@ -49,13 +49,13 @@ class LineupDetailResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'formation' => $this->formation,
             'color' => $this->color,
             'coaches' => $this->coaches,
             'lineup' => $this->lineup,
             'bench' => $this->bench,
             'willNotPlay' => $this->willNotPlay,
-        ];
+        ]);
     }
 }

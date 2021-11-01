@@ -53,7 +53,7 @@ class CommentaryResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'match' => $this->match->toArray(),
 			'type' => $this->type,
@@ -61,6 +61,6 @@ class CommentaryResponse
 			'minute' => $this->minute,
 			'players' => $this->players,
 			'half' => $this->half,
-        ];
+        ]);
     }
 }

@@ -33,9 +33,9 @@ class MatchStatisticResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'match' => $this->match,
             'stats' => $this->stats
-        ];
+        ]);
     }
 }

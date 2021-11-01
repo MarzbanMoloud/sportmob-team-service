@@ -33,9 +33,9 @@ class StageResponse
 	 */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'name' => $this->name,
-        ];
+        ]);
     }
 }

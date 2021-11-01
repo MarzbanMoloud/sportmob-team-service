@@ -33,9 +33,9 @@ class Head2HeadResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'aggregation' => $this->aggregation ? $this->aggregation->toArray() : null,
             'matches' => $this->matches
-        ];
+        ]);
     }
 }

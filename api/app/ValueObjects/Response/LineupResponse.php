@@ -37,10 +37,10 @@ class LineupResponse
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'match' => $this->match->toArray(),
             'homeTeamLineup' => $this->homeTeamLineup->toArray(),
             'awayTeamLineup' => $this->awayTeamLineup->toArray(),
-        ];
+        ]);
     }
 }
