@@ -239,6 +239,8 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
 		$this->assertNotNull($response['data']['nextMatch']['coverage']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
 
 		$this->assertNotEmpty($response['data']['teamForm']);
 		$this->assertNotEmpty($response['data']['teamForm']['team']);
@@ -269,6 +271,8 @@ class TeamControllerTest extends TestCase
 			$this->assertNotNull($item['result']['total']['away']);
 			$this->assertNotNull($item['result']['penalty']['home']);
 			$this->assertNotNull($item['result']['penalty']['away']);
+			$this->assertNotNull($item['stage']['id']);
+			$this->assertNotNull($item['tournament']['id']);
 		}
 		/**
 		 * Read from Cache.
@@ -295,6 +299,8 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
 		$this->assertNotNull($response['data']['nextMatch']['coverage']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
 
 		$this->assertNotEmpty($response['data']['teamForm']);
 		$this->assertNotEmpty($response['data']['teamForm']['team']);
@@ -325,6 +331,8 @@ class TeamControllerTest extends TestCase
 			$this->assertNotNull($item['result']['total']['away']);
 			$this->assertNotNull($item['result']['penalty']['home']);
 			$this->assertNotNull($item['result']['penalty']['away']);
+			$this->assertNotNull($item['stage']['id']);
+			$this->assertNotNull($item['tournament']['id']);
 		}
 	}
 
@@ -513,6 +521,8 @@ class TeamControllerTest extends TestCase
 			$this->assertNotNull($item['result']['total']['away']);
 			$this->assertNotNull($item['result']['penalty']['home']);
 			$this->assertNotNull($item['result']['penalty']['away']);
+			$this->assertNotNull($item['stage']['id']);
+			$this->assertNotNull($item['tournament']['id']);
 		}
 		/**
 		 * Read from Cache.
@@ -552,6 +562,8 @@ class TeamControllerTest extends TestCase
 			$this->assertNotNull($item['result']['total']['away']);
 			$this->assertNotNull($item['result']['penalty']['home']);
 			$this->assertNotNull($item['result']['penalty']['away']);
+			$this->assertNotNull($item['stage']['id']);
+			$this->assertNotNull($item['tournament']['id']);
 		}
 	}
 
@@ -702,6 +714,8 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
 		$this->assertNotNull($response['data']['nextMatch']['coverage']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
 
 		$this->assertNotEmpty($response['data']['teamForm']);
 		$this->assertNotEmpty($response['data']['teamForm']['team']);
@@ -735,6 +749,8 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
 		$this->assertNotNull($response['data']['nextMatch']['coverage']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
 
 		$this->assertNotEmpty($response['data']['teamForm']);
 		$this->assertNotEmpty($response['data']['teamForm']['team']);
@@ -944,6 +960,10 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['full']);
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['name']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['team']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['team']['name']['full']);
 		$this->assertNotNull($response['data']['previousMatch']['team']['name']['short']);
@@ -963,6 +983,10 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['total']['away']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['penalty']['away']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['penalty']['home']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['id']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['name']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['stage']['id']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['tournament']['id']);
 		$this->assertNotNull($response['data']['teamFormSymbols']['team']['id']);
 		$this->assertNotNull($response['data']['teamFormSymbols']['team']['name']['full']);
 		$this->assertNotNull($response['data']['teamFormSymbols']['team']['name']['short']);
@@ -990,6 +1014,10 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['full']);
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['name']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['team']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['team']['name']['full']);
 		$this->assertNotNull($response['data']['previousMatch']['team']['name']['short']);
@@ -1009,6 +1037,10 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['total']['away']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['penalty']['away']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['penalty']['home']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['id']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['name']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['stage']['id']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['tournament']['id']);
 		$this->assertNotNull($response['data']['teamFormSymbols']['team']['id']);
 		$this->assertNotNull($response['data']['teamFormSymbols']['team']['name']['full']);
 		$this->assertNotNull($response['data']['teamFormSymbols']['team']['name']['short']);
@@ -1194,6 +1226,8 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['name']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['date']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['stage']['id']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['tournament']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['coverage']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['total']['home']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['total']['away']);
@@ -1227,6 +1261,8 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['competition']['name']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['date']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['stage']['id']);
+		$this->assertNotNull($response['data']['previousMatch']['form']['tournament']['id']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['coverage']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['total']['home']);
 		$this->assertNotNull($response['data']['previousMatch']['form']['result']['total']['away']);
@@ -1381,6 +1417,10 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['full']);
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['name']);
 		/**
 		 * Read from Cache.
 		 */
@@ -1401,6 +1441,10 @@ class TeamControllerTest extends TestCase
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['full']);
 		$this->assertNotNull($response['data']['nextMatch']['awayTeam']['name']['short']);
 		$this->assertNotNull($response['data']['nextMatch']['date']);
+		$this->assertNotNull($response['data']['nextMatch']['tournament']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['stage']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['id']);
+		$this->assertNotNull($response['data']['nextMatch']['competition']['name']);
 	}
 
 	protected function tearDown(): void

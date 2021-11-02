@@ -132,6 +132,24 @@ interface TeamControllerInterface
 	 *                                    property="coverage",
 	 *                                    type="string",
 	 *                                    example="low"
+	 *                              ),
+	 *     							@OA\Property(
+	 *                                    property="tournament",
+	 *                                    type="object",
+	 *                                    @OA\Property(
+	 *                                    		property="id",
+	 *                                    		type="string",
+	 *                                    		example="30909342-cde6-3f99-9480-21213e11b37c"
+	 *                              	  )
+	 *                              ),
+	 *     							@OA\Property(
+	 *                                    property="stage",
+	 *                                    type="object",
+	 *                                    @OA\Property(
+	 *                                    		property="id",
+	 *                                    		type="string",
+	 *                                    		example="9c403643-69a5-3c2c-b64b-4eb0342d114e"
+	 *                              	  )
 	 *                              )
 	 *                          ),
 	 *     						@OA\Property(
@@ -166,6 +184,12 @@ interface TeamControllerInterface
 	 *											"competition": {
 	 *												"id": "0cb4a362-a5dc-3b6e-b0b5-cd0a6581df8b",
 	 *												"name": "Marquis Daniel"
+	 *											},
+	 *     										"stage": {
+	 * 												"id": "85f9ca63-a323-315f-89fa-98af94be5480"
+	 * 											},
+	 *      									"tournament": {
+	 *												"id": "d0e52909-80af-3580-b3e6-4a19fc81d4fd"
 	 *											},
 	 *											"date": 1611055800,
 	 *											"coverage": "low",
@@ -292,6 +316,38 @@ interface TeamControllerInterface
 	 *                                 )
 	 *                             ),
 	 *     						   @OA\Property(
+	 *                                 property="competition",
+	 *                                 type="object",
+	 *                                  @OA\Property(
+	 *                                 		property="id",
+	 *                                 		type="string",
+	 *                                 		example="esthrxky0w"
+	 *                             		),
+	 *                                  @OA\Property(
+	 *                                 		property="name",
+	 *                                 		type="string",
+	 *                                 		example="Highland/Lowland"
+	 *                             		)
+	 *                             ),
+	 *     						   @OA\Property(
+	 *                                 property="stage",
+	 *                                 type="object",
+	 *                                  @OA\Property(
+	 *                                 		property="id",
+	 *                                 		type="string",
+	 *                                 		example="esthrxky0w"
+	 *                             		)
+	 *                             ),
+	 *     						   @OA\Property(
+	 *                                 property="tournament",
+	 *                                 type="object",
+	 *                                  @OA\Property(
+	 *                                 		property="id",
+	 *                                 		type="string",
+	 *                                 		example="esthrxky0w"
+	 *                             		)
+	 *                             ),
+	 *     						   @OA\Property(
 	 *                                 property="date",
 	 *                                 type="number",
 	 *                                 example=1611315000
@@ -300,37 +356,6 @@ interface TeamControllerInterface
 	 *     						@OA\Property(
 	 *                                property="previousMatch",
 	 *								  type="object",
-	 *     							  @OA\Property(
-	 *                                    property="team",
-	 *                                    type="object",
-	 *                                    @OA\Property(
-	 *                              			property="id",
-	 *											type="string",
-	 *     										example="6ad8f80e-bc4b-390e-b68c-82c50dca9243"
-	 * 									  ),
-	 *                                    @OA\Property(
-	 *                              			property="name",
-	 *											type="object",
-	 *                                    		@OA\Property(
-	 *                              				property="full",
-	 *												type="string",
-	 *     											example="Sylvia1"
-	 * 									  		),
-	 *                                    		@OA\Property(
-	 *                              				property="short",
-	 *												type="string",
-	 *     											example="Syl1"
-	 * 									  		),
-	 *                                    		@OA\Property(
-	 *                              				property="official",
-	 *												type="string",
-	 *     											example="Sylvia1"
-	 * 									  		)
-	 * 									 ),
-	 *                               ),
-	 *     							 @OA\Property(
-	 *                                    property="form",
-	 *                                    type="object",
 	 *                                    @OA\Property(
 	 *                              			property="id",
 	 *											type="string",
@@ -438,7 +463,24 @@ interface TeamControllerInterface
 	 *     										example="Waino Littel"
 	 * 										),
 	 * 									),
-	 *                              ),
+	 *      							@OA\Property(
+	 *                              		property="tournament",
+	 *										type="object",
+	 *     									@OA\Property(
+	 *                              			property="id",
+	 *											type="string",
+	 *     										example="699547fe-f848-3c23-99b4-fe3646aa3a0b"
+	 * 										)
+	 * 									),
+	 *      							@OA\Property(
+	 *                              		property="stage",
+	 *										type="object",
+	 *     									@OA\Property(
+	 *                              			property="id",
+	 *											type="string",
+	 *     										example="699547fe-f848-3c23-99b4-fe3646aa3a0b"
+	 * 										)
+	 * 									),
 	 *                          ),
 	 *     						@OA\Property(
 	 *                              property="teamFormSymbols",

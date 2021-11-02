@@ -48,6 +48,9 @@ trait TeamsMatchRepositoryTestTrait
 	): TeamsMatch {
 		$fakeEvaluation = [TeamsMatch::EVALUATION_DRAW, TeamsMatch::EVALUATION_LOSS, TeamsMatch::EVALUATION_WIN];
 		$fakeTeamsMatchModel = (new TeamsMatch())
+			->setTournamentId($this->faker->uuid)
+			->setStageId($this->faker->uuid)
+			->setStageName($this->faker->name)
 			->setCompetitionId($this->faker->uuid)
 			->setCompetitionName($this->faker->name)
 			->setTeamId($teamId)

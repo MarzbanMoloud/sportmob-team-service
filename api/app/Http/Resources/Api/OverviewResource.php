@@ -9,9 +9,11 @@ use App\Models\ReadModels\TeamsMatch;
 use App\ValueObjects\Response\CompetitionResponse;
 use App\ValueObjects\Response\MatchResponse;
 use App\ValueObjects\Response\NameResponse;
+use App\ValueObjects\Response\StageResponse;
 use App\ValueObjects\Response\TeamForm;
 use App\ValueObjects\Response\TeamFormResponse;
 use App\ValueObjects\Response\TeamResponse;
+use App\ValueObjects\Response\TournamentResponse;
 use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
 use SportMob\Translation\Client;
@@ -74,6 +76,8 @@ class OverviewResource extends JsonResource
 					$upcoming->getCompetitionId(),
 					($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
 				),
+				StageResponse::create($upcoming->getStageId()),
+				TournamentResponse::create($upcoming->getTournamentId()),
 				$upcoming->getCoverage()
 			)->toArray();
 
@@ -100,6 +104,8 @@ class OverviewResource extends JsonResource
 						$teamsMatch->getCompetitionId(),
 						($teamsMatch->getCompetitionName()) ? $this->client->getByLang($teamsMatch->getCompetitionName(), $this->lang) : null
 					),
+					StageResponse::create($teamsMatch->getStageId()),
+					TournamentResponse::create($teamsMatch->getTournamentId()),
 					$teamsMatch->getCoverage(),
 					$teamsMatch->getResult()
 				)->toArray();

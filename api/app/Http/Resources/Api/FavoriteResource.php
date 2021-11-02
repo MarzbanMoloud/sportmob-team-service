@@ -9,9 +9,11 @@ use App\Models\ReadModels\TeamsMatch;
 use App\ValueObjects\Response\CompetitionResponse;
 use App\ValueObjects\Response\MatchResponse;
 use App\ValueObjects\Response\NameResponse;
+use App\ValueObjects\Response\StageResponse;
 use App\ValueObjects\Response\TeamFormResponse;
 use App\ValueObjects\Response\TeamFormSymbolsResponse;
 use App\ValueObjects\Response\TeamResponse;
+use App\ValueObjects\Response\TournamentResponse;
 use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
 use SportMob\Translation\Client;
@@ -70,7 +72,13 @@ class FavoriteResource extends JsonResource
 				$upcoming->getMatchId(),
 				$home,
 				$away,
-				TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp()
+				TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
+				CompetitionResponse::create(
+					$upcoming->getCompetitionId(),
+					($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
+				),
+				StageResponse::create($upcoming->getStageId()),
+				TournamentResponse::create($upcoming->getTournamentId())
 			)->toArray();
 		} catch (Exception $exception) {
 			return [];
@@ -88,16 +96,7 @@ class FavoriteResource extends JsonResource
 
 			list($home, $away) = $this->checkHomeAwayTeam($finished);
 
-			return TeamFormResponse::create(
-				TeamResponse::create(
-					$this->resource['team']['id'],
-					NameResponse::create(
-						$this->client->getByLang($this->resource['team']['name']['original'], $this->lang),
-						($this->resource['team']['name']['short']) ? $this->client->getByLang($this->resource['team']['name']['short'], $this->lang) : null,
-						($this->resource['team']['name']['official']) ? $this->client->getByLang($this->resource['team']['name']['official'], $this->lang) : null
-					)
-				),
-				MatchResponse::create(
+			return MatchResponse::create(
 					$finished->getMatchId(),
 					$home,
 					$away,
@@ -106,10 +105,11 @@ class FavoriteResource extends JsonResource
 						$finished->getCompetitionId(),
 						($finished->getCompetitionName()) ? $this->client->getByLang($finished->getCompetitionName(), $this->lang) : null
 					),
+					StageResponse::create($finished->getStageId()),
+					TournamentResponse::create($finished->getTournamentId()),
 					$finished->getCoverage(),
 					$finished->getResult()
-				)->toArray()
-			)->toArray();
+				)->toArray();
 
 		} catch (Exception $exception) {
 			return [];

@@ -27,6 +27,9 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	const COVERAGE_LOW = 'low';
 
 	private string $competitionId;
+	private string $tournamentId;
+	private string $stageId;
+	private ?string $stageName = null;
 	private ?string $competitionName = null;
 	private string $matchId;
 	private string $teamId;
@@ -44,6 +47,60 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	public function __construct()
 	{
 		$this->setUpdatedAt(new \DateTime());
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTournamentId(): string
+	{
+		return $this->tournamentId;
+	}
+
+	/**
+	 * @param string $tournamentId
+	 * @return TeamsMatch
+	 */
+	public function setTournamentId(string $tournamentId): TeamsMatch
+	{
+		$this->tournamentId = $tournamentId;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStageId(): string
+	{
+		return $this->stageId;
+	}
+
+	/**
+	 * @param string $stageId
+	 * @return TeamsMatch
+	 */
+	public function setStageId(string $stageId): TeamsMatch
+	{
+		$this->stageId = $stageId;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getStageName(): ?string
+	{
+		return $this->stageName;
+	}
+
+	/**
+	 * @param string|null $stageName
+	 * @return TeamsMatch
+	 */
+	public function setStageName(?string $stageName): TeamsMatch
+	{
+		$this->stageName = $stageName;
+		return $this;
 	}
 
 	/**

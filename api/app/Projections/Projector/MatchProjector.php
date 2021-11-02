@@ -204,7 +204,7 @@ class MatchProjector
 	 */
 	private function checkIdentifiersValidation(Message $message): void
 	{
-		$requiredFields = ['match', 'home', 'away', 'competition'];
+		$requiredFields = ['match', 'home', 'away', 'competition', 'tournament', 'stage'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getIdentifiers()[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
@@ -220,7 +220,7 @@ class MatchProjector
 	 */
 	private function checkMetadataValidation(Message $message): void
 	{
-		$requiredFields = ['date', 'time'];
+		$requiredFields = ['date', 'time', 'stage'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getMetadata()[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
@@ -268,6 +268,9 @@ class MatchProjector
 
 		return (new TeamsMatch())
 			->setCompetitionId($identifier['competition'])
+			->setTournamentId($identifier['tournament'])
+			->setStageId($identifier['stage'])
+			->setStageName($metadata['stage'])
 			->setMatchId($identifier['match'])
 			->setTeamId($home ? $identifier['home'] : $identifier['away'])
 			->setOpponentId($home ? $identifier['away'] : $identifier['home'])

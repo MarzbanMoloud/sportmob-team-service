@@ -85,12 +85,15 @@ class EventStrategyHandleTest extends TestCase
 					"match":"%s",
 					"home":"%s",
 					"away":"%s",
-					"competition": "%s"
+					"competition": "%s",
+					"tournament": "3dr99391m0",
+					"stage": "82z9j09xxk"
 				 },
 				"metadata": {
 					"coverage": "high",
 					"date": "2006-02-19Z",
-					"time": "11:30:00Z"
+					"time": "11:30:00Z",
+					"stage": "Champions League Grp.A"
 				}
 			}
 		}',
@@ -116,6 +119,9 @@ class EventStrategyHandleTest extends TestCase
 			 */
 			$this->assertInstanceOf(TeamsMatch::class, $item);
 			$this->assertEquals($message->getBody()->getIdentifiers()['match'], $item->getMatchId());
+			$this->assertNotNull($item->getStageId());
+			$this->assertNotNull($item->getStageName());
+			$this->assertNotNull($item->getTournamentId());
 			$this->assertNotNull($item->getTeamId());
 			$this->assertNotNull($item->getTeamName());
 			$this->assertNotNull($item->getOpponentId());
@@ -217,12 +223,15 @@ class EventStrategyHandleTest extends TestCase
 					"match":"%s",
 					"home":"%s",
 					"away":"%s",
-					"competition": "%s"
-				 },
+					"competition": "%s",
+					"tournament": "3dr99391m0",
+					"stage": "82z9j09xxk"
+				},
 				"metadata": {
 					"coverage": "",
 					"date": "2006-02-19Z",
-					"time": "11:30:00Z"
+					"time": "11:30:00Z",
+					"stage": "Champions League Grp.A"
 				}
 			}
 		}',
@@ -248,6 +257,9 @@ class EventStrategyHandleTest extends TestCase
 			 */
 			$this->assertInstanceOf(TeamsMatch::class, $item);
 			$this->assertEquals($message->getBody()->getIdentifiers()['match'], $item->getMatchId());
+			$this->assertNotNull($item->getStageId());
+			$this->assertNotNull($item->getStageName());
+			$this->assertNotNull($item->getTournamentId());
 			$this->assertNotNull($item->getTeamId());
 			$this->assertNotNull($item->getTeamName());
 			$this->assertNotNull($item->getOpponentId());
@@ -341,12 +353,15 @@ class EventStrategyHandleTest extends TestCase
 					"match":"%s",
 					"home":"%s",
 					"away":"%s",
-					"competition": "%s"
+					"competition": "%s",
+					"tournament": "3dr99391m0",
+					"stage": "82z9j09xxk"
 				 },
 				"metadata": {
 					"coverage": "high",
 					"date": "2006-02-19Z",
-					"time": "11:30:00Z"
+					"time": "11:30:00Z",
+					"stage": "Champions League Grp.A"
 				}
 			}
 		}',
@@ -372,6 +387,9 @@ class EventStrategyHandleTest extends TestCase
 			 */
 			$this->assertInstanceOf(TeamsMatch::class, $item);
 			$this->assertEquals($message->getBody()->getIdentifiers()['match'], $item->getMatchId());
+			$this->assertNotNull($item->getStageId());
+			$this->assertNotNull($item->getStageName());
+			$this->assertNotNull($item->getTournamentId());
 			$this->assertNotNull($item->getTeamId());
 			$this->assertNotNull($item->getTeamName());
 			$this->assertNotNull($item->getOpponentId());
