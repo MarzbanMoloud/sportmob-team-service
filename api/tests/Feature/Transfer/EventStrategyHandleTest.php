@@ -233,7 +233,7 @@ class EventStrategyHandleTest extends TestCase
 		 */
 		$transfers = $this->transferRepository->findByPersonId($message->getBody()->getIdentifiers()['person']);
 		$this->assertNotEmpty($transfers);
-		$this->assertCount(13, $transfers);
+		$this->assertCount(12, $transfers);
 		foreach ($transfers as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
@@ -243,7 +243,7 @@ class EventStrategyHandleTest extends TestCase
 		 */
 		$transfers = $this->transferCacheService->get(sprintf(TransferCacheServiceInterface::TRANSFER_BY_PERSON_KEY, $message->getBody()->getIdentifiers()['person']));
 		$this->assertNotEmpty($transfers);
-		$this->assertCount(13, $transfers);
+		$this->assertCount(12, $transfers);
 		foreach ($transfers as $transfer) {
 			$this->assertInstanceOf(Transfer::class, $transfer);
 		}
@@ -620,7 +620,7 @@ class EventStrategyHandleTest extends TestCase
 		 */
 		$transfers = $this->transferRepository->findByPersonId($message->getBody()->getIdentifiers()['person']);
 		$this->assertNotEmpty($transfers);
-		$this->assertCount(13, $transfers);
+		$this->assertCount(12, $transfers);
 		foreach ($transfers as $transfer) {
 			$this->assertNull($transfer->getToTeamName());
 			$this->assertNull($transfer->getFromTeamName());

@@ -47,7 +47,7 @@ class TeamControllerTest extends TestCase
 		$fakeTeamModel = $this->createTeamModel();
 		$fakeTeamModel->setId($fakeTeamId);
 		$this->teamRepository->persist($fakeTeamModel);
-		$response = $this->json('GET', '/admin/teams/' . $fakeTeamId);
+		$response = $this->json('GET', '/tm/admin/teams/' . $fakeTeamId);
 		$response->assertResponseStatus(Response::HTTP_OK);
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertEmpty($response['links']);
@@ -68,7 +68,7 @@ class TeamControllerTest extends TestCase
 
 	public function testShowWhenItemNotExist()
 	{
-		$response = $this->json('GET', '/admin/teams/' . $this->faker->uuid);
+		$response = $this->json('GET', '/tm/admin/teams/' . $this->faker->uuid);
 		$response->assertResponseStatus(Response::HTTP_NOT_FOUND);
 		$response = json_decode($response->response->getContent(), true);
 		$this->assertNotNull($response['message']);
@@ -81,7 +81,7 @@ class TeamControllerTest extends TestCase
 		$fakeTeamModel = $this->createTeamModel();
 		$fakeTeamModel->setId($fakeTeamId);
 		$this->teamRepository->persist($fakeTeamModel);
-		$response = $this->put('/admin/teams/' . $fakeTeamId, [
+		$response = $this->put('/tm/admin/teams/' . $fakeTeamId, [
 			'name' => [
 				'original' => 'Barcelona original',
 				'official' => 'Barcelona official',
@@ -112,7 +112,7 @@ class TeamControllerTest extends TestCase
 
 	public function testUpdateWhenItemNotExist()
 	{
-		$response = $this->put('/admin/teams/' . $this->faker->uuid, [
+		$response = $this->put('/tm/admin/teams/' . $this->faker->uuid, [
 			'name' => [
 				'original' => 'Barcelona original',
 				'official' => 'Barcelona official',
@@ -148,7 +148,7 @@ class TeamControllerTest extends TestCase
 			'bar?',
 		];
 		foreach ($wrongValues as $value) {
-			$response = $this->put('/admin/teams/' . $this->faker->uuid, [
+			$response = $this->put('/tm/admin/teams/' . $this->faker->uuid, [
 				'name' => [
 					'original' => $value,
 				]

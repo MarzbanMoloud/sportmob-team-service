@@ -80,7 +80,6 @@ class TransferControllerTest extends TestCase
 			$this->assertNotEmpty($transferItem['toTeam']);
 			$this->assertNotNull($transferItem['toTeam']['id']);
 			$this->assertNotNull($transferItem['toTeam']['name']['full']);
-			$this->assertNull($transferItem['fromTeam']);
 			$this->assertNotEmpty($transferItem['person']);
 			$this->assertNotNull($transferItem['person']['id']);
 			$this->assertNotNull($transferItem['person']['name']);
@@ -107,7 +106,6 @@ class TransferControllerTest extends TestCase
 			$this->assertNotEmpty($transferItem['toTeam']);
 			$this->assertNotNull($transferItem['toTeam']['id']);
 			$this->assertNotNull($transferItem['toTeam']['name']['full']);
-			$this->assertNull($transferItem['fromTeam']);
 			$this->assertNotEmpty($transferItem['person']);
 			$this->assertNotNull($transferItem['person']['id']);
 			$this->assertNotNull($transferItem['person']['name']);
@@ -149,8 +147,6 @@ class TransferControllerTest extends TestCase
 				$this->assertNotEmpty($transferItem['fromTeam']['name']);
 				$this->assertNotNull($transferItem['fromTeam']['name']['full']);
 			}
-
-			$this->assertNull($transferItem['marketValue']);
 			$this->assertNotNull($transferItem['startDate']);
 			$this->assertNotNull($transferItem['type']);
 			$this->assertNotNull($transferItem['like']);
@@ -179,8 +175,6 @@ class TransferControllerTest extends TestCase
 				$this->assertNotEmpty($transferItem['fromTeam']['name']);
 				$this->assertNotNull($transferItem['fromTeam']['name']['full']);
 			}
-
-			$this->assertNull($transferItem['marketValue']);
 			$this->assertNotNull($transferItem['startDate']);
 			$this->assertNotNull($transferItem['type']);
 			$this->assertNotNull($transferItem['like']);

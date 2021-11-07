@@ -81,6 +81,6 @@ class TransferResponse
 			'like' => $this->like,
 			'dislike' => $this->dislike,
 			'season' => $this->season,
-        ]);
+        ],  fn($value) => !is_null($value) && $value !== '');
     }
 }
