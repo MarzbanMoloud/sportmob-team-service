@@ -67,6 +67,8 @@ class OverviewResource extends JsonResource
 
 			list($home, $away) = $this->checkHomeAwayTeam($upcoming);
 
+			[$matchStatus,] = explode('#', $upcoming->getSortKey());
+
 			return MatchResponse::create(
 				$upcoming->getMatchId(),
 				$home,
@@ -78,6 +80,7 @@ class OverviewResource extends JsonResource
 				),
 				StageResponse::create($upcoming->getStageId()),
 				TournamentResponse::create($upcoming->getTournamentId()),
+				($matchStatus == TeamsMatch::STATUS_UPCOMING) ? 'notStarted' : null,
 				$upcoming->getCoverage()
 			)->toArray();
 
@@ -95,6 +98,8 @@ class OverviewResource extends JsonResource
 			$form = array_map(function (TeamsMatch $teamsMatch) {
 				list($home, $away) = $this->checkHomeAwayTeam($teamsMatch);
 
+				[$matchStatus,] = explode('#', $teamsMatch->getSortKey());
+
 				return MatchResponse::create(
 					$teamsMatch->getMatchId(),
 					$home,
@@ -106,6 +111,7 @@ class OverviewResource extends JsonResource
 					),
 					StageResponse::create($teamsMatch->getStageId()),
 					TournamentResponse::create($teamsMatch->getTournamentId()),
+					$matchStatus,
 					$teamsMatch->getCoverage(),
 					$teamsMatch->getResult()
 				)->toArray();

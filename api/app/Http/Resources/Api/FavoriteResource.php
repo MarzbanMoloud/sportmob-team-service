@@ -10,7 +10,6 @@ use App\ValueObjects\Response\CompetitionResponse;
 use App\ValueObjects\Response\MatchResponse;
 use App\ValueObjects\Response\NameResponse;
 use App\ValueObjects\Response\StageResponse;
-use App\ValueObjects\Response\TeamFormResponse;
 use App\ValueObjects\Response\TeamFormSymbolsResponse;
 use App\ValueObjects\Response\TeamResponse;
 use App\ValueObjects\Response\TournamentResponse;
@@ -66,6 +65,8 @@ class FavoriteResource extends JsonResource
 			/** @var TeamsMatch $upcoming */
 			$upcoming = $this->resource[TeamsMatch::STATUS_UPCOMING][0];
 
+			[$matchStatus,] = explode('#', $upcoming->getSortKey());
+
 			list($home, $away) = $this->checkHomeAwayTeam($upcoming);
 
 			return MatchResponse::create(
@@ -78,7 +79,8 @@ class FavoriteResource extends JsonResource
 					($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
 				),
 				StageResponse::create($upcoming->getStageId()),
-				TournamentResponse::create($upcoming->getTournamentId())
+				TournamentResponse::create($upcoming->getTournamentId()),
+				($matchStatus == TeamsMatch::STATUS_UPCOMING) ? 'notStarted' : null,
 			)->toArray();
 		} catch (Exception $exception) {
 			return [];
@@ -96,6 +98,8 @@ class FavoriteResource extends JsonResource
 
 			list($home, $away) = $this->checkHomeAwayTeam($finished);
 
+			[$matchStatus,] = explode('#', $finished->getSortKey());
+
 			return MatchResponse::create(
 					$finished->getMatchId(),
 					$home,
@@ -107,6 +111,7 @@ class FavoriteResource extends JsonResource
 					),
 					StageResponse::create($finished->getStageId()),
 					TournamentResponse::create($finished->getTournamentId()),
+				    $matchStatus,
 					$finished->getCoverage(),
 					$finished->getResult()
 				)->toArray();

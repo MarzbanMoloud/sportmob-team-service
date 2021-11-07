@@ -129,6 +129,11 @@ interface TeamControllerInterface
 	 *                                    example=1611315000
 	 *                              ),
 	 *     							@OA\Property(
+	 *                                    property="status",
+	 *                                    type="string",
+	 *                                    example="notStarted"
+	 *                              ),
+	 *     							@OA\Property(
 	 *                                    property="coverage",
 	 *                                    type="string",
 	 *                                    example="low"
@@ -192,6 +197,7 @@ interface TeamControllerInterface
 	 *												"id": "d0e52909-80af-3580-b3e6-4a19fc81d4fd"
 	 *											},
 	 *											"date": 1611055800,
+	 *											"status": "finished",
 	 *											"coverage": "low",
 	 *											"result": {
 	 *												"total": {
@@ -351,6 +357,11 @@ interface TeamControllerInterface
 	 *                                 property="date",
 	 *                                 type="number",
 	 *                                 example=1611315000
+	 *                             ),
+	 *     						   @OA\Property(
+	 *                                 property="status",
+	 *                                 type="number",
+	 *                                 example="notStarted"
 	 *                             )
 	 *                          ),
 	 *     						@OA\Property(
@@ -443,6 +454,11 @@ interface TeamControllerInterface
 	 *                              		property="date",
 	 *										type="number",
 	 *     									example=1611055800
+	 * 									),
+	 *      							@OA\Property(
+	 *                              		property="status",
+	 *										type="string",
+	 *     									example="finished"
 	 * 									),
 	 *      							@OA\Property(
 	 *                              		property="coverage",
