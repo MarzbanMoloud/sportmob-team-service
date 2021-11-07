@@ -17,10 +17,10 @@ class MatchResponse
 	private CompetitionResponse $competition;
 	private TournamentResponse $tournament;
 	private StageResponse $stage;
+	private string $status;
 	private ?string $coverage = null;
 	private ?array $result = null;//TODO:: change!
 	private ?string $currentStatus = null;
-	private ?string $status = null;
 	private ?MatchStatusResponse $statuses = null;
 	private ?string $venue = null;
 	private ?array $referees = null;
@@ -38,10 +38,10 @@ class MatchResponse
 	 * @param CompetitionResponse $competition
 	 * @param StageResponse $stage
 	 * @param TournamentResponse $tournament
+	 * @param string $status
 	 * @param string|null $coverage
 	 * @param array|null $result
 	 * @param string|null $currentStatus
-	 * @param string|null $status
 	 * @param MatchStatusResponse|null $statuses
 	 * @param string|null $venue
 	 * @param array|null $referees
@@ -60,10 +60,10 @@ class MatchResponse
 		CompetitionResponse $competition,
 		StageResponse $stage,
 		TournamentResponse $tournament,
+		string $status,
 		?string $coverage = null,
 		?array $result = null,
 		?string $currentStatus = null,
-		?string $status = null,
 		?MatchStatusResponse $statuses = null,
 		?string $venue = null,
 		?array $referees = null,
