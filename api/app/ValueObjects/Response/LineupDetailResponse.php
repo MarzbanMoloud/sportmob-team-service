@@ -12,9 +12,21 @@ class LineupDetailResponse
 {
     private string $formation;
     private array $color;
+    /**
+     * @var PersonResponse[]
+     */
     private array $coaches;
+    /**
+     * @var LineupPlayerResponse[]
+     */
     private array $lineup;
+    /**
+     * @var LineupPlayerResponse[]
+     */
     private array $bench;
+    /**
+     * @var LineupPlayerResponse[]
+     */
     private array $willNotPlay;
 
 	/**
