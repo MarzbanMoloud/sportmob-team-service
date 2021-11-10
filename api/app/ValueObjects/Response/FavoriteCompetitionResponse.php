@@ -16,8 +16,10 @@ class FavoriteCompetitionResponse
 	private ?string $startDate = null;
 	private ?int $mostPoints = null;
 	private ?int $matches = null;
-	private ?FavoriteCompetitionStatsResponse $stats = null;
-
+	/**
+	 * @var FavoriteCompetitionStatsResponse[]
+	 */
+	private ?array $stats = null;
 
 	/**
 	 * @param CompetitionResponse $competition
@@ -26,7 +28,7 @@ class FavoriteCompetitionResponse
 	 * @param string|null $startDate
 	 * @param int|null $mostPoints
 	 * @param int|null $matches
-	 * @param FavoriteCompetitionStatsResponse|null $stats
+	 * @param array|null $stats
 	 * @return FavoriteCompetitionResponse
 	 */
 	public static function create(
@@ -36,7 +38,7 @@ class FavoriteCompetitionResponse
 		?string $startDate = null,
 		?int $mostPoints = null,
 		?int $matches = null,
-		?FavoriteCompetitionStatsResponse $stats = null
+		?array $stats = null
 	): FavoriteCompetitionResponse {
 		$instance = new self();
 		$instance->competition = $competition;
@@ -61,7 +63,7 @@ class FavoriteCompetitionResponse
     		'startDate' => $this->startDate,
     		'mostPoints' => $this->mostPoints,
     		'matches' => $this->matches,
-    		'stats' => $this->stats ? $this->stats->toArray() : null,
+    		'stats' => $this->stats,
         ]);
     }
 }
