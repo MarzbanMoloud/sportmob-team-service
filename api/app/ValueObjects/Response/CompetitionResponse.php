@@ -11,8 +11,8 @@ namespace App\ValueObjects\Response;
 class CompetitionResponse
 {
 	private string $id;
-	private ?string $name = null;
-	private ?CountryResponse $country = null;
+	private string $name;
+	private CountryResponse $country;
 	private ?string $format = null;
 	private ?bool $isYouth = null;
 	private ?bool $isClub = null;
@@ -22,8 +22,8 @@ class CompetitionResponse
 
 	/**
 	 * @param string $id
-	 * @param string|null $name
-	 * @param CountryResponse|null $country
+	 * @param string $name
+	 * @param CountryResponse $country
 	 * @param string|null $format
 	 * @param bool|null $isYouth
 	 * @param bool|null $isClub
@@ -34,8 +34,8 @@ class CompetitionResponse
 	 */
 	public static function create(
 		string $id,
-		?string $name = null,
-		?CountryResponse $country = null,
+		string $name,
+		CountryResponse $country,
 		?string $format = null,
 		?bool $isYouth = null,
 		?bool $isClub = null,
@@ -64,7 +64,7 @@ class CompetitionResponse
         return array_filter([
             'id' => $this->id,
             'name' => $this->name,
-            'country' => $this->country ? $this->country->toArray() : null,
+            'country' => $this->country->toArray(),
             'format' => $this->format,
             'isYouth' => $this->isYouth,
             'isClub' => $this->isClub,
