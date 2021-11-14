@@ -1,6 +1,6 @@
 <?php
 /**
- * Class MatchOverview
+ * Class MatchOverviewResponse
  * @author Fariba Karimi <f.karimi@tgbsco.com>
  * @package App\ValueObjects\Response
  * Date: 11/7/2021
@@ -11,10 +11,10 @@ namespace App\ValueObjects\Response;
 
 
 /**
- * Class MatchOverview
+ * Class MatchOverviewResponse
  * @package App\ValueObjects\Response
  */
-class MatchOverview
+class MatchOverviewResponse
 {
     private MatchResponse $match;
     private ?TeamFormSymbolsResponse $homeTeamFormSymbols = null;
@@ -26,14 +26,14 @@ class MatchOverview
      * @param TeamRankingResponse|null $homeTeamFormSymbols
      * @param TeamFormSymbolsResponse|null $awayTeamFormSymbols
      * @param TeamRankingResponse|null $ranking
-     * @return MatchOverview
+     * @return MatchOverviewResponse
      */
     public static function create(
         MatchResponse $match,
         ?TeamRankingResponse $homeTeamFormSymbols,
         ?TeamFormSymbolsResponse $awayTeamFormSymbols,
         ?TeamRankingResponse $ranking
-    ): MatchOverview
+    ): MatchOverviewResponse
     {
         $instance = new self;
         $instance->match = $match;
