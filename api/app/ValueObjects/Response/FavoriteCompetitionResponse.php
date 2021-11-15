@@ -11,7 +11,7 @@ namespace App\ValueObjects\Response;
 class FavoriteCompetitionResponse
 {
 	private CompetitionResponse $competition;
-	private TeamResponse $team;
+	private ?TeamResponse $team = null;
 	private ?string $season = null;
 	private ?string $startDate = null;
 	private ?int $mostPoints = null;
@@ -23,7 +23,7 @@ class FavoriteCompetitionResponse
 
 	/**
 	 * @param CompetitionResponse $competition
-	 * @param TeamResponse $team
+	 * @param TeamResponse|null $team
 	 * @param string|null $season
 	 * @param string|null $startDate
 	 * @param int|null $mostPoints
@@ -33,7 +33,7 @@ class FavoriteCompetitionResponse
 	 */
 	public static function create(
 		CompetitionResponse $competition,
-		TeamResponse $team,
+		?TeamResponse $team = null,
 		?string $season = null,
 		?string $startDate = null,
 		?int $mostPoints = null,
@@ -58,7 +58,7 @@ class FavoriteCompetitionResponse
 	{
         return array_filter([
     		'competition' => $this->competition->toArray(),
-    		'team' => $this->team->toArray(),
+    		'team' => $this->team ? $this->team->toArray() : null,
     		'season' => $this->season,
     		'startDate' => $this->startDate,
     		'mostPoints' => $this->mostPoints,
