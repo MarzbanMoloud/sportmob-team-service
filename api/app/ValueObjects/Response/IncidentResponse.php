@@ -68,7 +68,7 @@ class IncidentResponse
             'half' => $this->half,
             'reason' => $this->reason,
             'players' => $this->players,
-            'var' => $this->var->toArray(),
+            'var' => $this->var ? $this->var->toArray() : null,
         ]);
     }
 }
