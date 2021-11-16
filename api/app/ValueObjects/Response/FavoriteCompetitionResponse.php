@@ -15,7 +15,7 @@ class FavoriteCompetitionResponse
 	private string $startDate;
 	private ?TopStatTeamResponse $topTeam = null;
 	private ?TopStatPersonResponse $topScorer = null;
-	private ?TopStatPersonResponse $topAssists = null;
+	private ?TopStatPersonResponse $topAssist = null;
 
 	/**
 	 * @param CompetitionResponse $competition
@@ -23,7 +23,7 @@ class FavoriteCompetitionResponse
 	 * @param string $startDate
 	 * @param TopStatTeamResponse|null $topTeam
 	 * @param TopStatPersonResponse|null $topScorer
-	 * @param TopStatPersonResponse|null $topAssists
+	 * @param TopStatPersonResponse|null $topAssist
 	 * @return FavoriteCompetitionResponse
 	 */
 	public static function create(
@@ -32,7 +32,7 @@ class FavoriteCompetitionResponse
 		string $startDate,
 		?TopStatTeamResponse $topTeam = null,
 		?TopStatPersonResponse $topScorer = null,
-		?TopStatPersonResponse $topAssists = null
+		?TopStatPersonResponse $topAssist = null
 	): FavoriteCompetitionResponse {
 		$instance = new self();
 		$instance->competition = $competition;
@@ -40,7 +40,7 @@ class FavoriteCompetitionResponse
 		$instance->startDate = $startDate;
 		$instance->topTeam = $topTeam;
 		$instance->topScorer = $topScorer;
-		$instance->topAssists = $topAssists;
+		$instance->topAssist = $topAssist;
 		return $instance;
 	}
 
@@ -55,7 +55,7 @@ class FavoriteCompetitionResponse
 			'startDate' => $this->startDate,
     		'topTeam' => $this->topTeam ? $this->topTeam->toArray() : null,
     		'topScorer' => $this->topScorer ? $this->topScorer->toArray() : null,
-    		'topAssists' => $this->topAssists ? $this->topAssists->toArray() : null,
+    		'topAssist' => $this->topAssist ? $this->topAssist->toArray() : null,
         ]);
     }
 }
