@@ -16,18 +16,23 @@ class IncidentResponse
     private ?int $minute = null;
     private ?int $half = null;
     private ?string $reason = null;
+    /**
+     * @var PersonResponse[]|null
+     */
     private ?array $players = null;
+    private ?VarResponse $var = null;
 
-	/**
-	 * @param string $id
-	 * @param string $type
-	 * @param TeamResponse|null $team
-	 * @param int|null $minute
-	 * @param int|null $half
-	 * @param string|null $reason
-	 * @param array|null $players
-	 * @return IncidentResponse
-	 */
+    /**
+     * @param string $id
+     * @param string $type
+     * @param TeamResponse|null $team
+     * @param int|null $minute
+     * @param int|null $half
+     * @param string|null $reason
+     * @param array|null $players
+     * @param VarResponse|null $var
+     * @return IncidentResponse
+     */
     public static function create(
 		string $id,
 		string $type,
@@ -35,7 +40,8 @@ class IncidentResponse
 		?int $minute = null,
 		?int $half = null,
 		?string $reason = null,
-		?array $players = null
+		?array $players = null,
+        ?VarResponse $var = null
 	): IncidentResponse {
         $instance = new self();
         $instance->id = $id;
@@ -45,6 +51,7 @@ class IncidentResponse
         $instance->half = $half;
         $instance->reason = $reason;
         $instance->players = $players;
+        $instance->var = $var;
         return $instance;
     }
 
@@ -61,6 +68,7 @@ class IncidentResponse
             'half' => $this->half,
             'reason' => $this->reason,
             'players' => $this->players,
+            'var' => $this->var ? $this->var->toArray() : null,
         ]);
     }
 }
