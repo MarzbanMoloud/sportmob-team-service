@@ -19,7 +19,7 @@ class MatchResponse
 	private int $date;
 	private string $status;
 	private ?string $coverage = null;
-	private ?array $result = null;
+	private ?ResultResponse $result = null;
 	private ?MatchStatusResponse $statuses = null;
 	private ?string $venue = null;
     /**
@@ -41,7 +41,7 @@ class MatchResponse
      * @param TournamentResponse $tournament
      * @param string $status
      * @param string|null $coverage
-     * @param array|null $result
+     * @param ResultResponse|null $result
      * @param MatchStatusResponse|null $statuses
      * @param string|null $venue
      * @param array|null $referees
@@ -58,7 +58,7 @@ class MatchResponse
 		TournamentResponse $tournament,
 		string $status,
 		?string $coverage = null,
-		?array $result = null,
+		?ResultResponse $result = null,
 		?MatchStatusResponse $statuses = null,
 		?string $venue = null,
 		?array $referees = null,
@@ -97,7 +97,7 @@ class MatchResponse
             'status' => $this->status,
             'date' => $this->date,
 			'coverage' => $this->coverage,
-			'result' => $this->result,
+			'result' => $this->result ? $this->result->toArray() : null,
 			'statuses' => $this->statuses ? $this->statuses->toArray() : null,
 			'venue' => $this->venue,
 			'referees' => $this->referees,
