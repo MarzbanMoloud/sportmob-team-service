@@ -121,6 +121,8 @@ class TransferService
 		}
 
 		$this->transferCacheService->putUserActionTransfer($action, $user, $transfer);
+		$this->transferCacheService->forget('transfer_team_*');
+		$this->transferCacheService->forget('transfer_person_*');
 	}
 
 	/**
