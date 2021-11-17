@@ -95,9 +95,7 @@ class TransferService
 		if ($action == self::TRANSFER_LIKE) {
 
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_DISLIKE, $user, $transfer)) {
-				$transferItem->setDislike($transferItem->getDislike() - 1);
-				$this->transferCacheService->forget(TransferCacheService::getUserActionTransferKey(self::TRANSFER_DISLIKE, $user, $transfer));
-				$transferItem->setLike($transferItem->getLike() + 1);
+				throw new UserActionTransferNotAllow();
 			} else {
 				$transferItem->setLike($transferItem->getLike() + 1);
 			}
@@ -105,9 +103,7 @@ class TransferService
 		} else if ($action == self::TRANSFER_DISLIKE) {
 
 			if ($this->transferCacheService->hasUserActionTransfer(self::TRANSFER_LIKE, $user, $transfer)) {
-				$transferItem->setLike($transferItem->getLike() - 1);
-				$this->transferCacheService->forget(TransferCacheService::getUserActionTransferKey(self::TRANSFER_LIKE, $user, $transfer));
-				$transferItem->setDislike($transferItem->getDislike() + 1);
+				throw new UserActionTransferNotAllow();
 			} else {
 				$transferItem->setDislike($transferItem->getDislike() + 1);
 			}
