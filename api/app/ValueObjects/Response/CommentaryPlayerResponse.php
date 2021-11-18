@@ -11,16 +11,16 @@ namespace App\ValueObjects\Response;
 class CommentaryPlayerResponse
 {
     private PersonResponse $player;
-    private TeamResponse $team;
+    private ?TeamResponse $team = null;
 
 	/**
 	 * @param PersonResponse $player
-	 * @param TeamResponse $team
+	 * @param TeamResponse|null $team
 	 * @return CommentaryPlayerResponse
 	 */
     public static function create(
 		PersonResponse $player,
-		TeamResponse $team
+		?TeamResponse $team = null
 	): CommentaryPlayerResponse {
         $instance = new self();
         $instance->player = $player;
@@ -35,7 +35,7 @@ class CommentaryPlayerResponse
     {
         return array_filter([
             'player' => $this->player->toArray(),
-            'team' => $this->team->toArray(),
+            'team' => $this->team ? $this->team->toArray() : null,
         ]);
     }
 }
