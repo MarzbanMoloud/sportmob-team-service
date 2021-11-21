@@ -48,11 +48,11 @@ class FavoriteResource extends JsonResource
 	{
 		return [
 			'links' => (object) null,
-			'data' => [
+			'data' => array_filter([
 				'nextMatch' => $this->makeNextMatchData(),
 				'previousMatch' => $this->makeTeamFormData(),
 				'teamFormSymbols' => $this->makeTeamFormSymbols()
-			]
+			])
 		];
 	}
 
