@@ -38,7 +38,7 @@ class TableGroupResponse
 	{
         return array_filter([
             'stage' => $this->stage ? $this->stage->toArray() : null,
-            'teamTableItems' => $this->teamTableItems ? $this->teamTableItems->toArray() : null
+            'teamTableItems' => $this->teamTableItems
         ]);
     }
 }
