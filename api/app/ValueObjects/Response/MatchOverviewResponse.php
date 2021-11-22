@@ -30,9 +30,9 @@ class MatchOverviewResponse
      */
     public static function create(
         MatchResponse $match,
-        ?TeamRankingResponse $homeTeamFormSymbols,
-        ?TeamFormSymbolsResponse $awayTeamFormSymbols,
-        ?TeamRankingResponse $ranking
+        ?TeamRankingResponse $homeTeamFormSymbols = null,
+        ?TeamFormSymbolsResponse $awayTeamFormSymbols = null,
+        ?TeamRankingResponse $ranking = null
     ): MatchOverviewResponse
     {
         $instance = new self;

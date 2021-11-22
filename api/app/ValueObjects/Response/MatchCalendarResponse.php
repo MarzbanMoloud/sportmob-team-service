@@ -11,21 +11,25 @@ namespace App\ValueObjects\Response;
 class MatchCalendarResponse
 {
     private MatchResponse $match;
-    private ?int $priority = null;
+    private ?int $competitionPriority = null;
+    private ?int $matchPriority = null;
 
     /**
      * @param MatchResponse $match
-     * @param int|null $priority
+     * @param int|null $competitionPriority
+     * @param int|null $matchPriority
      * @return MatchCalendarResponse
      */
     public static function create(
         MatchResponse $match,
-        ?int $priority
+        ?int $competitionPriority,
+        ?int $matchPriority
     ): MatchCalendarResponse
     {
         $instance = new self;
         $instance->match = $match;
-        $instance->priority = $priority;
+        $instance->competitionPriority = $competitionPriority;
+        $instance->matchPriority = $matchPriority;
         return $instance;
     }
 
@@ -36,7 +40,8 @@ class MatchCalendarResponse
     {
         return array_filter([
             'match' => $this->match->toArray(),
-            'priority' => $this->priority,
+            'competitionPriority' => $this->competitionPriority,
+            'matchPriority' => $this->matchPriority,
         ]);
     }
 
