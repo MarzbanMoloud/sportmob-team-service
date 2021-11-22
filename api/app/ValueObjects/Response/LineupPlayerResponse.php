@@ -11,31 +11,31 @@ namespace App\ValueObjects\Response;
 class LineupPlayerResponse
 {
     private PersonResponse $player;
-    private ?int $shirtNumber = null;
+    private int $shirtNumber;
     private string $type;
-	private int $positionZone;
+	private ?int $positionZone = null;
     private ?string $subPosition = null;
 
-	/**
-	 * @param PersonResponse $player
-	 * @param string $type
-	 * @param int $positionZone
-	 * @param int|null $shirtNumber
-	 * @param string|null $subPosition
-	 * @return LineupPlayerResponse
-	 */
+    /**
+     * @param PersonResponse $player
+     * @param int $shirtNumber
+     * @param string $type
+     * @param int|null $positionZone
+     * @param string|null $subPosition
+     * @return LineupPlayerResponse
+     */
     public static function create(
 		PersonResponse $player,
+        int $shirtNumber,
 		string $type,
-		int $positionZone,
-		?int $shirtNumber = null,
+		?int $positionZone = null,
 		?string $subPosition = null
 	): LineupPlayerResponse {
         $instance = new self();
         $instance->player = $player;
+        $instance->shirtNumber = $shirtNumber;
         $instance->type = $type;
         $instance->positionZone = $positionZone;
-        $instance->shirtNumber = $shirtNumber;
         $instance->subPosition = $subPosition;
         return $instance;
     }
@@ -47,9 +47,9 @@ class LineupPlayerResponse
     {
         return array_filter([
             'player' => $this->player->toArray(),
+            'shirtNumber' => $this->shirtNumber,
             'type' => $this->type,
             'positionZone' => $this->positionZone,
-            'shirtNumber' => $this->shirtNumber,
             'subPosition' => $this->subPosition,
         ]);
     }
