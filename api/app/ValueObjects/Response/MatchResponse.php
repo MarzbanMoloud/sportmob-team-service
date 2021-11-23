@@ -20,7 +20,7 @@ class MatchResponse
 	private string $status;
 	private ?string $coverage = null;
 	private ?ResultResponse $result = null;
-	private ?MatchStatusResponse $statuses = null;
+	private ?TimeStatusResponse $timeStatus = null;
 	private ?string $venue = null;
     /**
      * @var PersonResponse[]|null
@@ -31,23 +31,23 @@ class MatchResponse
      */
 	private ?array $incidents = null;
 
-    /**
-     * @param string $id
-     * @param TeamResponse $homeTeam
-     * @param TeamResponse $awayTeam
-     * @param int $date
-     * @param CompetitionResponse $competition
-     * @param StageResponse $stage
-     * @param TournamentResponse $tournament
-     * @param string $status
-     * @param string|null $coverage
-     * @param ResultResponse|null $result
-     * @param MatchStatusResponse|null $statuses
-     * @param string|null $venue
-     * @param array|null $referees
-     * @param array|null $incidents
-     * @return MatchResponse
-     */
+	/**
+	 * @param string $id
+	 * @param TeamResponse $homeTeam
+	 * @param TeamResponse $awayTeam
+	 * @param int $date
+	 * @param CompetitionResponse $competition
+	 * @param StageResponse $stage
+	 * @param TournamentResponse $tournament
+	 * @param string $status
+	 * @param string|null $coverage
+	 * @param ResultResponse|null $result
+	 * @param TimeStatusResponse|null $timeStatus
+	 * @param string|null $venue
+	 * @param array|null $referees
+	 * @param array|null $incidents
+	 * @return MatchResponse
+	 */
 	public static function create(
 		string $id,
 		TeamResponse $homeTeam,
@@ -59,7 +59,7 @@ class MatchResponse
 		string $status,
 		?string $coverage = null,
 		?ResultResponse $result = null,
-		?MatchStatusResponse $statuses = null,
+		?TimeStatusResponse $timeStatus = null,
 		?string $venue = null,
 		?array $referees = null,
 		?array $incidents = null
@@ -75,7 +75,7 @@ class MatchResponse
         $instance->status = $status;
 		$instance->coverage = $coverage;
 		$instance->result = $result;
-		$instance->statuses = $statuses;
+		$instance->timeStatus = $timeStatus;
 		$instance->venue = $venue;
 		$instance->referees = $referees;
 		$instance->incidents = $incidents;
@@ -98,7 +98,7 @@ class MatchResponse
             'date' => $this->date,
 			'coverage' => $this->coverage,
 			'result' => $this->result ? $this->result->toArray() : null,
-			'statuses' => $this->statuses ? $this->statuses->toArray() : null,
+			'timeStatus' => $this->timeStatus ? $this->timeStatus->toArray() : null,
 			'venue' => $this->venue,
 			'referees' => $this->referees,
 			'incidents' => $this->incidents,
