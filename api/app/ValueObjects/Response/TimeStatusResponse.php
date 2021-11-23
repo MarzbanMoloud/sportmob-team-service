@@ -5,14 +5,13 @@ namespace App\ValueObjects\Response;
 
 
 /**
- * Class MatchStatusResponse
+ * Class TimeStatusResponse
  * @package App\ValueObjects\Response
  */
-class MatchStatusResponse
+class TimeStatusResponse
 {
-    private string $notStarted;
-    private ?string $gamedEnded = null;
-    private ?string $gameStarted = null;
+	private ?string $gameStarted = null;
+	private ?string $gamedEnded = null;
     private ?string $firstHalfEnded = null;
     private ?string $secondHalfStarted = null;
     private ?string $secondHalfEnded = null;
@@ -20,47 +19,32 @@ class MatchStatusResponse
     private ?string $extraTimeFirstHalfEnded = null;
     private ?string $extraTimeSecondHalfStarted = null;
     private ?string $extraTimeSecondHalfEnded = null;
-    private ?string $penalty = null;
-    private ?string $cancelled = null;
-    private ?string $postponed = null;
-    private ?string $suspended = null;
 
-    /**
-     * @param string $notStarted
-     * @param string|null $gamedEnded
-     * @param string|null $gameStarted
-     * @param string|null $firstHalfEnded
-     * @param string|null $secondHalfStarted
-     * @param string|null $secondHalfEnded
-     * @param string|null $extraTimeStarted
-     * @param string|null $extraTimeFirstHalfEnded
-     * @param string|null $extraTimeSecondHalfStarted
-     * @param string|null $extraTimeSecondHalfEnded
-     * @param string|null $penalty
-     * @param string|null $cancelled
-     * @param string|null $postponed
-     * @param string|null $suspended
-     * @return MatchStatusResponse
-     */
+	/**
+	 * @param string|null $gameStarted
+	 * @param string|null $gamedEnded
+	 * @param string|null $firstHalfEnded
+	 * @param string|null $secondHalfStarted
+	 * @param string|null $secondHalfEnded
+	 * @param string|null $extraTimeStarted
+	 * @param string|null $extraTimeFirstHalfEnded
+	 * @param string|null $extraTimeSecondHalfStarted
+	 * @param string|null $extraTimeSecondHalfEnded
+	 * @return TimeStatusResponse
+	 */
     public static function create(
-        string $notStarted,
-        ?string $gamedEnded = null,
-        ?string $gameStarted = null,
+		?string $gameStarted = null,
+		?string $gamedEnded = null,
         ?string $firstHalfEnded = null,
         ?string $secondHalfStarted = null,
         ?string $secondHalfEnded = null,
         ?string $extraTimeStarted = null,
         ?string $extraTimeFirstHalfEnded = null,
         ?string $extraTimeSecondHalfStarted = null,
-        ?string $extraTimeSecondHalfEnded = null,
-        ?string $penalty = null,
-        ?string $cancelled = null,
-        ?string $postponed = null,
-        ?string $suspended = null
-    ): MatchStatusResponse
+        ?string $extraTimeSecondHalfEnded = null
+    ): TimeStatusResponse
     {
         $instance = new self();
-        $instance->notStarted = $notStarted;
         $instance->gamedEnded = $gamedEnded;
         $instance->gameStarted = $gameStarted;
         $instance->firstHalfEnded = $firstHalfEnded;
@@ -70,10 +54,6 @@ class MatchStatusResponse
         $instance->extraTimeFirstHalfEnded = $extraTimeFirstHalfEnded;
         $instance->extraTimeSecondHalfStarted = $extraTimeSecondHalfStarted;
         $instance->extraTimeSecondHalfEnded = $extraTimeSecondHalfEnded;
-        $instance->penalty = $penalty;
-        $instance->cancelled = $cancelled;
-        $instance->postponed = $postponed;
-        $instance->suspended = $suspended;
         return $instance;
     }
 
@@ -83,7 +63,6 @@ class MatchStatusResponse
     public function toArray(): array
     {
         return array_filter([
-            'notStarted' => $this->notStarted,
             'gameStarted' => $this->gameStarted,
             'firstHalfEnded' => $this->firstHalfEnded,
             'secondHalfStarted' => $this->secondHalfStarted,
@@ -92,10 +71,6 @@ class MatchStatusResponse
             'extraTimeFirstHalfEnded' => $this->extraTimeFirstHalfEnded,
             'extraTimeSecondHalfStarted' => $this->extraTimeSecondHalfStarted,
             'extraTimeSecondHalfEnded' => $this->extraTimeSecondHalfEnded,
-            'penalty' => $this->penalty,
-            'cancelled' => $this->cancelled,
-            'postponed' => $this->postponed,
-            'suspended' => $this->suspended,
             'gamedEnded' => $this->gamedEnded,
         ]);
     }

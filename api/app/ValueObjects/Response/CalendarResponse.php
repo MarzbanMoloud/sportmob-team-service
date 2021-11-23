@@ -32,8 +32,6 @@ class CalendarResponse
      */
     public function toArray(): array
     {
-        return array_filter([
-            'matches' => $this->matches,
-        ]);
+        return array_filter($this->matches);
     }
 }
