@@ -20,7 +20,7 @@ class TeamFormSymbolsResponse
 	 */
 	public static function create(
 		TeamResponse $team,
-		?array $form
+		?array $form = null
 	): TeamFormSymbolsResponse {
 		$instance = new self();
 		$instance->team = $team;

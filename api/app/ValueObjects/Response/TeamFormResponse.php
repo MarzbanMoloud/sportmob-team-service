@@ -13,11 +13,11 @@ class TeamFormResponse
 	private TeamResponse $team;
 	private ?array $form;
 
-	/**
-	 * @param TeamResponse $team
-	 * @param array|null $form
-	 * @return TeamFormResponse
-	 */
+    /**
+     * @param TeamResponse $team
+     * @param array|null $form
+     * @return TeamFormResponse
+     */
 	public static function create(
 		TeamResponse $team,
 		?array $form = null

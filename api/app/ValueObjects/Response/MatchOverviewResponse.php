@@ -19,27 +19,30 @@ class MatchOverviewResponse
     private MatchResponse $match;
     private ?TeamFormSymbolsResponse $homeTeamFormSymbols = null;
     private ?TeamFormSymbolsResponse $awayTeamFormSymbols = null;
-    private ?TeamRankingResponse $ranking = null;
+    /**
+     * @var TeamTableItemResponse[]|null
+     */
+    private ?array $teamTableInfo = null;
 
     /**
      * @param MatchResponse $match
-     * @param TeamRankingResponse|null $homeTeamFormSymbols
+     * @param TeamFormSymbolsResponse|null $homeTeamFormSymbols
      * @param TeamFormSymbolsResponse|null $awayTeamFormSymbols
-     * @param TeamRankingResponse|null $ranking
+     * @param array|null $teamTableInfo
      * @return MatchOverviewResponse
      */
     public static function create(
         MatchResponse $match,
-        ?TeamRankingResponse $homeTeamFormSymbols = null,
+        ?TeamFormSymbolsResponse $homeTeamFormSymbols = null,
         ?TeamFormSymbolsResponse $awayTeamFormSymbols = null,
-        ?TeamRankingResponse $ranking = null
+        ?array $teamTableInfo = null
     ): MatchOverviewResponse
     {
         $instance = new self;
         $instance->match = $match;
         $instance->homeTeamFormSymbols = $homeTeamFormSymbols;
         $instance->awayTeamFormSymbols = $awayTeamFormSymbols;
-        $instance->ranking = $ranking;
+        $instance->teamTableInfo = $teamTableInfo;
         return $instance;
     }
 
@@ -50,9 +53,9 @@ class MatchOverviewResponse
     {
         return array_filter([
             'match' => $this->match->toArray(),
-            'homeTeamFormSymbols' => $this->homeTeamFormSymbols->toArray(),
-            'awayTeamFormSymbols' => $this->awayTeamFormSymbols->toArray(),
-            'ranking' => $this->ranking->toArray(),
+            'homeTeamFormSymbols' => $this->homeTeamFormSymbols ? $this->homeTeamFormSymbols->toArray() : null,
+            'awayTeamFormSymbols' => $this->awayTeamFormSymbols ? $this->awayTeamFormSymbols->toArray() : null,
+            'teamTableInfo' => $this->teamTableInfo,
         ]);
     }
 }
