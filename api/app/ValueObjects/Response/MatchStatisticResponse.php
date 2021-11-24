@@ -11,6 +11,9 @@ namespace App\ValueObjects\Response;
 class MatchStatisticResponse
 {
     private MatchResponse $match;
+    /**
+     * @var MatchStatResponse[]
+     */
     private array $stats;
 
 	/**
@@ -34,8 +37,8 @@ class MatchStatisticResponse
     public function toArray(): array
     {
         return array_filter([
-            'match' => $this->match,
-            'stats' => $this->stats
+            'match' => $this->match->toArray(),
+            'stats' => $this->stats,
         ]);
     }
 }

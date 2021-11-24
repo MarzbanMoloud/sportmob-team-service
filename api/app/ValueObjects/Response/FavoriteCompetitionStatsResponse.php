@@ -41,11 +41,11 @@ class FavoriteCompetitionStatsResponse
      */
     public function toArray(): array
     {
-        return array_filter([
+        return [
             'key' => $this->key,
             'value' => $this->value,
             'clubTeamName' => $this->clubTeamName,
             'person' => $this->person ? $this->person->toArray() : null,
-        ]);
+        ];
     }
 }

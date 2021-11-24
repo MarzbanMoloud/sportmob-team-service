@@ -11,7 +11,7 @@ namespace App\ValueObjects\Response;
 class TeamResponse
 {
 	private string $id;
-	private NameResponse $teamName;
+	private ?NameResponse $teamName = null;
 	private ?string $code = null;
 	private ?string $city = null;
 	private ?string $founded = null;
@@ -20,7 +20,7 @@ class TeamResponse
 
 	/**
 	 * @param string $id
-	 * @param NameResponse $teamName
+	 * @param NameResponse|null $teamName
 	 * @param string|null $code
 	 * @param string|null $city
 	 * @param string|null $founded
@@ -30,7 +30,7 @@ class TeamResponse
 	 */
 	public static function create(
 		string $id,
-		NameResponse $teamName,
+		?NameResponse $teamName = null,
 		?string $code = null,
 		?string $city = null,
 		?string $founded = null,
@@ -55,7 +55,7 @@ class TeamResponse
 	{
         return array_filter([
             'id' => $this->id,
-            'name' => $this->teamName->toArray(),
+            'name' => $this->teamName ? $this->teamName->toArray() : null,
             'code' => $this->code,
             'city' => $this->city,
             'founded' => $this->founded,

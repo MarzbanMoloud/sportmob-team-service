@@ -10,30 +10,54 @@ namespace App\ValueObjects\Response;
  */
 class LineupDetailResponse
 {
-    private string $formation;
-    private array $color;
-    private array $coaches;
-    private array $lineup;
-    private array $bench;
-    private array $willNotPlay;
+    /**
+     * @var string|null
+     */
+    private ?string $formation = null;
 
-	/**
-	 * @param string $formation
-	 * @param array $color
-	 * @param array $coaches
-	 * @param array $lineup
-	 * @param array $bench
-	 * @param array $willNotPlay
-	 * @return LineupDetailResponse
-	 */
+    /**
+     * @var array|null
+     */
+    private ?array $color = null;
+
+    /**
+     * @var PersonResponse[]|null
+     */
+    private ?array $coaches = null;
+
+    /**
+     * @var LineupPlayerResponse[]|null
+     */
+    private ?array $lineup = null;
+
+    /**
+     * @var LineupPlayerResponse[]|null
+     */
+    private ?array $bench = null;
+
+    /**
+     * @var LineupPlayerResponse[]|null
+     */
+    private ?array $willNotPlay = null;
+
+    /**
+     * @param string|null $formation
+     * @param array|null $color
+     * @param array|null $coaches
+     * @param array|null $lineup
+     * @param array|null $bench
+     * @param array|null $willNotPlay
+     * @return LineupDetailResponse
+     */
     public static function create(
-		string $formation,
-		array $color,
-		array $coaches,
-		array $lineup,
-		array $bench,
-		array $willNotPlay
-	): LineupDetailResponse {
+        ?string $formation = null,
+        ?array $color = null,
+        ?array $coaches = null,
+        ?array $lineup = null,
+        ?array $bench = null,
+        ?array $willNotPlay = null
+    ): LineupDetailResponse
+    {
         $instance = new self();
         $instance->formation = $formation;
         $instance->color = $color;

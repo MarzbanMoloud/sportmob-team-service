@@ -11,41 +11,36 @@ namespace App\ValueObjects\Response;
 class FavoriteCompetitionResponse
 {
 	private CompetitionResponse $competition;
-	private TeamResponse $team;
-	private ?string $season = null;
-	private ?string $startDate = null;
-	private ?int $mostPoints = null;
-	private ?int $matches = null;
-	private ?FavoriteCompetitionStatsResponse $stats = null;
-
+	private string $season;
+	private string $startDate;
+	private ?TopStatTeamResponse $topTeam = null;
+	private ?TopStatPersonResponse $topScorer = null;
+	private ?TopStatPersonResponse $topAssist = null;
 
 	/**
 	 * @param CompetitionResponse $competition
-	 * @param TeamResponse $team
-	 * @param string|null $season
-	 * @param string|null $startDate
-	 * @param int|null $mostPoints
-	 * @param int|null $matches
-	 * @param FavoriteCompetitionStatsResponse|null $stats
+	 * @param string $season
+	 * @param string $startDate
+	 * @param TopStatTeamResponse|null $topTeam
+	 * @param TopStatPersonResponse|null $topScorer
+	 * @param TopStatPersonResponse|null $topAssist
 	 * @return FavoriteCompetitionResponse
 	 */
 	public static function create(
 		CompetitionResponse $competition,
-		TeamResponse $team,
-		?string $season = null,
-		?string $startDate = null,
-		?int $mostPoints = null,
-		?int $matches = null,
-		?FavoriteCompetitionStatsResponse $stats = null
+		string $season,
+		string $startDate,
+		?TopStatTeamResponse $topTeam = null,
+		?TopStatPersonResponse $topScorer = null,
+		?TopStatPersonResponse $topAssist = null
 	): FavoriteCompetitionResponse {
 		$instance = new self();
 		$instance->competition = $competition;
-		$instance->team = $team;
 		$instance->season = $season;
 		$instance->startDate = $startDate;
-		$instance->mostPoints = $mostPoints;
-		$instance->matches = $matches;
-		$instance->stats = $stats;
+		$instance->topTeam = $topTeam;
+		$instance->topScorer = $topScorer;
+		$instance->topAssist = $topAssist;
 		return $instance;
 	}
 
@@ -56,12 +51,11 @@ class FavoriteCompetitionResponse
 	{
         return array_filter([
     		'competition' => $this->competition->toArray(),
-    		'team' => $this->team->toArray(),
-    		'season' => $this->season,
-    		'startDate' => $this->startDate,
-    		'mostPoints' => $this->mostPoints,
-    		'matches' => $this->matches,
-    		'stats' => $this->stats ? $this->stats->toArray() : null,
+			'season' => $this->season,
+			'startDate' => $this->startDate,
+    		'topTeam' => $this->topTeam ? $this->topTeam->toArray() : null,
+    		'topScorer' => $this->topScorer ? $this->topScorer->toArray() : null,
+    		'topAssist' => $this->topAssist ? $this->topAssist->toArray() : null,
         ]);
     }
 }

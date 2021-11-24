@@ -15,6 +15,9 @@ class CommentaryResponse
 	private string $type;
 	private string $comment;
 	private string $minute;
+    /**
+     * @var CommentaryPlayerResponse[]
+     */
 	private array $players;
 	private ?string $half = null;
 
