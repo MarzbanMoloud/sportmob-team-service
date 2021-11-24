@@ -18,6 +18,7 @@ class TeamTableItemResponse
 	private ?int $lost = null;
 	private ?int $played = null;
 	private ?int $goalsDiff = null;
+	private ?string $matchStatus = null;
 
 	/**
 	 * @param TeamResponse|null $team
@@ -28,6 +29,7 @@ class TeamTableItemResponse
 	 * @param int|null $lost
 	 * @param int|null $played
 	 * @param int|null $goalsDiff
+	 * @param string|null $matchStatus
 	 * @return TeamTableItemResponse
 	 */
 	public static function create(
@@ -38,7 +40,8 @@ class TeamTableItemResponse
 		?int $drawn = null,
 		?int $lost = null,
 		?int $played = null,
-		?int $goalsDiff = null
+		?int $goalsDiff = null,
+		?string $matchStatus = null
 	): TeamTableItemResponse {
 		$instance = new self();
 		$instance->team = $team;
@@ -49,6 +52,7 @@ class TeamTableItemResponse
 		$instance->lost = $lost;
 		$instance->played = $played;
 		$instance->goalsDiff = $goalsDiff;
+		$instance->matchStatus = $matchStatus;
 		return $instance;
 	}
 
@@ -66,6 +70,7 @@ class TeamTableItemResponse
             'lost' => $this->lost,
             'played' => $this->played,
             'goalsDiff' => $this->goalsDiff,
+            'matchStatus' => $this->matchStatus,
         ]);
     }
 }
