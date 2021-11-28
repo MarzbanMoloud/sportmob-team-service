@@ -31,6 +31,8 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	private string $stageId;
 	private ?string $stageName = null;
 	private ?string $competitionName = null;
+	private ?string $countryId = null;
+	private ?string $countryName = null;
 	private string $matchId;
 	private string $teamId;
 	private TeamName $teamName;
@@ -47,6 +49,42 @@ class TeamsMatch implements DynamoDBRepositoryModelInterface
 	public function __construct()
 	{
 		$this->setUpdatedAt(new \DateTime());
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getCountryId(): ?string
+	{
+		return $this->countryId;
+	}
+
+	/**
+	 * @param string|null $countryId
+	 * @return TeamsMatch
+	 */
+	public function setCountryId(?string $countryId): TeamsMatch
+	{
+		$this->countryId = $countryId;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getCountryName(): ?string
+	{
+		return $this->countryName;
+	}
+
+	/**
+	 * @param string|null $countryName
+	 * @return TeamsMatch
+	 */
+	public function setCountryName(?string $countryName): TeamsMatch
+	{
+		$this->countryName = $countryName;
+		return $this;
 	}
 
 	/**

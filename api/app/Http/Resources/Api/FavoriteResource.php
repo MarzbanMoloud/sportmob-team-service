@@ -7,8 +7,11 @@ namespace App\Http\Resources\Api;
 use App\Http\Resources\Api\Traits\CalculateResultTrait;
 use App\Models\ReadModels\TeamsMatch;
 use App\ValueObjects\Response\CompetitionResponse;
+use App\ValueObjects\Response\CountryResponse;
+use App\ValueObjects\Response\HomeAwayResponse;
 use App\ValueObjects\Response\MatchResponse;
 use App\ValueObjects\Response\NameResponse;
+use App\ValueObjects\Response\ResultResponse;
 use App\ValueObjects\Response\StageResponse;
 use App\ValueObjects\Response\TeamFormSymbolsResponse;
 use App\ValueObjects\Response\TeamResponse;
@@ -76,7 +79,11 @@ class FavoriteResource extends JsonResource
 				TeamsMatch::getMatchDate($upcoming->getSortKey())->getTimestamp(),
 				CompetitionResponse::create(
 					$upcoming->getCompetitionId(),
-					($upcoming->getCompetitionName()) ? $this->client->getByLang($upcoming->getCompetitionName(), $this->lang) : null
+					$this->client->getByLang($upcoming->getCompetitionName(), $this->lang),
+					CountryResponse::create(
+						$upcoming->getCountryId(),
+						$this->client->getByLang($upcoming->getCountryName(), $this->lang)
+					)
 				),
 				StageResponse::create($upcoming->getStageId()),
 				TournamentResponse::create($upcoming->getTournamentId()),
@@ -100,6 +107,13 @@ class FavoriteResource extends JsonResource
 
 			[$matchStatus,] = explode('#', $finished->getSortKey());
 
+			$resultResponse = ResultResponse::create(
+				isset($finished->getResult()['total']) ? HomeAwayResponse::create(
+					$finished->getResult()['total']['home'], $finished->getResult()['total']['away']) : null,
+				isset($finished->getResult()['penalty']) ? HomeAwayResponse::create(
+					$finished->getResult()['total']['penalty'], $finished->getResult()['penalty']['away']) : null
+			);
+
 			return MatchResponse::create(
 					$finished->getMatchId(),
 					$home,
@@ -107,13 +121,17 @@ class FavoriteResource extends JsonResource
 					TeamsMatch::getMatchDate($finished->getSortKey())->getTimestamp(),
 					CompetitionResponse::create(
 						$finished->getCompetitionId(),
-						($finished->getCompetitionName()) ? $this->client->getByLang($finished->getCompetitionName(), $this->lang) : null
+						$this->client->getByLang($finished->getCompetitionName(), $this->lang),
+						CountryResponse::create(
+							$finished->getCountryId(),
+							$this->client->getByLang($finished->getCountryName(), $this->lang)
+						)
 					),
 					StageResponse::create($finished->getStageId()),
 					TournamentResponse::create($finished->getTournamentId()),
 				    $matchStatus,
 					$finished->getCoverage(),
-					$finished->getResult()
+					$resultResponse
 				)->toArray();
 
 		} catch (Exception $exception) {

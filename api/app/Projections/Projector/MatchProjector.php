@@ -220,7 +220,7 @@ class MatchProjector
 	 */
 	private function checkMetadataValidation(Message $message): void
 	{
-		$requiredFields = ['date', 'time', 'stage'];
+		$requiredFields = ['date', 'time', 'stage', 'country', 'countryId'];
 		foreach ($requiredFields as $fieldName) {
 			if (empty($message->getBody()->getMetadata()[$fieldName])) {
 				$validationMessage = sprintf("%s field is empty.", ucfirst($fieldName));
@@ -268,6 +268,8 @@ class MatchProjector
 
 		return (new TeamsMatch())
 			->setCompetitionId($identifier['competition'])
+			->setCountryId($metadata['countryId'])
+			->setCountryName($metadata['country'])
 			->setTournamentId($identifier['tournament'])
 			->setStageId($identifier['stage'])
 			->setStageName($metadata['stage'])
