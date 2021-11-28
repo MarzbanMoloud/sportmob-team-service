@@ -65,6 +65,20 @@ interface TeamControllerInterface
 	 *                                        property="id",
 	 *                                        type="string",
 	 *                                        example="tga692ec-3fac-3858-83e3-2ed5b5bd26rf"
+	 *                                    ),
+	 *                         			  @OA\Property(
+	 *                                        property="country",
+	 *                                        type="object",
+	 *                         			  	  @OA\Property(
+	 *                                        		property="id",
+	 *                                        		type="string",
+	 *                                        		example="tga692ec-3fac-3858-83e3-2ed5b5bd26rf"
+	 *                                    	  ),
+	 *                         			  	  @OA\Property(
+	 *                                        		property="name",
+	 *                                        		type="string",
+	 *                                        		example="England"
+	 *                                    	  ),
 	 *                                    )
 	 *                                ),
 	 *	 							  @OA\Property(
@@ -188,7 +202,11 @@ interface TeamControllerInterface
 	 *											},
 	 *											"competition": {
 	 *												"id": "0cb4a362-a5dc-3b6e-b0b5-cd0a6581df8b",
-	 *												"name": "Marquis Daniel"
+	 *												"name": "Marquis Daniel",
+	 *     											"country": {
+	 *													"id": "dummy countryId",
+	 *													"name": "dummy countryName"
+	 *												}
 	 *											},
 	 *     										"stage": {
 	 * 												"id": "85f9ca63-a323-315f-89fa-98af94be5480"
@@ -333,6 +351,20 @@ interface TeamControllerInterface
 	 *                                 		property="name",
 	 *                                 		type="string",
 	 *                                 		example="Highland/Lowland"
+	 *                             		),
+	 *                                  @OA\Property(
+	 *                                 		property="country",
+	 *                                 		type="object",
+	 *                                  	@OA\Property(
+	 *                                 			property="id",
+	 *                                 			type="string",
+	 *                                 			example="v3m3cavrx4"
+	 *                             			),
+	 *                                  	@OA\Property(
+	 *                                 			property="name",
+	 *                                 			type="string",
+	 *                                 			example="Oberliga"
+	 *                             			),
 	 *                             		)
 	 *                             ),
 	 *     						   @OA\Property(
@@ -477,6 +509,20 @@ interface TeamControllerInterface
 	 *                              			property="name",
 	 *											type="string",
 	 *     										example="Waino Littel"
+	 * 										),
+	 *     									@OA\Property(
+	 *                              			property="country",
+	 *											type="object",
+	 *     										@OA\Property(
+	 *                              				property="id",
+	 *												type="string",
+	 *     											example="v5ytv42scm"
+	 * 											),
+	 *     										@OA\Property(
+	 *                              				property="name",
+	 *												type="string",
+	 *     											example="England"
+	 * 											),
 	 * 										),
 	 * 									),
 	 *      							@OA\Property(
